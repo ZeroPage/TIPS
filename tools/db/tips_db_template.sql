@@ -216,7 +216,7 @@ CREATE TABLE `problem` (
   `member_id` bigint(20) NOT NULL,
   `title` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time_limit` smallint(6) DEFAULT 0,
+  `time_limit` smallint(6) NOT NULL DEFAULT 0,
   `good_vote` bigint(20) NOT NULL DEFAULT 0,
   `bad_vote` bigint(20) NOT NULL DEFAULT 0,
   `hard_vote` bigint(20) NOT NULL DEFAULT 0,
@@ -273,4 +273,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-04  9:37:27
+-- Dump completed on 2020-10-04 14:35:08
