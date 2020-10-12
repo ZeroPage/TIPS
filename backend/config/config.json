@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "tips",
+    "password": "tips",
+    "database": "tips",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  },
+  "test": {
+    "username": "tips",
+    "password": "tips",
+    "database": "tips",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  },
+  "production": {
+    "username": "tips",
+    "password": "tips",
+    "database": "tips",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  }
+}
