@@ -1,42 +1,40 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('solves', {
-      id: {
+    await queryInterface.createTable('solve', {
+      solve_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      solve_id: {
         type: Sequelize.BIGINT
       },
       problem_id: {
+        allowNull: false,
         type: Sequelize.BIGINT
       },
       member_id: {
+        allowNull: false,
         type: Sequelize.BIGINT
       },
       content: {
+        allowNull: false,
         type: Sequelize.TEXT
       },
       date: {
-        type: Sequelize.DATE
-      },
-      duration: {
-        type: Sequelize.TIME
-      },
-      createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      duration: {
+        allowNull: false,
+        type: Sequelize.TIME
+      },
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('solves');
+    await queryInterface.dropTable('solve');
   }
 };

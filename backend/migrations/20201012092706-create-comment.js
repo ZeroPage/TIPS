@@ -1,20 +1,18 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('comments', {
-      id: {
+    await queryInterface.createTable('comment', {
+      comment_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      comment_id: {
         type: Sequelize.BIGINT
       },
       parent_id: {
         type: Sequelize.BIGINT
       },
       member_id: {
+        allowNull: false,
         type: Sequelize.BIGINT
       },
       problem_id: {
@@ -27,28 +25,24 @@ module.exports = {
         type: Sequelize.BIGINT
       },
       content: {
+        allowNull: false,
         type: Sequelize.TEXT
       },
       created: {
+        allowNull: false,
         type: Sequelize.DATE
       },
       good_vote: {
+        allowNull: false,
         type: Sequelize.BIGINT
       },
       bad_vote: {
+        allowNull: false,
         type: Sequelize.BIGINT
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('comments');
+    await queryInterface.dropTable('comment');
   }
 };
