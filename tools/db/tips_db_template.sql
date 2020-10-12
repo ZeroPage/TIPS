@@ -27,6 +27,8 @@ CREATE TABLE `answer` (
   `member_id` bigint(20) NOT NULL,
   `problem_id` bigint(20) NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reference` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   `good_vote` bigint(20) NOT NULL DEFAULT 0,
   `bad_vote` bigint(20) NOT NULL DEFAULT 0,
   PRIMARY KEY (`answer_id`),
@@ -55,7 +57,7 @@ DROP TABLE IF EXISTS `board`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `board` (
   `board_id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`board_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -84,6 +86,7 @@ CREATE TABLE `comment` (
   `answer_id` bigint(20) DEFAULT NULL,
   `document_id` bigint(20) DEFAULT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   `good_vote` bigint(20) NOT NULL DEFAULT 0,
   `bad_vote` bigint(20) NOT NULL DEFAULT 0,
   PRIMARY KEY (`comment_id`),
@@ -121,8 +124,10 @@ CREATE TABLE `document` (
   `board_id` bigint(20) NOT NULL,
   `category_id` bigint(20) NOT NULL,
   `member_id` bigint(20) NOT NULL,
-  `title` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reference` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   `good_vote` bigint(20) NOT NULL DEFAULT 0,
   `bad_vote` bigint(20) NOT NULL DEFAULT 0,
   PRIMARY KEY (`document_id`),
@@ -155,7 +160,7 @@ CREATE TABLE `document_category` (
   `category_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `parent_id` bigint(20) DEFAULT NULL,
   `board_id` bigint(20) NOT NULL,
-  `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`category_id`),
   KEY `parent_id` (`parent_id`),
   KEY `board_id` (`board_id`),
@@ -187,6 +192,7 @@ CREATE TABLE `member` (
   `email` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`member_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `nickname` (`nickname`),
@@ -214,9 +220,11 @@ CREATE TABLE `problem` (
   `problem_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `category_id` bigint(20) NOT NULL,
   `member_id` bigint(20) NOT NULL,
-  `title` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `time_limit` smallint(6) NOT NULL DEFAULT 0,
+  `reference` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   `good_vote` bigint(20) NOT NULL DEFAULT 0,
   `bad_vote` bigint(20) NOT NULL DEFAULT 0,
   `hard_vote` bigint(20) NOT NULL DEFAULT 0,
@@ -248,7 +256,7 @@ DROP TABLE IF EXISTS `problem_category`;
 CREATE TABLE `problem_category` (
   `category_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `parent_id` bigint(20) DEFAULT NULL,
-  `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`category_id`),
   KEY `parent_id` (`parent_id`),
   CONSTRAINT `problem_category_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `problem_category` (`category_id`)
@@ -263,6 +271,37 @@ LOCK TABLES `problem_category` WRITE;
 /*!40000 ALTER TABLE `problem_category` DISABLE KEYS */;
 /*!40000 ALTER TABLE `problem_category` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `solve`
+--
+
+DROP TABLE IF EXISTS `solve`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `solve` (
+  `solve_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `problem_id` bigint(20) NOT NULL,
+  `member_id` bigint(20) NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` datetime NOT NULL DEFAULT current_timestamp(),
+  `duration` time NOT NULL,
+  PRIMARY KEY (`solve_id`),
+  KEY `problem_id` (`problem_id`),
+  KEY `member_id` (`member_id`),
+  CONSTRAINT `solve_ibfk_1` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
+  CONSTRAINT `solve_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `solve`
+--
+
+LOCK TABLES `solve` WRITE;
+/*!40000 ALTER TABLE `solve` DISABLE KEYS */;
+/*!40000 ALTER TABLE `solve` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -273,4 +312,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-04 14:35:08
+-- Dump completed on 2020-10-12 17:11:53

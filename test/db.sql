@@ -4,10 +4,10 @@ DROP DATABASE IF EXISTS tips;
 CREATE DATABASE tips;
 USE tips;
 
--- GRANT ALL PRIVILEGES ON tips.* TO 'tips'@'localhost' IDENTIFIED BY '1';
--- GRANT ALL PRIVILEGES ON tips.* TO 'tips'@'127.0.0.1' IDENTIFIED BY '1';
--- GRANT ALL PRIVILEGES ON tips.* TO 'tips'@'::1' IDENTIFIED BY '1';
--- FLUSH PRIVILEGES;
+GRANT ALL PRIVILEGES ON tips.* TO 'tips'@'localhost' IDENTIFIED BY 'tips';
+GRANT ALL PRIVILEGES ON tips.* TO 'tips'@'127.0.0.1' IDENTIFIED BY 'tips';
+GRANT ALL PRIVILEGES ON tips.* TO 'tips'@'::1' IDENTIFIED BY 'tips';
+FLUSH PRIVILEGES;
 
 
 DROP TABLE IF EXISTS member;
@@ -17,14 +17,15 @@ CREATE TABLE member(
 	nickname VARCHAR(40) NOT NULL UNIQUE KEY,
 	email VARCHAR(180) NOT NULL UNIQUE KEY,
 	password VARCHAR(60) NOT NULL,
-	is_admin TINYINT(1) NOT NULL DEFAULT 0
+	is_admin TINYINT(1) NOT NULL DEFAULT 0,
+	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS problem_category;
 CREATE TABLE problem_category(
 	category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	parent_id BIGINT,
-	name VARCHAR(250) NOT NULL,
+	name VARCHAR(255) NOT NULL,
 
 	FOREIGN KEY(parent_id) REFERENCES problem_category(category_id)
 );
@@ -35,9 +36,11 @@ CREATE TABLE problem(
 	category_id BIGINT NOT NULL,
 	member_id BIGINT NOT NULL,
 
-	title VARCHAR(250) NOT NULL,
+	title VARCHAR(255) NOT NULL,
 	content LONGTEXT NOT NULL,
 	time_limit SMALLINT NOT NULL DEFAULT 0,
+	reference VARCHAR(4096),
+	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	good_vote BIGINT NOT NULL DEFAULT 0,
 	bad_vote BIGINT NOT NULL DEFAULT 0,
@@ -48,6 +51,20 @@ CREATE TABLE problem(
 	FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
+DROP TABLE IF EXISTS solve;
+CREATE TABLE solve(
+	solve_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	problem_id BIGINT NOT NULL,
+	member_id BIGINT NOT NULL,
+
+	content LONGTEXT NOT NULL,
+	date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	duration TIME NOT NULL,
+
+	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+	FOREIGN KEY(member_id) REFERENCES member(member_id)
+);
+
 DROP TABLE IF EXISTS answer;
 CREATE TABLE answer(
 	answer_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -55,6 +72,8 @@ CREATE TABLE answer(
 	problem_id BIGINT NOT NULL,
 
 	content LONGTEXT NOT NULL,
+	reference VARCHAR(4096),
+	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	good_vote BIGINT NOT NULL DEFAULT 0,
 	bad_vote BIGINT NOT NULL DEFAULT 0,
@@ -66,7 +85,7 @@ CREATE TABLE answer(
 DROP TABLE IF EXISTS board;
 CREATE TABLE board(
 	board_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	name VARCHAR(250) NOT NULL
+	name VARCHAR(255) NOT NULL
 );
 
 DROP TABLE IF EXISTS document_category;
@@ -75,7 +94,7 @@ CREATE TABLE document_category(
 	parent_id BIGINT,
 	board_id BIGINT NOT NULL,
 
-	name VARCHAR(250) NOT NULL,
+	name VARCHAR(255) NOT NULL,
 
 	FOREIGN KEY(parent_id) REFERENCES document_category(category_id),
 	FOREIGN KEY(board_id) REFERENCES board(board_id)
@@ -87,9 +106,11 @@ CREATE TABLE document(
 	board_id BIGINT NOT NULL,
 	category_id BIGINT NOT NULL,
 	member_id BIGINT NOT NULL,
-	
-	title VARCHAR(250) NOT NULL,
+
+	title VARCHAR(255) NOT NULL,
 	content LONGTEXT NOT NULL,
+	reference VARCHAR(4096),
+	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	good_vote BIGINT NOT NULL DEFAULT 0,
 	bad_vote BIGINT NOT NULL DEFAULT 0,
@@ -110,6 +131,7 @@ CREATE TABLE comment(
 	document_id BIGINT,
 
 	content LONGTEXT NOT NULL,
+	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	good_vote BIGINT NOT NULL DEFAULT 0,
 	bad_vote BIGINT NOT NULL DEFAULT 0,
@@ -130,6 +152,9 @@ INSERT INTO problem_category(name) VALUES('network');
 
 INSERT INTO problem(category_id, member_id, title, content) VALUES(1, 1, 'problem', 'problem');
 INSERT INTO problem(category_id, member_id, title, content) VALUES(1, 1, 'problem 2', 'problem 2');
+
+INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve', '00:10:00');
+INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve 2', '00:05:00');
 
 INSERT INTO answer(member_id, problem_id, content) VALUES(1, 1, 'answer');
 INSERT INTO answer(member_id, problem_id, content) VALUES(2, 1, 'answer 2');
