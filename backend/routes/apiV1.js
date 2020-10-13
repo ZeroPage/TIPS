@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var crypto = require('crypto');
 var models = require('../models');
 
 router.post('/member', function(req, res, next) {
