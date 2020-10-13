@@ -7,6 +7,7 @@ var logger = require('morgan');
 var session = require('express-session');
 var passport = require('passport');
 var mariadb = require('mariadb');
+var models = require('./models');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
