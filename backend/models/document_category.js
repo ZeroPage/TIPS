@@ -33,7 +33,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'document_category',
-    schema: 'tips'
+    schema: 'tips',
     timestamps: false,
     });
 };

@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'problem_category',
-    schema: 'tips'
+    schema: 'tips',
     timestamps: false,
     });
 };

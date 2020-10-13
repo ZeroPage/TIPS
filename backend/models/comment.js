@@ -75,7 +75,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'comment',
-    schema: 'tips'
+    schema: 'tips',
     timestamps: false,
     });
 };

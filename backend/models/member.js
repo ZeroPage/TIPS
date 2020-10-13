@@ -40,7 +40,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'member',
-    schema: 'tips'
+    schema: 'tips',
     timestamps: false,
     });
 };

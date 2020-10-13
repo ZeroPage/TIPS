@@ -42,7 +42,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'solve',
-    schema: 'tips'
+    schema: 'tips',
     timestamps: false,
     });
 };
