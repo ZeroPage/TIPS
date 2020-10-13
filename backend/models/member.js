@@ -1,30 +1,45 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class member extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+/* jshint indent: 2 */
+
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('member', {
+    member_id: {
+      autoIncrement: true,
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      primaryKey: true
+    },
+    username: {
+      type: DataTypes.STRING(80),
+      allowNull: false,
+      unique: "username"
+    },
+    nickname: {
+      type: DataTypes.STRING(40),
+      allowNull: false,
+      unique: "nickname"
+    },
+    email: {
+      type: DataTypes.STRING(180),
+      allowNull: false,
+      unique: "email"
+    },
+    password: {
+      type: DataTypes.STRING(60),
+      allowNull: false
+    },
+    is_admin: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 0
+    },
+    created: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.fn('current_timestamp')
     }
-  };
-  member.init({
-    member_id: DataTypes.BIGINT,
-    username: DataTypes.STRING(80),
-    nickname: DataTypes.STRING(40),
-    email: DataTypes.STRING(180),
-    password: DataTypes.STRING(60),
-    is_admin: DataTypes.BOOLEAN,
-    created: DataTypes.DATE(6)
   }, {
     sequelize,
-    modelName: 'member',
-    timestamps: false,
-  });
-  return member;
+    tableName: 'member',
+    schema: 'tips'
+    });
 };

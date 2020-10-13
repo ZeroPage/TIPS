@@ -1,26 +1,29 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class problem_category extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+/* jshint indent: 2 */
+
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('problem_category', {
+    category_id: {
+      autoIncrement: true,
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      primaryKey: true
+    },
+    parent_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      references: {
+        model: 'problem_category',
+        key: 'category_id'
+      },
+      unique: "problem_category_ibfk_1"
+    },
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: false
     }
-  };
-  problem_category.init({
-    category_id: DataTypes.BIGINT,
-    parent_id: DataTypes.BIGINT,
-    name: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'problem_category',
-    timestamps: false,
-  });
-  return problem_category;
+    tableName: 'problem_category',
+    schema: 'tips'
+    });
 };

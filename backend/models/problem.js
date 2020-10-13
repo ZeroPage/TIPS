@@ -1,37 +1,76 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class problem extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+/* jshint indent: 2 */
+
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('problem', {
+    problem_id: {
+      autoIncrement: true,
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      primaryKey: true
+    },
+    category_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'problem_category',
+        key: 'category_id'
+      },
+      unique: "problem_ibfk_1"
+    },
+    member_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'member',
+        key: 'member_id'
+      },
+      unique: "problem_ibfk_2"
+    },
+    title: {
+      type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    content: {
+      type: "LONGTEXT",
+      allowNull: false
+    },
+    time_limit: {
+      type: DataTypes.INTEGER(6),
+      allowNull: false,
+      defaultValue: 0
+    },
+    reference: {
+      type: DataTypes.STRING(4096),
+      allowNull: true
+    },
+    created: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.fn('current_timestamp')
+    },
+    good_vote: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0
+    },
+    bad_vote: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0
+    },
+    hard_vote: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0
+    },
+    easy_vote: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0
     }
-  };
-  problem.init({
-    problem_id: DataTypes.BIGINT,
-    category_id: DataTypes.BIGINT,
-    member_id: DataTypes.BIGINT,
-
-    title: DataTypes.STRING,
-    content: DataTypes.TEXT,
-    time_limit: DataTypes.INTEGER,
-    reference: DataTypes.TEXT,
-    created: DataTypes.DATE(6),
-
-    good_vote: DataTypes.BIGINT,
-    bad_vote: DataTypes.BIGINT,
-    hard_vote: DataTypes.BIGINT,
-    easy_vote: DataTypes.BIGINT
   }, {
     sequelize,
-    modelName: 'problem',
-    timestamps: false,
-  });
-  return problem;
+    tableName: 'problem',
+    schema: 'tips'
+    });
 };

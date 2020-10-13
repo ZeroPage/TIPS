@@ -1,33 +1,57 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class answer extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+/* jshint indent: 2 */
+
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('answer', {
+    answer_id: {
+      autoIncrement: true,
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      primaryKey: true
+    },
+    member_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'member',
+        key: 'member_id'
+      },
+      unique: "answer_ibfk_1"
+    },
+    problem_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'problem',
+        key: 'problem_id'
+      },
+      unique: "answer_ibfk_2"
+    },
+    content: {
+      type: "LONGTEXT",
+      allowNull: false
+    },
+    reference: {
+      type: DataTypes.STRING(4096),
+      allowNull: true
+    },
+    created: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.fn('current_timestamp')
+    },
+    good_vote: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0
+    },
+    bad_vote: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0
     }
-  };
-  answer.init({
-    answer_id: DataTypes.BIGINT,
-    member_id: DataTypes.BIGINT,
-    problem_id: DataTypes.BIGINT,
-
-    content: DataTypes.TEXT,
-    reference: DataTypes.STRING(4096),
-    created: DataTypes.DATE(6),
-
-    good_vote: DataTypes.BIGINT,
-    bad_vote: DataTypes.BIGINT
   }, {
     sequelize,
-    modelName: 'answer',
-    timestamps: false,
-  });
-  return answer;
+    tableName: 'answer',
+    schema: 'tips'
+    });
 };
