@@ -53,5 +53,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'answer',
     schema: 'tips'
+    timestamps: false,
     });
 };

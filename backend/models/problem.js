@@ -72,5 +72,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'problem',
     schema: 'tips'
+    timestamps: false,
     });
 };

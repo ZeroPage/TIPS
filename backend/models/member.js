@@ -41,5 +41,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'member',
     schema: 'tips'
+    timestamps: false,
     });
 };
