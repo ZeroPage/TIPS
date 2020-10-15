@@ -20,10 +20,14 @@ import React from "react";
 // reactstrap components
 import { Button, Card, Container, Form, Input, Row, Col } from "reactstrap";
 
+// CKEditor component
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
-class Profile extends React.Component {
+class ProblemEdit extends React.Component {
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -73,21 +77,12 @@ class Profile extends React.Component {
                       id="exampleFormControlInput1"
                       placeholder="제목"
                       rows="1"
-                      type="textarea"
+                      type="text"
                     />
                     <br />
-                    <Input
-                      id="exampleFormControlTextarea1"
-                      placeholder="내용"
-                      rows="10"
-                      type="textarea"
-                    />
-                    <br />
-                    <Input
-                      id="exampleFormControlTextarea1"
-                      placeholder="답변"
-                      rows="10"
-                      type="textarea"
+                    <CKEditor
+                      id="exampleFormControlEditor"
+                      editor={ ClassicEditor }
                     />
                     <div className="text-center">
                       <Button
@@ -119,4 +114,4 @@ class Profile extends React.Component {
   }
 }
 
-export default Profile;
+export default ProblemEdit;
