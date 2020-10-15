@@ -26,6 +26,7 @@ import "assets/scss/argon-design-system-react.scss?v1.1.0";
 import Index from "views/Index.js";
 import Login from "views/Login.js";
 import Register from "views/Register.js";
+import ProblemEdit from "views/ProblemEdit.js";
 import Landing from "views/examples/Landing.js";
 import Profile from "views/examples/Profile.js";
 
@@ -44,11 +45,8 @@ ReactDOM.render(
         exact
         render={props => <Profile {...props} />}
       />
-      <Route
-        path="/register-page"
-        exact
-        render={props => <Register {...props} />}
-      />
+      <Route path="/register-page" exact render={props => <Register {...props} />} />
+      <Route path="/problem-edit-page" exact render={props => <ProblemEdit {...props} />} />
       <Redirect to="/" />
     </Switch>
   </BrowserRouter>,
