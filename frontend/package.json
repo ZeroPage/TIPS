@@ -48,6 +48,8 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^23.0.0",
+    "@ckeditor/ckeditor5-react": "^2.1.0",
     "bootstrap": "4.3.1",
     "classnames": "2.2.6",
     "headroom.js": "0.11.0",
