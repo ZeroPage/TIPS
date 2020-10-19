@@ -23,7 +23,7 @@ import { Card, Container, Form, Row, Col } from "reactstrap";
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
-class Profile extends React.Component {
+class ProblemList extends React.Component {
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -127,4 +127,4 @@ class Profile extends React.Component {
   }
 }
 
-export default Profile;
+export default ProblemList;

@@ -23,7 +23,7 @@ import { Button, Card, Container, Form, Input, Modal, PopoverBody, UncontrolledP
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
-class Profile extends React.Component {
+class ProblemView extends React.Component {
   state = {
     exampleModal: false,
     time: 10
@@ -171,4 +171,4 @@ class Profile extends React.Component {
   }
 }
 
-export default Profile;
+export default ProblemView;

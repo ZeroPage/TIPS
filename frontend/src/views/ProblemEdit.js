@@ -27,14 +27,14 @@ import {
   Row,
   Col } from "reactstrap";
 
-// core components
-import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
-
-// CKEditor
+// CKEditor component
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-class Profile extends React.Component {
+// core components
+import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
+
+class ProblemEdit extends React.Component {
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -160,4 +160,4 @@ class Profile extends React.Component {
   }
 }
 
-export default Profile;
+export default ProblemEdit;
