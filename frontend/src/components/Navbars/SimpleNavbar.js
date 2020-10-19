@@ -31,12 +31,10 @@ import {
   NavbarBrand,
   Navbar,
   NavItem,
-  NavLink,
   Nav,
   Container,
   Row,
-  Col,
-  UncontrolledTooltip
+  Col
 } from "reactstrap";
 
 class DemoNavbar extends React.Component {
@@ -110,68 +108,26 @@ class DemoNavbar extends React.Component {
                   </Row>
                 </div>
                 <Nav className="navbar-nav-hover align-items-lg-center" navbar>
+                  <span>&emsp;</span>
                   <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-ui-04 d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">분야별 보기</span>
-                    </DropdownToggle>
-                    <DropdownMenu className="dropdown-menu-xl">
-                      <div className="dropdown-menu-inner">
-                        <Media
-                          className="d-flex align-items-center"
-                          href="https://demos.creative-tim.com/argon-design-system-react/#/documentation/overview?ref=adsr-navbar"
-                          target="_blank">
-                          <div className="icon icon-shape bg-gradient-primary rounded-circle text-white">
-                            <i className="ni ni-money-coins" />
-                          </div>
-                          <Media body className="ml-3">
-                            <h6 className="heading text-primary mb-md-1">
-                              Database System
-                            </h6>
-                          </Media>
-                        </Media>
-                        <Media
-                          className="d-flex align-items-center"
-                          href="https://demos.creative-tim.com/argon-design-system-react/#/documentation/colors?ref=adsr-navbar"
-                          target="_blank">
-                          <div className="icon icon-shape bg-gradient-success rounded-circle text-white">
-                            <i className="ni ni-laptop" />
-                          </div>
-                          <Media body className="ml-3">
-                            <h6 className="heading text-primary mb-md-1">
-                              Operating System
-                            </h6>
-                          </Media>
-                        </Media>
-                        <Media
-                          className="d-flex align-items-center"
-                          href="https://demos.creative-tim.com/argon-design-system-react/#/documentation/alert?ref=adsr-navbar"
-                          target="_blank">
-                          <div className="icon icon-shape bg-gradient-warning rounded-circle text-white">
-                            <i className="ni ni-sound-wave" />
-                          </div>
-                          <Media body className="ml-3">
-                            <h5 className="heading text-warning mb-md-1">
-                              Computer Network
-                            </h5>
-                          </Media>
-                        </Media>
-                      </div>
-                    </DropdownMenu>
+                    <i className="ni ni-ui-04 d-lg-none mr-1" />
+                    <span className="nav-link-inner--text">
+                      <a href="/problem-list-page" className="text-white">문제 보기</a>
+                    </span>
                   </UncontrolledDropdown>
+                  <span>&emsp;&emsp;</span>
                   <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">커뮤니티</span>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      <DropdownItem to="/landing-page" tag={Link}>
-                        서비스 소개
-                      </DropdownItem>
-                      <DropdownItem to="/profile-page" tag={Link}>
-                        프로필
-                      </DropdownItem>
-                    </DropdownMenu>
+                    <i className="ni ni-ui-04 d-lg-none mr-1" />
+                    <span className="nav-link-inner--text">
+                      <a href="" className="text-white">문제 검색</a>
+                    </span>
+                  </UncontrolledDropdown>
+                  <span>&emsp;&emsp;</span>
+                  <UncontrolledDropdown nav>
+                    <i className="ni ni-ui-04 d-lg-none mr-1" />
+                    <span className="nav-link-inner--text">
+                      <a href="" className="text-white">그룹 보기</a>
+                    </span>
                   </UncontrolledDropdown>
                 </Nav>
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>

@@ -19,14 +19,12 @@
 import React from "react";
 // reactstrap components
 import {
-  Button,
   NavItem,
   NavLink,
   Nav,
   Container,
   Row,
-  Col,
-  UncontrolledTooltip
+  Col
 } from "reactstrap";
 
 class SimpleFooter extends React.Component {

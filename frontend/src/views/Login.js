@@ -34,7 +34,6 @@ import {
 } from "reactstrap";
 
 // core components
-import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
 class Login extends React.Component {
   componentDidMount() {

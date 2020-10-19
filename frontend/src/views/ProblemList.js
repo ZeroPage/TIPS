@@ -18,21 +18,10 @@
 import React from "react";
 
 // reactstrap components
-import {
-  Button,
-  Card,
-  Container,
-  Form,
-  Input,
-  Row,
-  Col } from "reactstrap";
+import { Card, Container, Form, Row, Col } from "reactstrap";
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
-
-// CKEditor
-import CKEditor from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 class Profile extends React.Component {
   componentDidMount() {
@@ -87,66 +76,44 @@ class Profile extends React.Component {
             <Card className="card-profile shadow mt--300">
               <div className="px-4">
                 <Form>
-                  <Container className="mb-5">
-                    <br />
-                    <h1 className="display-3 text-center">문제 수정</h1>
-                    <br />
-                    <Row>
-                      <Col lg="12">
-                        <Input
-                          id="exampleFormControlInput1"
-                          placeholder="제목"
-                          rows="1"
-                        />
-                      </Col>
-                    </Row>
-                    <br />
-                    <Row>
-                      <Col lg="6">
-                        <Input placeholder="문제 분야" type="text" />
-                      </Col>
-                      <Col lg="6">
-                        <Input placeholder="난이도" type="text" />
-                      </Col>
-                    </Row>
-                    <br />
-                    <CKEditor
-                      editor={ ClassicEditor }
-                      data={"문제 내용"}
-                      onInit={ editor => {
-                          // You can store the "editor" and use when it is needed.
-                          console.log( 'Editor is ready to use!', editor );
-                      } }
-                      onChange={ ( event, editor ) => {
-                          const data = editor.getData();
-                          console.log( { event, editor, data } );
-                      } }
-                      onBlur={ ( event, editor ) => {
-                          console.log( 'Blur.', editor );
-                      } }
-                      onFocus={ ( event, editor ) => {
-                          console.log( 'Focus.', editor );
-                      } }
-                    />
-                    <br />
-                    <div className="text-center">
-                      <Button
-                        className="mt-4"
-                        color="primary"
-                        type="button"
-                      >
-                        작성완료
-                      </Button>
-                      <Button
-                        className="mt-4"
-                        color="primary"
-                        type="button"
-                        href="/"
-                      >
-                        돌아가기
-                      </Button>
-                      <br />
-                    </div>
+                  <br />
+                    <h1 className="display-3 text-center">문제 목록</h1>
+                  <br />
+                  <Container>
+                    <table class="table-bordered table-striped table">
+                      <thead>
+                        <tr>
+                          <th class="text-center">No.</th>
+                          <th class="text-center">문제 이름</th>
+                          <th class="text-center">답변 수</th>
+                          <th class="text-center">분야</th>
+                          <th class="text-center">난이도</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1</td>
+                          <td><a href="/problem-view-page">Hello world!</a></td>
+                          <td>3</td>
+                          <td>기초</td>
+                          <td>1</td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td><a href="/problem-view-page">프로세스와 쓰레드의 차이는?</a></td>
+                          <td>2</td>
+                          <td>운영체제</td>
+                          <td>3</td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td><a href="/problem-view-page">UDP와 TCP의 차이는?</a></td>
+                          <td>0</td>
+                          <td>네트워크</td>
+                          <td>3</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </Container>
                 </Form>
               </div>

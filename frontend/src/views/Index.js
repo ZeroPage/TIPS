@@ -17,9 +17,6 @@
 */
 import React from "react";
 
-// reactstrap components
-import { Container, Row } from "reactstrap";
-
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 import SimpleFooter from "components/Footers/SimpleFooter.js";

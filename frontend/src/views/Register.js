@@ -21,7 +21,6 @@ import React from "react";
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
   FormGroup,
   Form,
@@ -35,8 +34,6 @@ import {
 } from "reactstrap";
 
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.js";
-import SimpleFooter from "components/Footers/SimpleFooter.js";
 
 class Register extends React.Component {
   componentDidMount() {
@@ -110,12 +107,23 @@ class Register extends React.Component {
                             />
                           </InputGroup>
                         </FormGroup>
+                        <FormGroup>
+                          <InputGroup className="input-group-alternative">
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>
+                                <i className="ni ni-lock-circle-open" />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder="비밀번호 확인"
+                              type="password"
+                              autoComplete="off"
+                            />
+                          </InputGroup>
+                        </FormGroup>
                         <div className="text-muted font-italic">
-                          <small>
-                            암호화 수준:{" "}
-                            <span className="text-success font-weight-700">
-                              안전
-                            </span>
+                          <small className="text-danger">
+                            암호가 일치하지 않습니다.
                           </small>
                         </div>
                         <Row className="my-4">
@@ -133,7 +141,7 @@ class Register extends React.Component {
                                 <span>
                                   <a
                                     href="#pablo"
-                                    onClick={e => e.preventDefault()}
+                                    //onClick={e => e.preventDefault()}
                                   >
                                     개인정보 정책
                                   </a>
