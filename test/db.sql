@@ -1,4 +1,5 @@
 -- Foreign keys will be removed soon. They are provided just for easy understanding of relations.
+-- Triggers will be added soon.
 
 DROP DATABASE IF EXISTS tips;
 CREATE DATABASE tips;
@@ -42,10 +43,8 @@ CREATE TABLE problem(
 	reference VARCHAR(4096),
 	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	good_vote BIGINT NOT NULL DEFAULT 0,
-	bad_vote BIGINT NOT NULL DEFAULT 0,
-	hard_vote BIGINT NOT NULL DEFAULT 0,
-	easy_vote BIGINT NOT NULL DEFAULT 0,
+	vote BIGINT NOT NULL DEFAULT 0,
+	difficulty TINYINT(1) NOT NULL CHECK(difficulty >= 1 AND difficulty <= 5),
 
 	FOREIGN KEY(category_id) REFERENCES problem_category(category_id),
 	FOREIGN KEY(member_id) REFERENCES member(member_id)
@@ -68,18 +67,17 @@ CREATE TABLE solve(
 DROP TABLE IF EXISTS answer;
 CREATE TABLE answer(
 	answer_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	member_id BIGINT NOT NULL,
 	problem_id BIGINT NOT NULL,
+	member_id BIGINT NOT NULL,
 
 	content LONGTEXT NOT NULL,
 	reference VARCHAR(4096),
 	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	good_vote BIGINT NOT NULL DEFAULT 0,
-	bad_vote BIGINT NOT NULL DEFAULT 0,
+	vote BIGINT NOT NULL DEFAULT 0,
 
-	FOREIGN KEY(member_id) REFERENCES member(member_id),
-	FOREIGN KEY(problem_id) REFERENCES problem(problem_id)
+	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+	FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
 DROP TABLE IF EXISTS board;
@@ -112,8 +110,7 @@ CREATE TABLE document(
 	reference VARCHAR(4096),
 	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	good_vote BIGINT NOT NULL DEFAULT 0,
-	bad_vote BIGINT NOT NULL DEFAULT 0,
+	vote BIGINT NOT NULL DEFAULT 0,
 
 	FOREIGN KEY(board_id) REFERENCES board(board_id),
 	FOREIGN KEY(category_id) REFERENCES document_category(category_id),
@@ -133,8 +130,7 @@ CREATE TABLE comment(
 	content LONGTEXT NOT NULL,
 	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	good_vote BIGINT NOT NULL DEFAULT 0,
-	bad_vote BIGINT NOT NULL DEFAULT 0,
+	vote BIGINT NOT NULL DEFAULT 0,
 
 	FOREIGN KEY(parent_id) REFERENCES comment(comment_id),
 	FOREIGN KEY(member_id) REFERENCES member(member_id),
@@ -143,6 +139,38 @@ CREATE TABLE comment(
 	FOREIGN KEY(document_id) REFERENCES document(document_id)
 );
 
+DROP TABLE IF EXISTS vote;
+CREATE TABLE vote(
+	vote_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    member_id BIGINT NOT NULL,
+
+    problem_id BIGINT,
+    document_id BIGINT,
+    comment_id BIGINT,
+
+    type VARCHAR(10) NOT NULL CHECK(type IN ('good', 'bad')),
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY(member_id) REFERENCES member(member_id),
+	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(document_id) REFERENCES document(document_id),
+    FOREIGN KEY(comment_id) REFERENCES comment(comment_id)
+);
+
+DROP TABLE IF EXISTS difficulty;
+CREATE TABLE difficulty(
+    difficulty_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    problem_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
+
+	difficulty TINYINT(1) NOT NULL CHECK(difficulty >= 1 AND difficulty <= 5),
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id)
+);
+
+
 -- Test
 INSERT INTO member(username, nickname, email, password, is_admin) VALUES('admin', 'admin', 'admin@test.test', 'admin', 1);
 INSERT INTO member(username, nickname, email, password) VALUES('test', 'test', 'test@test.test', 'test');
@@ -150,14 +178,14 @@ INSERT INTO member(username, nickname, email, password) VALUES('test', 'test', '
 INSERT INTO problem_category(name) VALUES('os');
 INSERT INTO problem_category(name) VALUES('network');
 
-INSERT INTO problem(category_id, member_id, title, content) VALUES(1, 1, 'problem', 'problem');
-INSERT INTO problem(category_id, member_id, title, content) VALUES(1, 1, 'problem 2', 'problem 2');
+INSERT INTO problem(category_id, member_id, title, content, difficulty) VALUES(1, 1, 'problem', 'problem', 3);
+INSERT INTO problem(category_id, member_id, title, content, difficulty) VALUES(1, 1, 'problem 2', 'problem 2', 3);
 
 INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve', '00:10:00');
 INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve 2', '00:05:00');
 
-INSERT INTO answer(member_id, problem_id, content) VALUES(1, 1, 'answer');
-INSERT INTO answer(member_id, problem_id, content) VALUES(2, 1, 'answer 2');
+INSERT INTO answer(problem_id, member_id, content) VALUES(1, 1, 'answer');
+INSERT INTO answer(problem_id, member_id, content) VALUES(1, 2, 'answer 2');
 
 INSERT INTO board(name) VALUES('notice');
 INSERT INTO board(name) VALUES('free');
@@ -172,4 +200,11 @@ INSERT INTO document(board_id, category_id, member_id, title, content) VALUES(2,
 INSERT INTO document(board_id, category_id, member_id, title, content) VALUES(3, 1, 2, 'qna', 'qna');
 
 INSERT INTO comment(parent_id, member_id, document_id, content) VALUES(NULL, 2, 1, 'comment');
-INSERT INTO comment(parent_id, member_id, document_id, content) VALUES(1, 2, 1, 'comment 2');
+INSERT INTO comment(parent_id, member_id, document_id, content) VALUES(1, 1, 1, 'comment 2');
+
+INSERT INTO vote(member_id, problem_id, type) VALUES(1, 1, 'good');
+INSERT INTO vote(member_id, document_id, type) VALUES(2, 1, 'bad');
+INSERT INTO vote(member_id, comment_id, type) VALUES(2, 2, 'good');
+
+INSERT INTO difficulty(problem_id, member_id, difficulty) VALUES(1, 1, 4);
+INSERT INTO difficulty(problem_id, member_id, difficulty) VALUES(1, 2, 2);
