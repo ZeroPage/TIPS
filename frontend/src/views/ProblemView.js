@@ -106,6 +106,7 @@ class ProblemView extends React.Component {
                 <Form>
                   <br />
                   <h1 className="display-3 text-center">문제 보기</h1>
+                  <h2 className="display-5 text-center">No.1 - Hello World</h2>
                   <br />
                   <h2 className="display-5">문제</h2>
                   <p className="lead">
