@@ -117,7 +117,9 @@ class Register extends React.Component {
     fetch("http://localhost:3000/api/v1/member", {
       method: 'POST',
       redirect: 'follow',
-      headers: new Headers().append("Content-Type", "application/json"),
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         "username": this.state.userName,
         "nickname": this.state.nickName,
@@ -125,13 +127,10 @@ class Register extends React.Component {
         "password": this.state.password
       })
     })
-    .then(res => {
-      console.log(res.statusText);
-      return res.json();
-    })
+    .then(res => res.json())
     .then(
       (result) => {
-        if(result.items.success === "OK")
+        if(result.success === "ok")
         {
           this.setState({check: <><br /><Alert className="alert-success">회원가입이 완료되었습니다.</Alert></>});
           setInterval(() => this.redirect(), 2000);
@@ -179,7 +178,9 @@ class Register extends React.Component {
                 <Col lg="5">
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
-                      <div className="text-center text-muted mb-4">TIPS 회원가입</div>
+                      <h1 className="display-3 text-center">TIPS 회원가입</h1>
+                      {this.state.check}
+                      <br />
                       <Form role="form">
                         <FormGroup>
                           <InputGroup className="input-group-alternative mb-3">
@@ -261,10 +262,9 @@ class Register extends React.Component {
                             type="button"
                             href="/"
                           >
-                            돌아가기
+                            메인으로
                           </Button>
                         </div>
-                        {this.state.check}
                       </Form>
                     </CardBody>
                   </Card>

@@ -61,7 +61,8 @@ class Login extends React.Component {
                 <Col lg="5">
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
-                      <div className="text-center text-muted mb-4">TIPS 로그인</div>
+                      <h1 className="display-3 text-center">TIPS 로그인</h1>
+                      <br />
                       <Form role="form">
                         <FormGroup className="mb-3">
                           <InputGroup className="input-group-alternative">
@@ -114,7 +115,7 @@ class Login extends React.Component {
                             type="button"
                             href="/"
                           >
-                            돌아가기
+                            메인으로
                           </Button>
                         </div>
                       </Form>

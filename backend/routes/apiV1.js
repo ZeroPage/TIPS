@@ -77,6 +77,7 @@ router.get('/problem', function(req, res, next) {
   models.problem.findAll({
     attributes: ['problem_id', 'category_id', 'member_id', 'title', 'created',
       'good_vote', 'bad_vote', 'hard_vote', 'easy_vote'],
+      'vote', 'difficulty'],
   })
   .then(problems => {
     res.json({

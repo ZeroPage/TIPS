@@ -25,13 +25,13 @@ import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
 class ProblemView extends React.Component {
   state = {
-    exampleModal: false,
-    time: 10
+    isShare: false,
+    time: 30
   };
 
   toggleModal = () => {
     this.setState({
-      exampleModal: !this.state.exampleModal
+      isShare: !this.state.isShare
     });
   };
 
@@ -136,7 +136,7 @@ class ProblemView extends React.Component {
                       </Button>
                       <Modal
                         className="modal-dialog-centered"
-                        isOpen={this.state.exampleModal}
+                        isOpen={this.state.isShare}
                         toggle={() => this.toggleModal()}
                       >
                         <div className="modal-header">
