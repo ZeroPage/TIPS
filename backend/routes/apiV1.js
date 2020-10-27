@@ -100,10 +100,8 @@ router.get('/problem/:problem_id', function(req, res, next) {
         time_limit: problem.time_limit,
         created: problem.created,
         reference: problem.reference,
-        good_vote: problem.good_vote,
-        bad_vote: problem.bad_vote,
-        hard_vote: problem.hard_vote,
-        easy_vote: problem.easy_vote,
+        vote: problem.vote,
+        difficulty: problem.difficulty
       });
     } else {
       res.json({ success: 'fail' });

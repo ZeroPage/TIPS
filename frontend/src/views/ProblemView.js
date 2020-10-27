@@ -24,10 +24,22 @@ import { Button, Card, Container, Form, Input, Modal, PopoverBody, UncontrolledP
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
 class ProblemView extends React.Component {
-  state = {
-    isShare: false,
-    time: 30
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: "",
+      memberId: "",
+      categoryId: "",
+      timeLimit: "",
+      reference: "",
+      content: "",
+      difficulty: "",
+      vote: "",
+      problemId: this.props.match.params.id,
+      isShare: false,
+      time: ""
+    };
+  }
 
   toggleModal = () => {
     this.setState({
@@ -47,16 +59,62 @@ class ProblemView extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+
+    fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          this.setState({
+            title: result.title,
+            memberId: result.member_id,
+            categoryId: result.category_id,
+            timeLimit: result.time_limit,
+            reference: result.reference,
+            content: result.content,
+            difficulty: result.difficulty,
+            vote: result.vote,
+            time: result.time_limit
+          });
+        }
+      },
+      (error) => console.log(error)
+    )
+
     setInterval(() => this.tick(), 1000);
   }
 
   render() {
-    let answer = <br />;
+    let answerPanel = <br />;
     if (this.state.time === 0) {
-      answer = <div>
-        <h2 className="display-5">답변</h2>
-        <p className="lead">Hello World!</p>
-      </div>;
+      let answer = "";
+      console.log(this.state.problemId);
+      if (this.state.problemId == 1) {
+        answer = "<p>Hello World!</p>";
+      }
+      else if (this.state.problemId == 2) {
+        answer = "<p>1. 표준 프로토콜을 사용"
+        + "<br>2. 작은 소리를 크게 변환 -  리피터 설치 증폭 / 작은 소리도 이해 가능 - 복조기 성능 향상"
+        + "<br>3. 빠른 속도의 조절 필요 - 반송파 신호 조정 / 빠른 속도도 이해 가능 - 반송파 신호 중첩"
+        + "<br>4. 한사람만 발언 허용 - 반이중 기술 적용/ 동시에 발언 가능 - 전이중 기술 적용"
+        + "<br>5.물이 아닌 전송매체 변화 - 무선통신 매체사용 / 물속 에서도 대화 가능 - 음파통신 매체사용<\p>";
+      }
+      else {
+        answer = "답변이 등록 되어있지 않습니다.";
+      }
+
+      answerPanel = (
+        <div>
+          <h2 className="display-5">답변</h2>
+          <div dangerouslySetInnerHTML={{ __html: answer }}></div>
+        </div>
+      );
     }
     return (
       <>
@@ -106,13 +164,16 @@ class ProblemView extends React.Component {
                 <Form>
                   <br />
                   <h1 className="display-3 text-center">문제 보기</h1>
-                  <h2 className="display-5 text-center">No.1 - Hello World</h2>
+                  <h2 className="display-5 text-center">No.{this.state.problemId} - {this.state.title}</h2>
                   <br />
                   <h2 className="display-5">문제</h2>
                   <p className="lead">
-                    Hello World!
+                    <div dangerouslySetInnerHTML={{ __html: this.state.content }}>
+                    </div>
                   </p>
                   <p className="text-center">
+                    출처 : {this.state.reference}
+                  <br />
                     남은 시간 : {this.state.time} sec
                   </p>
                   <div className="text-center">
@@ -128,11 +189,14 @@ class ProblemView extends React.Component {
                           Hello World!
                         </PopoverBody>
                       </UncontrolledPopover>
-                      <Button color="default" type="button" href="/problem-edit-page">
+                      <Button color="default" type="button" href={"/problem-edit-page/" + this.state.problemId}>
                         문제 수정
                       </Button>
                       <Button color="default" type="button" onClick={() => this.toggleModal()}>
                         공유 하기
+                      </Button>
+                      <Button color="default" type="button" onClick={() => this.setState({time:0})}>
+                        답안 확인
                       </Button>
                       <Modal
                         className="modal-dialog-centered"
@@ -158,7 +222,7 @@ class ProblemView extends React.Component {
                         </div>
                       </Modal>
                   </div>
-                  {answer}
+                  {answerPanel}
                   <br />
                 </Form>
               </div>

@@ -46,7 +46,8 @@ class ProblemEdit extends React.Component {
       reference: "",
       content: "",
       problemId: this.props.match.params.id,
-      check: ""
+      check: "",
+      category: []
     };
 
     if(this.state.problemId === undefined) {
@@ -164,7 +165,6 @@ class ProblemEdit extends React.Component {
       .then(res => res.json())
       .then(
         (result) => {
-          console.log(result);
           if(result.success === "ok") {
             this.setState({check: <><br /><Alert className="alert-success">문제 추가가 완료되었습니다</Alert></>});
             setInterval(() => this.redirect(), 2000);
@@ -187,10 +187,29 @@ class ProblemEdit extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+    
+    fetch("http://localhost:3000/api/v1/problem/category", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          this.setState({
+            category: result.category
+          });
+        }
+      },
+      (error) => console.log(error)
+    )
 
     if(this.state.problemId !== 0)
     {
-      fetch("http://localhost:3000/api/v1/problem" + this.state.problemId, {
+      fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json"
@@ -199,7 +218,6 @@ class ProblemEdit extends React.Component {
       .then(res => res.json())
       .then(
         (result) => {
-          console.log(result)
           if(result.success === "ok")
           {
             this.setState({
@@ -286,7 +304,16 @@ class ProblemEdit extends React.Component {
                     <br />
                     <Row>
                       <Col lg="4">
-                        <Input placeholder="문제 분야" type="text" value={this.state.categoryId} onChange={this.handleCategoryId} />
+                        <Input type="select" name="분류 선택" value={this.state.categoryId} onChange={this.handleCategoryId}>
+                          {
+                            this.state.category &&
+                            this.state.category.map(item => (
+                              <option value={item.category_id}>
+                                {item.name}
+                              </option>
+                            ))
+                          }
+                        </Input>
                       </Col>
                       <Col lg="4">
                         <Input placeholder="시간 제한" type="text" value={this.state.timeLimit} onChange={this.handleTimeLimit} />
@@ -297,9 +324,9 @@ class ProblemEdit extends React.Component {
                     </Row>
                     <br />
                     <CKEditor
-                      editor={ ClassicEditor }
-                      data={ "문제 내용" }
-                      onChange={ ( event, editor ) => {
+                      editor={ClassicEditor}
+                      data={this.state.content}
+                      onChange={(event, editor) => {
                           let data = editor.getData();
                           this.setState({content: data});
                       }}

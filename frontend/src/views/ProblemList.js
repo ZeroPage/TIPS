@@ -28,6 +28,7 @@ class ProblemList extends React.Component {
     super(props);
     this.state = {
       items: [],
+      category: [],
       isConnect: false,
       isLogin: true
     };
@@ -59,7 +60,33 @@ class ProblemList extends React.Component {
       },
       (error) => console.log(error)
     )
+
+    fetch("http://localhost:3000/api/v1/problem/category", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          let temp_category = [];
+          result.category.forEach(element => {
+            temp_category[element.category_id] = element.name;
+          });
+          this.setState({
+            category: temp_category
+          });
+          return;
+        }
+        else return;
+      },
+      (error) => console.log(error)
+    )
   }
+
   render() {
     return (
       <>
@@ -121,12 +148,12 @@ class ProblemList extends React.Component {
                       <table class="table-bordered table-striped table">
                       <thead>
                         <tr>
-                          <th class="text-center" width="100">No.</th>
+                          <th class="text-center" width="75">No.</th>
                           <th class="text-center">문제 이름</th>
-                          <th class="text-center" width="150">분야</th>
-                          <th class="text-center" width="100">난이도</th>
-                          <th class="text-center" width="200">출제자</th>
-                          <th class="text-center" width="100">비고</th>
+                          <th class="text-center" width="100">분야</th>
+                          <th class="text-center" width="75">난도</th>
+                          <th class="text-center" width="100">출제자</th>
+                          <th class="text-center" width="75">비고</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -134,12 +161,12 @@ class ProblemList extends React.Component {
                         this.state.items &&
                         this.state.items.map(item => (
                         <tr>
-                          <td>{item.problem_id}</td>
-                          <td><a href={"problem-view-page/"+item.problem_id}>{item.title}</a></td>
-                          <td>{item.category_id}</td>
-                          <td>{item.difficulty}</td>
-                          <td>{item.member_id}</td>
-                          <td>{}</td>
+                          <td class="text-center">{item.problem_id}</td>
+                          <td class="text-center"><a href={"problem-view-page/"+item.problem_id}>{item.title}</a></td>
+                          <td class="text-center">{this.state.category[item.category_id]}</td>
+                          <td class="text-center">{item.difficulty}</td>
+                          <td class="text-center">{}</td>
+                          <td class="text-center">{}</td>
                         </tr>
                         ))
                       }
