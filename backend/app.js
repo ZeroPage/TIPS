@@ -6,6 +6,7 @@ var methodOverride = require('method-override');
 var logger = require('morgan');
 var session = require('express-session');
 var passport = require('passport');
+var passportConfig = require('./passport');
 var cors = require('cors')
 
 var indexRouter = require('./routes/index');
@@ -27,6 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser('tips_cookieParser_secret_key'));
 app.use(session({ secret: 'tips_session_secret_key', resave: false, saveUninitialized: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
