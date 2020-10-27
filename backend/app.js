@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
-var bodyParser  = require('body-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var passport = require('passport');
@@ -21,17 +20,14 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.use(cors());
 app.use(logger('dev'));
+app.use(methodOverride());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser('tips_cookieParser_secret_key'));
 app.use(session({ secret: 'tips_session_secret_key', resave: false, saveUninitialized: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(cors());
-app.use(methodOverride());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
