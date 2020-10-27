@@ -61,7 +61,8 @@ class Login extends React.Component {
                 <Col lg="5">
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
-                      <div className="text-center text-muted mb-4">TIPS 로그인</div>
+                      <h1 className="display-3 text-center">TIPS 로그인</h1>
+                      <br />
                       <Form role="form">
                         <FormGroup className="mb-3">
                           <InputGroup className="input-group-alternative">
@@ -114,7 +115,7 @@ class Login extends React.Component {
                             type="button"
                             href="/"
                           >
-                            돌아가기
+                            메인으로
                           </Button>
                         </div>
                       </Form>
@@ -124,7 +125,7 @@ class Login extends React.Component {
                     <Col xs="6">
                       <a
                         className="text-light"
-                        href="#pablo"
+                        //href="#pablo"
                         onClick={e => e.preventDefault()}
                       >
                         <small>비밀번호 찾기</small>
@@ -133,8 +134,7 @@ class Login extends React.Component {
                     <Col className="text-right" xs="6">
                       <a
                         className="text-light"
-                        href="#pablo"
-                        onClick={e => e.preventDefault()}
+                        href="/register-page"
                       >
                         <small>회원가입</small>
                       </a>

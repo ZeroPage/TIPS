@@ -19,6 +19,7 @@ import React from "react";
 
 // reactstrap components
 import {
+  Alert,
   Button,
   Card,
   Container,
@@ -35,11 +36,207 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
 class ProblemEdit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: "",
+      memberId: 1,
+      categoryId: 1,
+      timeLimit: "",
+      reference: "",
+      content: "",
+      problemId: this.props.match.params.id,
+      check: "",
+      category: []
+    };
+
+    if(this.state.problemId === undefined) {
+      this.state.problemId = 0;
+    }
+
+    this.handleTitle = this.handleTitle.bind(this);
+    this.handleMemberId = this.handleMemberId.bind(this);
+    this.handleCategoryId = this.handleCategoryId.bind(this);
+    this.handleTimeLimit = this.handleTimeLimit.bind(this);
+    this.handleReference = this.handleReference.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleTitle(event) {
+    this.setState({title: event.target.value});
+  }
+
+  handleMemberId(event) {
+    this.setState({memberId: event.target.value});
+  }
+  
+  handleCategoryId(event) {
+    this.setState({categoryId: event.target.value});
+  }
+
+  handleTimeLimit(event) {
+    this.setState({timeLimit: event.target.value});
+  }
+
+  handleReference(event) {
+    this.setState({reference: event.target.value});
+  }
+
+  redirect = () => {
+    if(this.state.problemId !== 0) {
+      this.props.history.push('/problem-view-page/'+this.state.problemId);
+    }
+    this.props.history.push('/problem-list-page');
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+
+    //check form
+    if(this.state.title === "")
+    {
+      this.setState({check: <><br /><Alert className="alert-danger">제목이 비어있습니다.</Alert></>});
+      return;
+    }
+    if(this.state.categoryId === "")
+    {
+      this.setState({check: <><br /><Alert className="alert-danger">분류가 비어있습니다.</Alert></>});
+      return;
+    } 
+    if (this.state.timeLimit === "") {
+      this.setState({check: <><br /><Alert className="alert-danger">시간 제한이 비어있습니다.</Alert></>});
+      return;
+    }
+    if (this.state.reference === "") {
+      this.setState({check: <><br /><Alert className="alert-danger">출처가 비어있습니다.</Alert></>});
+      return;
+    }
+
+    if(this.state.problemId !== 0) {
+      fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
+        method: 'PUT',
+        redirect: 'follow',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          'title': this.state.title,
+          'category_id': this.state.categoryId,
+          'time_limit': this.state.timeLimit,
+          'reference': this.state.reference,
+          'content': this.state.content
+        })
+      })
+      .then(res => res.json())
+      .then(
+        (result) => {
+          if(result.success === "ok") {
+            this.setState({check: <><br /><Alert className="alert-success">문제 수정이 완료되었습니다</Alert></>});
+            setInterval(() => this.redirect(), 2000);
+            return;
+          }
+          else {
+            this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+            return;
+          }
+        },
+        (error) => {
+          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          console.log(error);
+        }
+      )
+    }
+    else {
+      fetch("http://localhost:3000/api/v1/problem", {
+        method: 'POST',
+        redirect: 'follow',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          'title': this.state.title,
+          'category_id': this.state.categoryId,
+          'member_id': this.state.memberId,
+          'time_limit': this.state.timeLimit,
+          'reference': this.state.reference,
+          'content': this.state.content
+        })
+      })
+      .then(res => res.json())
+      .then(
+        (result) => {
+          if(result.success === "ok") {
+            this.setState({check: <><br /><Alert className="alert-success">문제 추가가 완료되었습니다</Alert></>});
+            setInterval(() => this.redirect(), 2000);
+            return;
+          }
+          else {
+            this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+            return;
+          }
+        },
+        (error) => {
+          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          console.log(error);
+        }
+      )
+    }
+  }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+    
+    fetch("http://localhost:3000/api/v1/problem/category", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          this.setState({
+            category: result.category
+          });
+        }
+      },
+      (error) => console.log(error)
+    )
+
+    if(this.state.problemId !== 0)
+    {
+      fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(
+        (result) => {
+          if(result.success === "ok")
+          {
+            this.setState({
+              title: result.title,
+              memberId: result.member_id,
+              categoryId: result.category_id,
+              timeLimit: result.time_limit,
+              reference: result.reference,
+              content: result.content
+            });
+            return;
+          }
+          else return;
+        },
+        (error) => console.log(error)
+      )
+    }
   }
+
   render() {
     return (
       <>
@@ -89,7 +286,9 @@ class ProblemEdit extends React.Component {
                 <Form>
                   <Container className="mb-5">
                     <br />
-                    <h1 className="display-3 text-center">문제 수정</h1>
+                    {this.state.problemId === 0 && <h1 className="display-3 text-center">문제 추가</h1>}
+                    {this.state.problemId !== 0 && <h1 className="display-3 text-center">문제 수정</h1>}
+                    {this.state.check}
                     <br />
                     <Row>
                       <Col lg="12">
@@ -97,36 +296,40 @@ class ProblemEdit extends React.Component {
                           id="exampleFormControlInput1"
                           placeholder="제목"
                           rows="1"
+                          value={this.state.title}
+                          onChange={this.handleTitle} 
                         />
                       </Col>
                     </Row>
                     <br />
                     <Row>
-                      <Col lg="6">
-                        <Input placeholder="문제 분야" type="text" />
+                      <Col lg="4">
+                        <Input type="select" name="분류 선택" value={this.state.categoryId} onChange={this.handleCategoryId}>
+                          {
+                            this.state.category &&
+                            this.state.category.map(item => (
+                              <option value={item.category_id}>
+                                {item.name}
+                              </option>
+                            ))
+                          }
+                        </Input>
                       </Col>
-                      <Col lg="6">
-                        <Input placeholder="난이도" type="text" />
+                      <Col lg="4">
+                        <Input placeholder="시간 제한" type="text" value={this.state.timeLimit} onChange={this.handleTimeLimit} />
+                      </Col>
+                      <Col lg="4">
+                        <Input placeholder="출처" type="text" value={this.state.reference} onChange={this.handleReference} />
                       </Col>
                     </Row>
                     <br />
                     <CKEditor
-                      editor={ ClassicEditor }
-                      data={"문제 내용"}
-                      onInit={ editor => {
-                          // You can store the "editor" and use when it is needed.
-                          console.log( 'Editor is ready to use!', editor );
-                      } }
-                      onChange={ ( event, editor ) => {
-                          const data = editor.getData();
-                          console.log( { event, editor, data } );
-                      } }
-                      onBlur={ ( event, editor ) => {
-                          console.log( 'Blur.', editor );
-                      } }
-                      onFocus={ ( event, editor ) => {
-                          console.log( 'Focus.', editor );
-                      } }
+                      editor={ClassicEditor}
+                      data={this.state.content}
+                      onChange={(event, editor) => {
+                          let data = editor.getData();
+                          this.setState({content: data});
+                      }}
                     />
                     <br />
                     <div className="text-center">
@@ -134,6 +337,7 @@ class ProblemEdit extends React.Component {
                         className="mt-4"
                         color="primary"
                         type="button"
+                        onClick={this.handleSubmit}
                       >
                         작성완료
                       </Button>
@@ -141,7 +345,7 @@ class ProblemEdit extends React.Component {
                         className="mt-4"
                         color="primary"
                         type="button"
-                        href="/"
+                        href={this.state.problemId === 0 ? "/problem-list-page" : "/problem-view-page/" + this.state.problemId}
                       >
                         돌아가기
                       </Button>

@@ -18,17 +18,75 @@
 import React from "react";
 
 // reactstrap components
-import { Card, Container, Form, Row, Col } from "reactstrap";
+import { Button, Card, Container, Form, Row, Col } from "reactstrap";
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
 class ProblemList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [],
+      category: [],
+      isConnect: false,
+      isLogin: true
+    };
+  }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+
+    fetch("http://localhost:3000/api/v1/problem", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          this.setState({
+            items: result.problem,
+            isConnect: true
+          });
+          return;
+        }
+        else return;
+      },
+      (error) => console.log(error)
+    )
+
+    fetch("http://localhost:3000/api/v1/problem/category", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          let temp_category = [];
+          result.category.forEach(element => {
+            temp_category[element.category_id] = element.name;
+          });
+          this.setState({
+            category: temp_category
+          });
+          return;
+        }
+        else return;
+      },
+      (error) => console.log(error)
+    )
   }
+
   render() {
     return (
       <>
@@ -80,45 +138,62 @@ class ProblemList extends React.Component {
                     <h1 className="display-3 text-center">문제 목록</h1>
                   <br />
                   <Container>
-                    <table class="table-bordered table-striped table">
+                    {
+                      !this.state.isConnect &&
+                      <h1 className="display-3 text-center">로딩 중...</h1>
+                    }
+
+                    {
+                      this.state.isConnect &&
+                      <table class="table-bordered table-striped table">
                       <thead>
                         <tr>
-                          <th class="text-center">No.</th>
+                          <th class="text-center" width="75">No.</th>
                           <th class="text-center">문제 이름</th>
-                          <th class="text-center">답변 수</th>
-                          <th class="text-center">분야</th>
-                          <th class="text-center">난이도</th>
+                          <th class="text-center" width="100">분야</th>
+                          <th class="text-center" width="75">난도</th>
+                          <th class="text-center" width="100">출제자</th>
+                          <th class="text-center" width="75">비고</th>
                         </tr>
                       </thead>
                       <tbody>
+                      {
+                        this.state.items &&
+                        this.state.items.map(item => (
                         <tr>
-                          <td>1</td>
-                          <td><a href="/problem-view-page">Hello world!</a></td>
-                          <td>3</td>
-                          <td>기초</td>
-                          <td>1</td>
+                          <td class="text-center">{item.problem_id}</td>
+                          <td class="text-center"><a href={"problem-view-page/"+item.problem_id}>{item.title}</a></td>
+                          <td class="text-center">{this.state.category[item.category_id]}</td>
+                          <td class="text-center">{item.difficulty}</td>
+                          <td class="text-center">{}</td>
+                          <td class="text-center">{}</td>
                         </tr>
-                        <tr>
-                          <td>2</td>
-                          <td><a href="/problem-view-page">프로세스와 쓰레드의 차이는?</a></td>
-                          <td>2</td>
-                          <td>운영체제</td>
-                          <td>3</td>
-                        </tr>
-                        <tr>
-                          <td>3</td>
-                          <td><a href="/problem-view-page">UDP와 TCP의 차이는?</a></td>
-                          <td>0</td>
-                          <td>네트워크</td>
-                          <td>3</td>
-                        </tr>
+                        ))
+                      }
                       </tbody>
-                    </table>
+                      </table>
+                    }
+
+                    {
+                      this.state.isLogin &&
+                      <div className="text-center">
+                        <Button
+                          className="mt-4"
+                          color="primary"
+                          type="button"
+                          href="/problem-edit-page"
+                        >
+                          문제 추가
+                        </Button>
+                      </div>
+                    }
+                    <br />
                   </Container>
                 </Form>
               </div>
             </Card>
           </Container>
+          
           <br />
           <br />
         </main>
