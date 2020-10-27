@@ -52,7 +52,7 @@ class ProblemView extends React.Component {
 
   render() {
     let answer = <br />;
-    if (this.state.time == 0) {
+    if (this.state.time === 0) {
       answer = <div>
         <h2 className="display-5">답변</h2>
         <p className="lead">Hello World!</p>

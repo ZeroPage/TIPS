@@ -21,8 +21,8 @@ import React from "react";
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 import SimpleFooter from "components/Footers/SimpleFooter.js";
 
-// index page sections
-import Hero from "./IndexSections/Hero.js";
+// reactstrap components
+import { Container, Row, Col } from "reactstrap";
 
 class Index extends React.Component {
   componentDidMount() {
@@ -35,7 +35,55 @@ class Index extends React.Component {
       <>
         <SimpleNavbar />
         <main ref="main">
-          <Hero />
+          <div className="position-relative">
+            <section className="section section-hero section-shaped">
+              <div className="shape shape-style-1 shape-default">
+                <span className="span-150" />
+                <span className="span-50" />
+                <span className="span-50" />
+                <span className="span-75" />
+                <span className="span-100" />
+                <span className="span-75" />
+                <span className="span-50" />
+                <span className="span-100" />
+                <span className="span-50" />
+                <span className="span-100" />
+              </div>
+              <Container className="shape-container d-flex align-items-center py-lg">
+                <div className="col px-0">
+                  <Row className="align-items-center justify-content-center">
+                    <Col className="text-center" lg="6">
+                      <img
+                        alt="..."
+                        className="img-fluid"
+                        src="https://raw.githubusercontent.com/ZeroPage/TIPS/develop/tmp/tips-logo-tmp.png"
+                        style={{ width: "200px" }}
+                      />
+                      <p className="lead text-white">
+                        Tech Interview Practice Service
+                      </p>
+                    </Col>
+                  </Row>
+                </div>
+              </Container>
+              {/* SVG separator */}
+              <div className="separator separator-bottom separator-skew zindex-100">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="none"
+                  version="1.1"
+                  viewBox="0 0 2560 100"
+                  x="0"
+                  y="0"
+                >
+                  <polygon
+                    className="fill-white"
+                    points="2560 0 2560 100 0 100"
+                  />
+                </svg>
+              </div>
+            </section>
+          </div>
         </main>
         <SimpleFooter />
       </>
