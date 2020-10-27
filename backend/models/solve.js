@@ -30,14 +30,14 @@ module.exports = function(sequelize, DataTypes) {
       type: "LONGTEXT",
       allowNull: false
     },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: sequelize.fn('current_timestamp')
-    },
     duration: {
       type: DataTypes.TIME,
       allowNull: false
+    },
+    created: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.fn('current_timestamp')
     }
   }, {
     sequelize,

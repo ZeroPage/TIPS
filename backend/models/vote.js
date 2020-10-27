@@ -26,6 +26,15 @@ module.exports = function(sequelize, DataTypes) {
       },
       unique: "vote_ibfk_2"
     },
+    answer_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      references: {
+        model: 'answer',
+        key: 'answer_id'
+      },
+      unique: "vote_ibfk_3"
+    },
     document_id: {
       type: DataTypes.BIGINT,
       allowNull: true,
@@ -33,7 +42,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'document',
         key: 'document_id'
       },
-      unique: "vote_ibfk_3"
+      unique: "vote_ibfk_4"
     },
     comment_id: {
       type: DataTypes.BIGINT,
@@ -42,7 +51,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'comment',
         key: 'comment_id'
       },
-      unique: "vote_ibfk_4"
+      unique: "vote_ibfk_5"
     },
     type: {
       type: DataTypes.STRING(10),
