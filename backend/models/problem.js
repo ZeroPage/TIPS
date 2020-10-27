@@ -48,30 +48,19 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
     },
-    good_vote: {
+    vote: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: 0
     },
-    bad_vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
-    },
-    hard_vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
-    },
-    easy_vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
+    difficulty: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false
     }
   }, {
     sequelize,
     tableName: 'problem',
     schema: 'tips',
-    timestamps: false,
+    timestamps: false
     });
 };

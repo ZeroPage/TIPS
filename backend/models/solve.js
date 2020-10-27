@@ -43,6 +43,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'solve',
     schema: 'tips',
-    timestamps: false,
+    timestamps: false
     });
 };

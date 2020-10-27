@@ -52,12 +52,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
     },
-    good_vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
-    },
-    bad_vote: {
+    vote: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: 0
@@ -66,6 +61,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'document',
     schema: 'tips',
-    timestamps: false,
+    timestamps: false
     });
 };
