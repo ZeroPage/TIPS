@@ -57,8 +57,8 @@ CREATE TABLE solve(
     member_id BIGINT NOT NULL,
 
     content LONGTEXT NOT NULL,
-    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     duration TIME NOT NULL,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
     FOREIGN KEY(member_id) REFERENCES member(member_id)
