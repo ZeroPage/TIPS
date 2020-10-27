@@ -1,21 +1,12 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('comment', {
-    comment_id: {
+  return sequelize.define('vote', {
+    vote_id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
-    },
-    parent_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      references: {
-        model: 'comment',
-        key: 'comment_id'
-      },
-      unique: "comment_ibfk_1"
     },
     member_id: {
       type: DataTypes.BIGINT,
@@ -24,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'member',
         key: 'member_id'
       },
-      unique: "comment_ibfk_2"
+      unique: "vote_ibfk_1"
     },
     problem_id: {
       type: DataTypes.BIGINT,
@@ -33,16 +24,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'problem',
         key: 'problem_id'
       },
-      unique: "comment_ibfk_3"
-    },
-    answer_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      references: {
-        model: 'answer',
-        key: 'answer_id'
-      },
-      unique: "comment_ibfk_4"
+      unique: "vote_ibfk_2"
     },
     document_id: {
       type: DataTypes.BIGINT,
@@ -51,25 +33,29 @@ module.exports = function(sequelize, DataTypes) {
         model: 'document',
         key: 'document_id'
       },
-      unique: "comment_ibfk_5"
+      unique: "vote_ibfk_3"
     },
-    content: {
-      type: "LONGTEXT",
+    comment_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      references: {
+        model: 'comment',
+        key: 'comment_id'
+      },
+      unique: "vote_ibfk_4"
+    },
+    type: {
+      type: DataTypes.STRING(10),
       allowNull: false
     },
     created: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
-    },
-    vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
     }
   }, {
     sequelize,
-    tableName: 'comment',
+    tableName: 'vote',
     schema: 'tips',
     timestamps: false
     });

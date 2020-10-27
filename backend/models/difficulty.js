@@ -1,36 +1,34 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('member', {
-    member_id: {
+  return sequelize.define('difficulty', {
+    difficulty_id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    username: {
-      type: DataTypes.STRING(80),
+    problem_id: {
+      type: DataTypes.BIGINT,
       allowNull: false,
-      unique: "username"
+      references: {
+        model: 'problem',
+        key: 'problem_id'
+      },
+      unique: "difficulty_ibfk_1"
     },
-    nickname: {
-      type: DataTypes.STRING(40),
+    member_id: {
+      type: DataTypes.BIGINT,
       allowNull: false,
-      unique: "nickname"
+      references: {
+        model: 'member',
+        key: 'member_id'
+      },
+      unique: "difficulty_ibfk_2"
     },
-    email: {
-      type: DataTypes.STRING(180),
-      allowNull: false,
-      unique: "email"
-    },
-    password: {
-      type: DataTypes.STRING(60),
-      allowNull: false
-    },
-    is_admin: {
+    difficulty: {
       type: DataTypes.INTEGER(1),
-      allowNull: false,
-      defaultValue: 0
+      allowNull: false
     },
     created: {
       type: DataTypes.DATE,
@@ -39,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'member',
+    tableName: 'difficulty',
     schema: 'tips',
     timestamps: false
     });

@@ -8,21 +8,21 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    member_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'member',
-        key: 'member_id'
-      },
-      unique: "answer_ibfk_1"
-    },
     problem_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
         model: 'problem',
         key: 'problem_id'
+      },
+      unique: "answer_ibfk_1"
+    },
+    member_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'member',
+        key: 'member_id'
       },
       unique: "answer_ibfk_2"
     },
@@ -39,12 +39,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
     },
-    good_vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
-    },
-    bad_vote: {
+    vote: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: 0
@@ -53,6 +48,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'answer',
     schema: 'tips',
-    timestamps: false,
+    timestamps: false
     });
 };

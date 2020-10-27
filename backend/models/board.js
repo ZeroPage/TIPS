@@ -16,6 +16,6 @@ module.exports = function(sequelize, DataTypes) {
     sequelize,
     tableName: 'board',
     schema: 'tips',
-    timestamps: false,
+    timestamps: false
     });
 };
