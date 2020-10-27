@@ -1,5 +1,6 @@
-var passport = require('passport')
+var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var bcrypt = require('bcrypt');
 var models = require('./models');
 
 passport.use(new LocalStrategy({
@@ -13,7 +14,7 @@ passport.use(new LocalStrategy({
       if (!member ) {
         return done(null, false, { message: 'Incorrect username.' });
       }
-      if (!member.validPassword(password)) {
+      if (!bcrypt.compareSync(password, member.password)) {
         return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, member);
@@ -31,13 +32,7 @@ passport.serializeUser((member, done) => {
 });
 
 passport.deserializeUser((member, done) => {
-  models.member.findByPk(member.member_id)
-  .then(member => {
-    done(null, member);
-  })
-  .catch(err => {
-    done(err, member);
-  });
+  done(null, member);
 });
 
 module.exports = passport;
