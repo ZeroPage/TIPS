@@ -309,8 +309,8 @@ CREATE TABLE `solve` (
   `problem_id` bigint(20) NOT NULL,
   `member_id` bigint(20) NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` datetime NOT NULL DEFAULT current_timestamp(),
   `duration` time NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`solve_id`),
   KEY `problem_id` (`problem_id`),
   KEY `member_id` (`member_id`),
@@ -339,6 +339,7 @@ CREATE TABLE `vote` (
   `vote_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `member_id` bigint(20) NOT NULL,
   `problem_id` bigint(20) DEFAULT NULL,
+  `answer_id` bigint(20) DEFAULT NULL,
   `document_id` bigint(20) DEFAULT NULL,
   `comment_id` bigint(20) DEFAULT NULL,
   `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL CHECK (`type` in ('good','bad')),
@@ -346,12 +347,14 @@ CREATE TABLE `vote` (
   PRIMARY KEY (`vote_id`),
   KEY `member_id` (`member_id`),
   KEY `problem_id` (`problem_id`),
+  KEY `answer_id` (`answer_id`),
   KEY `document_id` (`document_id`),
   KEY `comment_id` (`comment_id`),
   CONSTRAINT `vote_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
   CONSTRAINT `vote_ibfk_2` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
-  CONSTRAINT `vote_ibfk_3` FOREIGN KEY (`document_id`) REFERENCES `document` (`document_id`),
-  CONSTRAINT `vote_ibfk_4` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`comment_id`)
+  CONSTRAINT `vote_ibfk_3` FOREIGN KEY (`answer_id`) REFERENCES `answer` (`answer_id`),
+  CONSTRAINT `vote_ibfk_4` FOREIGN KEY (`document_id`) REFERENCES `document` (`document_id`),
+  CONSTRAINT `vote_ibfk_5` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -373,4 +376,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26 18:47:48
+-- Dump completed on 2020-10-27 23:12:58

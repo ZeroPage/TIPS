@@ -44,7 +44,7 @@ CREATE TABLE `answer` (
 
 LOCK TABLES `answer` WRITE;
 /*!40000 ALTER TABLE `answer` DISABLE KEYS */;
-INSERT INTO `answer` VALUES (1,1,1,'answer',NULL,'2020-10-26 18:48:57',0),(2,1,2,'answer 2',NULL,'2020-10-26 18:48:57',0);
+INSERT INTO `answer` VALUES (1,1,1,'answer',NULL,'2020-10-27 23:13:31',0),(2,1,2,'answer 2',NULL,'2020-10-27 23:13:31',0);
 /*!40000 ALTER TABLE `answer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,7 +109,7 @@ CREATE TABLE `comment` (
 
 LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment` DISABLE KEYS */;
-INSERT INTO `comment` VALUES (1,NULL,2,NULL,NULL,1,'comment','2020-10-26 18:48:57',0),(2,1,1,NULL,NULL,1,'comment 2','2020-10-26 18:48:57',0);
+INSERT INTO `comment` VALUES (1,NULL,2,NULL,NULL,1,'comment','2020-10-27 23:13:31',0),(2,1,1,NULL,NULL,1,'comment 2','2020-10-27 23:13:31',0);
 /*!40000 ALTER TABLE `comment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -140,7 +140,7 @@ CREATE TABLE `difficulty` (
 
 LOCK TABLES `difficulty` WRITE;
 /*!40000 ALTER TABLE `difficulty` DISABLE KEYS */;
-INSERT INTO `difficulty` VALUES (1,1,1,4,'2020-10-26 18:48:57'),(2,1,2,2,'2020-10-26 18:48:57');
+INSERT INTO `difficulty` VALUES (1,1,1,4,'2020-10-27 23:13:31'),(2,1,2,2,'2020-10-27 23:13:31');
 /*!40000 ALTER TABLE `difficulty` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -177,7 +177,7 @@ CREATE TABLE `document` (
 
 LOCK TABLES `document` WRITE;
 /*!40000 ALTER TABLE `document` DISABLE KEYS */;
-INSERT INTO `document` VALUES (1,1,1,1,'notice','notice',NULL,'2020-10-26 18:48:57',0),(2,2,1,2,'free','free',NULL,'2020-10-26 18:48:57',0),(3,3,1,2,'qna','qna',NULL,'2020-10-26 18:48:57',0);
+INSERT INTO `document` VALUES (1,1,1,1,'notice','notice',NULL,'2020-10-27 23:13:31',0),(2,2,1,2,'free','free',NULL,'2020-10-27 23:13:31',0),(3,3,1,2,'qna','qna',NULL,'2020-10-27 23:13:31',0);
 /*!40000 ALTER TABLE `document` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -239,7 +239,7 @@ CREATE TABLE `member` (
 
 LOCK TABLES `member` WRITE;
 /*!40000 ALTER TABLE `member` DISABLE KEYS */;
-INSERT INTO `member` VALUES (1,'admin','admin','admin@test.test','admin',1,'2020-10-26 18:48:57'),(2,'test','test','test@test.test','test',0,'2020-10-26 18:48:57');
+INSERT INTO `member` VALUES (1,'admin','admin','admin@test.test','admin',1,'2020-10-27 23:13:31'),(2,'test','test','test@test.test','test',0,'2020-10-27 23:13:31');
 /*!40000 ALTER TABLE `member` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -275,7 +275,7 @@ CREATE TABLE `problem` (
 
 LOCK TABLES `problem` WRITE;
 /*!40000 ALTER TABLE `problem` DISABLE KEYS */;
-INSERT INTO `problem` VALUES (1,1,1,'problem','problem',0,NULL,'2020-10-26 18:48:57',0,3),(2,1,1,'problem 2','problem 2',0,NULL,'2020-10-26 18:48:57',0,3);
+INSERT INTO `problem` VALUES (1,1,1,'problem','problem',0,NULL,'2020-10-27 23:13:31',0,3),(2,1,1,'problem 2','problem 2',0,NULL,'2020-10-27 23:13:31',0,3);
 /*!40000 ALTER TABLE `problem` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -318,8 +318,8 @@ CREATE TABLE `solve` (
   `problem_id` bigint(20) NOT NULL,
   `member_id` bigint(20) NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` datetime NOT NULL DEFAULT current_timestamp(),
   `duration` time NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`solve_id`),
   KEY `problem_id` (`problem_id`),
   KEY `member_id` (`member_id`),
@@ -334,7 +334,7 @@ CREATE TABLE `solve` (
 
 LOCK TABLES `solve` WRITE;
 /*!40000 ALTER TABLE `solve` DISABLE KEYS */;
-INSERT INTO `solve` VALUES (1,1,2,'solve','2020-10-26 18:48:57','00:10:00'),(2,1,2,'solve 2','2020-10-26 18:48:57','00:05:00');
+INSERT INTO `solve` VALUES (1,1,2,'solve','00:10:00','2020-10-27 23:13:31'),(2,1,2,'solve 2','00:05:00','2020-10-27 23:13:31');
 /*!40000 ALTER TABLE `solve` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -349,6 +349,7 @@ CREATE TABLE `vote` (
   `vote_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `member_id` bigint(20) NOT NULL,
   `problem_id` bigint(20) DEFAULT NULL,
+  `answer_id` bigint(20) DEFAULT NULL,
   `document_id` bigint(20) DEFAULT NULL,
   `comment_id` bigint(20) DEFAULT NULL,
   `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL CHECK (`type` in ('good','bad')),
@@ -356,13 +357,15 @@ CREATE TABLE `vote` (
   PRIMARY KEY (`vote_id`),
   KEY `member_id` (`member_id`),
   KEY `problem_id` (`problem_id`),
+  KEY `answer_id` (`answer_id`),
   KEY `document_id` (`document_id`),
   KEY `comment_id` (`comment_id`),
   CONSTRAINT `vote_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
   CONSTRAINT `vote_ibfk_2` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
-  CONSTRAINT `vote_ibfk_3` FOREIGN KEY (`document_id`) REFERENCES `document` (`document_id`),
-  CONSTRAINT `vote_ibfk_4` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `vote_ibfk_3` FOREIGN KEY (`answer_id`) REFERENCES `answer` (`answer_id`),
+  CONSTRAINT `vote_ibfk_4` FOREIGN KEY (`document_id`) REFERENCES `document` (`document_id`),
+  CONSTRAINT `vote_ibfk_5` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`comment_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -371,7 +374,7 @@ CREATE TABLE `vote` (
 
 LOCK TABLES `vote` WRITE;
 /*!40000 ALTER TABLE `vote` DISABLE KEYS */;
-INSERT INTO `vote` VALUES (1,1,1,NULL,NULL,'good','2020-10-26 18:48:57'),(2,2,NULL,1,NULL,'bad','2020-10-26 18:48:57'),(3,2,NULL,NULL,2,'good','2020-10-26 18:48:57');
+INSERT INTO `vote` VALUES (1,1,1,NULL,NULL,NULL,'good','2020-10-27 23:13:31'),(2,1,NULL,2,NULL,NULL,'good','2020-10-27 23:13:31'),(3,2,NULL,NULL,1,NULL,'bad','2020-10-27 23:13:31'),(4,2,NULL,NULL,NULL,2,'good','2020-10-27 23:13:31');
 /*!40000 ALTER TABLE `vote` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -384,4 +387,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26 18:49:15
+-- Dump completed on 2020-10-27 23:15:07
