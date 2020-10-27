@@ -174,8 +174,8 @@ CREATE TABLE difficulty(
 
 
 -- Test
-INSERT INTO member(username, nickname, email, password, is_admin) VALUES('admin', 'admin', 'admin@test.test', 'admin', 1);
-INSERT INTO member(username, nickname, email, password) VALUES('test', 'test', 'test@test.test', 'test');
+INSERT INTO member(username, nickname, email, password, is_admin) VALUES('admin', 'admin', 'admin@test.test', '$2b$10$Yqae9guCSOF66IcMzAy2RuYmExWv9YLvYt3gRrrltV0J2OxLIeLP6', 1);
+INSERT INTO member(username, nickname, email, password) VALUES('test', 'test', 'test@test.test', '$2b$10$8EFzwb3sIlAOOvRKikBSS./YJs8HBEoc1Ke9WfUZVjlN6mT5OKBYG');
 
 INSERT INTO problem_category(name) VALUES('os');
 INSERT INTO problem_category(name) VALUES('network');
