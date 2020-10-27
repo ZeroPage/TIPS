@@ -6,8 +6,6 @@ var methodOverride = require('method-override');
 var logger = require('morgan');
 var session = require('express-session');
 var passport = require('passport');
-var mariadb = require('mariadb');
-var models = require('./models');
 var cors = require('cors')
 
 var indexRouter = require('./routes/index');
