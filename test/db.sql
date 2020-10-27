@@ -13,138 +13,139 @@ FLUSH PRIVILEGES;
 
 DROP TABLE IF EXISTS member;
 CREATE TABLE member(
-	member_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	username VARCHAR(80) NOT NULL UNIQUE KEY,
-	nickname VARCHAR(40) NOT NULL UNIQUE KEY,
-	email VARCHAR(180) NOT NULL UNIQUE KEY,
-	password VARCHAR(60) NOT NULL,
-	is_admin TINYINT(1) NOT NULL DEFAULT 0,
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    member_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) NOT NULL UNIQUE KEY,
+    nickname VARCHAR(40) NOT NULL UNIQUE KEY,
+    email VARCHAR(180) NOT NULL UNIQUE KEY,
+    password VARCHAR(60) NOT NULL,
+    is_admin TINYINT(1) NOT NULL DEFAULT 0,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS problem_category;
 CREATE TABLE problem_category(
-	category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	parent_id BIGINT,
-	name VARCHAR(255) NOT NULL,
+    category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    parent_id BIGINT,
+    name VARCHAR(255) NOT NULL,
 
-	FOREIGN KEY(parent_id) REFERENCES problem_category(category_id)
+    FOREIGN KEY(parent_id) REFERENCES problem_category(category_id)
 );
 
 DROP TABLE IF EXISTS problem;
 CREATE TABLE problem(
-	problem_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	category_id BIGINT NOT NULL,
-	member_id BIGINT NOT NULL,
+    problem_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    category_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
 
-	title VARCHAR(255) NOT NULL,
-	content LONGTEXT NOT NULL,
-	time_limit SMALLINT NOT NULL DEFAULT 0,
-	reference VARCHAR(4096),
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    time_limit SMALLINT NOT NULL DEFAULT 0,
+    reference VARCHAR(4096),
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	vote BIGINT NOT NULL DEFAULT 0,
-	difficulty TINYINT(1) NOT NULL CHECK(difficulty >= 1 AND difficulty <= 5),
+    vote BIGINT NOT NULL DEFAULT 0,
+    difficulty TINYINT(1) NOT NULL CHECK(difficulty >= 1 AND difficulty <= 5),
 
-	FOREIGN KEY(category_id) REFERENCES problem_category(category_id),
-	FOREIGN KEY(member_id) REFERENCES member(member_id)
+    FOREIGN KEY(category_id) REFERENCES problem_category(category_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
 DROP TABLE IF EXISTS solve;
 CREATE TABLE solve(
-	solve_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	problem_id BIGINT NOT NULL,
-	member_id BIGINT NOT NULL,
+    solve_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    problem_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
 
-	content LONGTEXT NOT NULL,
-	date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	duration TIME NOT NULL,
+    content LONGTEXT NOT NULL,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    duration TIME NOT NULL,
 
-	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
-	FOREIGN KEY(member_id) REFERENCES member(member_id)
+    FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
 DROP TABLE IF EXISTS answer;
 CREATE TABLE answer(
-	answer_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	problem_id BIGINT NOT NULL,
-	member_id BIGINT NOT NULL,
+    answer_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    problem_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
 
-	content LONGTEXT NOT NULL,
-	reference VARCHAR(4096),
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    content LONGTEXT NOT NULL,
+    reference VARCHAR(4096),
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	vote BIGINT NOT NULL DEFAULT 0,
+    vote BIGINT NOT NULL DEFAULT 0,
 
-	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
-	FOREIGN KEY(member_id) REFERENCES member(member_id)
+    FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
 DROP TABLE IF EXISTS board;
 CREATE TABLE board(
-	board_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	name VARCHAR(255) NOT NULL
+    board_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
 );
 
 DROP TABLE IF EXISTS document_category;
 CREATE TABLE document_category(
-	category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	parent_id BIGINT,
-	board_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    parent_id BIGINT,
+    board_id BIGINT NOT NULL,
 
-	name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
 
-	FOREIGN KEY(parent_id) REFERENCES document_category(category_id),
-	FOREIGN KEY(board_id) REFERENCES board(board_id)
+    FOREIGN KEY(parent_id) REFERENCES document_category(category_id),
+    FOREIGN KEY(board_id) REFERENCES board(board_id)
 );
 
 DROP TABLE IF EXISTS document;
 CREATE TABLE document(
-	document_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	board_id BIGINT NOT NULL,
-	category_id BIGINT NOT NULL,
-	member_id BIGINT NOT NULL,
+    document_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    board_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
 
-	title VARCHAR(255) NOT NULL,
-	content LONGTEXT NOT NULL,
-	reference VARCHAR(4096),
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    reference VARCHAR(4096),
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	vote BIGINT NOT NULL DEFAULT 0,
+    vote BIGINT NOT NULL DEFAULT 0,
 
-	FOREIGN KEY(board_id) REFERENCES board(board_id),
-	FOREIGN KEY(category_id) REFERENCES document_category(category_id),
-	FOREIGN KEY(member_id) REFERENCES member(member_id)
+    FOREIGN KEY(board_id) REFERENCES board(board_id),
+    FOREIGN KEY(category_id) REFERENCES document_category(category_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
 DROP TABLE IF EXISTS comment;
 CREATE TABLE comment(
-	comment_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	parent_id BIGINT,
-	member_id BIGINT NOT NULL,
+    comment_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    parent_id BIGINT,
+    member_id BIGINT NOT NULL,
 
-	problem_id BIGINT,
-	answer_id BIGINT,
-	document_id BIGINT,
+    problem_id BIGINT,
+    answer_id BIGINT,
+    document_id BIGINT,
 
-	content LONGTEXT NOT NULL,
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    content LONGTEXT NOT NULL,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	vote BIGINT NOT NULL DEFAULT 0,
+    vote BIGINT NOT NULL DEFAULT 0,
 
-	FOREIGN KEY(parent_id) REFERENCES comment(comment_id),
-	FOREIGN KEY(member_id) REFERENCES member(member_id),
-	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
-	FOREIGN KEY(answer_id) REFERENCES answer(answer_id),
-	FOREIGN KEY(document_id) REFERENCES document(document_id)
+    FOREIGN KEY(parent_id) REFERENCES comment(comment_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id),
+    FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(answer_id) REFERENCES answer(answer_id),
+    FOREIGN KEY(document_id) REFERENCES document(document_id)
 );
 
 DROP TABLE IF EXISTS vote;
 CREATE TABLE vote(
-	vote_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    vote_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     member_id BIGINT NOT NULL,
 
     problem_id BIGINT,
+    answer_id BIGINT,
     document_id BIGINT,
     comment_id BIGINT,
 
@@ -152,7 +153,8 @@ CREATE TABLE vote(
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY(member_id) REFERENCES member(member_id),
-	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(answer_id) REFERENCES answer(answer_id),
     FOREIGN KEY(document_id) REFERENCES document(document_id),
     FOREIGN KEY(comment_id) REFERENCES comment(comment_id)
 );
@@ -163,10 +165,10 @@ CREATE TABLE difficulty(
     problem_id BIGINT NOT NULL,
     member_id BIGINT NOT NULL,
 
-	difficulty TINYINT(1) NOT NULL CHECK(difficulty >= 1 AND difficulty <= 5),
+    difficulty TINYINT(1) NOT NULL CHECK(difficulty >= 1 AND difficulty <= 5),
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
+    FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
     FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
 
@@ -203,6 +205,7 @@ INSERT INTO comment(parent_id, member_id, document_id, content) VALUES(NULL, 2, 
 INSERT INTO comment(parent_id, member_id, document_id, content) VALUES(1, 1, 1, 'comment 2');
 
 INSERT INTO vote(member_id, problem_id, type) VALUES(1, 1, 'good');
+INSERT INTO vote(member_id, answer_id, type) VALUES(1, 2, 'good');
 INSERT INTO vote(member_id, document_id, type) VALUES(2, 1, 'bad');
 INSERT INTO vote(member_id, comment_id, type) VALUES(2, 2, 'good');
 
