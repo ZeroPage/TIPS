@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var crypto = require('crypto');
+var bcrypt = require('bcrypt');
 var models = require('../models');
 
 router.post('/member', function(req, res, next) {
-  // Password validation?
+  req.body.password = bcrypt.hashSync(req.body.password, 10);
   models.member.create(req.body, {
     fields: ['username', 'nickname', 'email', 'password'],
   })
