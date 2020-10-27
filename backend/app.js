@@ -25,7 +25,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser('tips_cookieParser_secret_key'));
-app.use(session({ secret: 'tips_session_secret_key' }));
+app.use(session({ secret: 'tips_session_secret_key', resave: false, saveUninitialized: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
