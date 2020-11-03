@@ -71,6 +71,61 @@ LOCK TABLES `board` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `class`
+--
+
+DROP TABLE IF EXISTS `class`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `class` (
+  `class_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `is_prime` tinyint(1) NOT NULL DEFAULT 0,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`class_id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `class`
+--
+
+LOCK TABLES `class` WRITE;
+/*!40000 ALTER TABLE `class` DISABLE KEYS */;
+/*!40000 ALTER TABLE `class` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `class_member`
+--
+
+DROP TABLE IF EXISTS `class_member`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `class_member` (
+  `class_id` bigint(20) NOT NULL,
+  `member_id` bigint(20) NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`class_id`,`member_id`),
+  KEY `member_id` (`member_id`),
+  CONSTRAINT `class_member_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `class` (`class_id`),
+  CONSTRAINT `class_member_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `class_member`
+--
+
+LOCK TABLES `class_member` WRITE;
+/*!40000 ALTER TABLE `class_member` DISABLE KEYS */;
+/*!40000 ALTER TABLE `class_member` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `comment`
 --
 
@@ -376,4 +431,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-28  8:49:45
+-- Dump completed on 2020-11-04  5:08:56

@@ -44,7 +44,7 @@ CREATE TABLE `answer` (
 
 LOCK TABLES `answer` WRITE;
 /*!40000 ALTER TABLE `answer` DISABLE KEYS */;
-INSERT INTO `answer` VALUES (1,1,1,'answer',NULL,'2020-10-28 08:47:49',0),(2,1,2,'answer 2',NULL,'2020-10-28 08:47:49',0);
+INSERT INTO `answer` VALUES (1,1,1,'answer',NULL,'2020-11-04 04:51:49',0),(2,1,2,'answer 2',NULL,'2020-11-04 04:51:49',0);
 /*!40000 ALTER TABLE `answer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -70,6 +70,63 @@ LOCK TABLES `board` WRITE;
 /*!40000 ALTER TABLE `board` DISABLE KEYS */;
 INSERT INTO `board` VALUES (1,'notice'),(2,'free'),(3,'qna');
 /*!40000 ALTER TABLE `board` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `class`
+--
+
+DROP TABLE IF EXISTS `class`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `class` (
+  `class_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `is_prime` tinyint(1) NOT NULL DEFAULT 0,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`class_id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `class`
+--
+
+LOCK TABLES `class` WRITE;
+/*!40000 ALTER TABLE `class` DISABLE KEYS */;
+INSERT INTO `class` VALUES (1,'default',1,0,0,'2020-11-04 04:51:49'),(2,'admin',0,1,0,'2020-11-04 04:51:49'),(3,'prime',0,0,1,'2020-11-04 04:51:49');
+/*!40000 ALTER TABLE `class` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `class_member`
+--
+
+DROP TABLE IF EXISTS `class_member`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `class_member` (
+  `class_id` bigint(20) NOT NULL,
+  `member_id` bigint(20) NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`class_id`,`member_id`),
+  KEY `member_id` (`member_id`),
+  CONSTRAINT `class_member_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `class` (`class_id`),
+  CONSTRAINT `class_member_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `class_member`
+--
+
+LOCK TABLES `class_member` WRITE;
+/*!40000 ALTER TABLE `class_member` DISABLE KEYS */;
+INSERT INTO `class_member` VALUES (1,1,'2020-11-04 04:51:49'),(1,2,'2020-11-04 04:51:49'),(1,3,'2020-11-04 04:51:49'),(2,1,'2020-11-04 04:51:49'),(3,2,'2020-11-04 04:51:49');
+/*!40000 ALTER TABLE `class_member` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -109,7 +166,7 @@ CREATE TABLE `comment` (
 
 LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment` DISABLE KEYS */;
-INSERT INTO `comment` VALUES (1,NULL,2,NULL,NULL,1,'comment','2020-10-28 08:47:49',0),(2,1,1,NULL,NULL,1,'comment 2','2020-10-28 08:47:49',0);
+INSERT INTO `comment` VALUES (1,NULL,2,NULL,NULL,1,'comment','2020-11-04 04:51:49',0),(2,1,1,NULL,NULL,1,'comment 2','2020-11-04 04:51:49',0);
 /*!40000 ALTER TABLE `comment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -140,7 +197,7 @@ CREATE TABLE `difficulty` (
 
 LOCK TABLES `difficulty` WRITE;
 /*!40000 ALTER TABLE `difficulty` DISABLE KEYS */;
-INSERT INTO `difficulty` VALUES (1,1,1,4,'2020-10-28 08:47:49'),(2,1,2,2,'2020-10-28 08:47:49');
+INSERT INTO `difficulty` VALUES (1,1,1,4,'2020-11-04 04:51:49'),(2,1,2,2,'2020-11-04 04:51:49');
 /*!40000 ALTER TABLE `difficulty` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -177,7 +234,7 @@ CREATE TABLE `document` (
 
 LOCK TABLES `document` WRITE;
 /*!40000 ALTER TABLE `document` DISABLE KEYS */;
-INSERT INTO `document` VALUES (1,1,1,1,'notice','notice',NULL,'2020-10-28 08:47:49',0),(2,2,1,2,'free','free',NULL,'2020-10-28 08:47:49',0),(3,3,1,2,'qna','qna',NULL,'2020-10-28 08:47:49',0);
+INSERT INTO `document` VALUES (1,1,1,1,'notice','notice',NULL,'2020-11-04 04:51:49',0),(2,2,1,2,'free','free',NULL,'2020-11-04 04:51:49',0),(3,3,1,2,'qna','qna',NULL,'2020-11-04 04:51:49',0);
 /*!40000 ALTER TABLE `document` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -230,7 +287,7 @@ CREATE TABLE `member` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `nickname` (`nickname`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -239,7 +296,7 @@ CREATE TABLE `member` (
 
 LOCK TABLES `member` WRITE;
 /*!40000 ALTER TABLE `member` DISABLE KEYS */;
-INSERT INTO `member` VALUES (1,'admin','admin','admin@test.test','$2b$10$Yqae9guCSOF66IcMzAy2RuYmExWv9YLvYt3gRrrltV0J2OxLIeLP6',1,'2020-10-28 08:47:49'),(2,'test','test','test@test.test','$2b$10$8EFzwb3sIlAOOvRKikBSS./YJs8HBEoc1Ke9WfUZVjlN6mT5OKBYG',0,'2020-10-28 08:47:49');
+INSERT INTO `member` VALUES (1,'admin','admin','admin@test.test','$2b$10$Yqae9guCSOF66IcMzAy2RuYmExWv9YLvYt3gRrrltV0J2OxLIeLP6',1,'2020-11-04 04:51:49'),(2,'test','test','test@test.test','$2b$10$8EFzwb3sIlAOOvRKikBSS./YJs8HBEoc1Ke9WfUZVjlN6mT5OKBYG',0,'2020-11-04 04:51:49'),(3,'test2','test2','test2@test.test','$2b$10$8EFzwb3sIlAOOvRKikBSS./YJs8HBEoc1Ke9WfUZVjlN6mT5OKBYG',0,'2020-11-04 04:51:49');
 /*!40000 ALTER TABLE `member` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -275,7 +332,7 @@ CREATE TABLE `problem` (
 
 LOCK TABLES `problem` WRITE;
 /*!40000 ALTER TABLE `problem` DISABLE KEYS */;
-INSERT INTO `problem` VALUES (1,1,1,'problem','problem',0,NULL,'2020-10-28 08:47:49',0,3),(2,1,1,'problem 2','problem 2',0,NULL,'2020-10-28 08:47:49',0,3);
+INSERT INTO `problem` VALUES (1,1,1,'problem','problem',0,NULL,'2020-11-04 04:51:49',0,3),(2,1,1,'problem 2','problem 2',0,NULL,'2020-11-04 04:51:49',0,3);
 /*!40000 ALTER TABLE `problem` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -334,7 +391,7 @@ CREATE TABLE `solve` (
 
 LOCK TABLES `solve` WRITE;
 /*!40000 ALTER TABLE `solve` DISABLE KEYS */;
-INSERT INTO `solve` VALUES (1,1,2,'solve','00:10:00','2020-10-28 08:47:49'),(2,1,2,'solve 2','00:05:00','2020-10-28 08:47:49');
+INSERT INTO `solve` VALUES (1,1,2,'solve','00:10:00','2020-11-04 04:51:49'),(2,1,2,'solve 2','00:05:00','2020-11-04 04:51:49');
 /*!40000 ALTER TABLE `solve` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -374,7 +431,7 @@ CREATE TABLE `vote` (
 
 LOCK TABLES `vote` WRITE;
 /*!40000 ALTER TABLE `vote` DISABLE KEYS */;
-INSERT INTO `vote` VALUES (1,1,1,NULL,NULL,NULL,'good','2020-10-28 08:47:49'),(2,1,NULL,2,NULL,NULL,'good','2020-10-28 08:47:49'),(3,2,NULL,NULL,1,NULL,'bad','2020-10-28 08:47:49'),(4,2,NULL,NULL,NULL,2,'good','2020-10-28 08:47:49');
+INSERT INTO `vote` VALUES (1,1,1,NULL,NULL,NULL,'good','2020-11-04 04:51:49'),(2,1,NULL,2,NULL,NULL,'good','2020-11-04 04:51:49'),(3,2,NULL,NULL,1,NULL,'bad','2020-11-04 04:51:49'),(4,2,NULL,NULL,NULL,2,'good','2020-11-04 04:51:49');
 /*!40000 ALTER TABLE `vote` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -387,4 +444,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-28  8:48:40
+-- Dump completed on 2020-11-04  5:04:37

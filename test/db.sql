@@ -22,6 +22,28 @@ CREATE TABLE member(
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS class;
+CREATE TABLE class(
+    class_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(80) NOT NULL UNIQUE KEY,
+    is_default TINYINT(1) NOT NULL DEFAULT 0,
+    is_admin TINYINT(1) NOT NULL DEFAULT 0,
+    is_prime TINYINT(1) NOT NULL DEFAULT 0,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS class_member;
+CREATE TABLE class_member(
+    class_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY(class_id, member_id),
+    FOREIGN KEY(class_id) REFERENCES class(class_id),
+    FOREIGN KEY(member_id) REFERENCES member(member_id)
+);
+
+
 DROP TABLE IF EXISTS problem_category;
 CREATE TABLE problem_category(
     category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -79,6 +101,7 @@ CREATE TABLE answer(
     FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
     FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
+
 
 DROP TABLE IF EXISTS board;
 CREATE TABLE board(
@@ -139,6 +162,7 @@ CREATE TABLE comment(
     FOREIGN KEY(document_id) REFERENCES document(document_id)
 );
 
+
 DROP TABLE IF EXISTS vote;
 CREATE TABLE vote(
     vote_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -176,6 +200,17 @@ CREATE TABLE difficulty(
 -- Test
 INSERT INTO member(username, nickname, email, password, is_admin) VALUES('admin', 'admin', 'admin@test.test', '$2b$10$Yqae9guCSOF66IcMzAy2RuYmExWv9YLvYt3gRrrltV0J2OxLIeLP6', 1);
 INSERT INTO member(username, nickname, email, password) VALUES('test', 'test', 'test@test.test', '$2b$10$8EFzwb3sIlAOOvRKikBSS./YJs8HBEoc1Ke9WfUZVjlN6mT5OKBYG');
+INSERT INTO member(username, nickname, email, password) VALUES('test2', 'test2', 'test2@test.test', '$2b$10$8EFzwb3sIlAOOvRKikBSS./YJs8HBEoc1Ke9WfUZVjlN6mT5OKBYG');
+
+INSERT INTO class(name, is_default) VALUES('default', 1);
+INSERT INTO class(name, is_admin) VALUES('admin', 1);
+INSERT INTO class(name, is_prime) VALUES('prime', 1);
+
+INSERT INTO class_member(class_id, member_id) VALUES(1, 1);
+INSERT INTO class_member(class_id, member_id) VALUES(2, 1);
+INSERT INTO class_member(class_id, member_id) VALUES(1, 2);
+INSERT INTO class_member(class_id, member_id) VALUES(3, 2);
+INSERT INTO class_member(class_id, member_id) VALUES(1, 3);
 
 INSERT INTO problem_category(name) VALUES('os');
 INSERT INTO problem_category(name) VALUES('network');
