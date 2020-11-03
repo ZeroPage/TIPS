@@ -19,6 +19,7 @@ import React from "react";
 
 // reactstrap components
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -36,11 +37,69 @@ import {
 // core components
 
 class Login extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      check: ""
+    };
+
+    this.handleUsername = this.handleUsername.bind(this);
+    this.handlePassword = this.handlePassword.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
   }
+
+  handleUsername(event) {
+    this.setState({username: event.target.value});
+  }
+
+  handlePassword(event) {
+    this.setState({password: event.target.value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+
+    if(this.state.username === "")
+    {
+      this.setState({check: <><br /><Alert className="alert-danger">이름을 입력하세요.</Alert></>});
+      return;
+    }
+    if(this.state.password === "")
+    {
+      this.setState({check: <><br /><Alert className="alert-danger">비밀번호를 입력하세요.</Alert></>});
+      return;
+    }
+
+    fetch("http://localhost:3000/api/auth/login/", {
+      method: 'POST',
+      redirect: 'follow',
+      headers: {
+        "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify({
+        'username': this.state.username,
+        'password': this.state.password
+      })
+    })
+    .then(res => {
+      if(res.url === "http://localhost:3000/") {
+        this.setState({check: <><br /><Alert className="alert-success">로그인에 성공하였습니다.</Alert></>});
+        this.props.history.push('/');
+      }
+      else {
+        this.setState({check: <><br /><Alert className="alert-danger">로그인에 실패하였습니다.</Alert></>});
+      }
+    })
+  }
+
   render() {
     return (
       <>
@@ -62,19 +121,20 @@ class Login extends React.Component {
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
                       <h1 className="display-3 text-center">TIPS 로그인</h1>
+                      {this.state.check}
                       <br />
                       <Form role="form">
                         <FormGroup className="mb-3">
                           <InputGroup className="input-group-alternative">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
-                                <i className="ni ni-email-83" />
+                                <i className="ni ni-single-02" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="E-mail" type="email" />
+                            <Input placeholder="이름" type="text" value={this.state.username} onChange={this.handleUsername} />
                           </InputGroup>
                         </FormGroup>
-                        <FormGroup>
+                        <FormGroup className="mb-3">
                           <InputGroup className="input-group-alternative">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
@@ -85,6 +145,8 @@ class Login extends React.Component {
                               placeholder="비밀번호"
                               type="password"
                               autoComplete="off"
+                              value={this.state.password}
+                              onChange={this.handlePassword}
                             />
                           </InputGroup>
                         </FormGroup>
@@ -106,6 +168,7 @@ class Login extends React.Component {
                             className="my-4"
                             color="primary"
                             type="button"
+                            onClick={this.handleSubmit}
                           >
                             로그인
                           </Button>

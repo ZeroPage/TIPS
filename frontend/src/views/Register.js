@@ -82,10 +82,6 @@ class Register extends React.Component {
     this.setState({passwordCheck: event.target.value});
   }
 
-  redirect = () => {
-    this.props.history.push('/');
-  }
-
   handleSubmit(event) {
     event.preventDefault();
 
@@ -133,12 +129,13 @@ class Register extends React.Component {
         if(result.success === "ok")
         {
           this.setState({check: <><br /><Alert className="alert-success">회원가입이 완료되었습니다.</Alert></>});
-          setInterval(() => this.redirect(), 2000);
+          this.props.history.push('/');
           return;
         }
         else
         {
           this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          console.log(result);
           return;
         }
       },
