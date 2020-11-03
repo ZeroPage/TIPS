@@ -81,6 +81,7 @@ class Login extends React.Component {
     fetch("http://localhost:3000/api/auth/login/", {
       method: 'POST',
       redirect: 'follow',
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json;charset=utf-8"
       },
