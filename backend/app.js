@@ -20,7 +20,8 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(cors());
+// Initialize middlewares
+app.use(cors({ origin: true, credentials: true }));
 app.use(logger('dev'));
 app.use(methodOverride());
 app.use(express.json());
