@@ -147,7 +147,7 @@ class ProblemEdit extends React.Component {
       )
     }
     else {
-      fetch("http://localhost:3000/api/v1/problem", {
+      fetch("/api/v1/problem", {
         method: 'POST',
         redirect: 'follow',
         headers: {

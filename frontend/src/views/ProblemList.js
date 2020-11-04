@@ -39,7 +39,7 @@ class ProblemList extends React.Component {
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
 
-    fetch("http://localhost:3000/api/v1/problem", {
+    fetch("/api/v1/problem", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
@@ -61,7 +61,7 @@ class ProblemList extends React.Component {
       (error) => console.log(error)
     )
 
-    fetch("http://localhost:3000/api/v1/problem/category", {
+    fetch("/api/v1/problem/category", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"

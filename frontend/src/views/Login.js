@@ -78,9 +78,10 @@ class Login extends React.Component {
       return;
     }
 
-    fetch("http://localhost:3000/api/auth/login/", {
+    fetch("http://localhost:3000/api/auth/login", {
       method: 'POST',
       redirect: 'follow',
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json;charset=utf-8"
       },
@@ -131,7 +132,7 @@ class Login extends React.Component {
                                 <i className="ni ni-single-02" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="이름" type="text" value={this.state.username} onChange={this.handleUsername} />
+                            <Input placeholder="아이디" type="text" value={this.state.username} onChange={this.handleUsername} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup className="mb-3">

@@ -110,7 +110,7 @@ class Register extends React.Component {
       return;
     }
 
-    fetch("http://localhost:3000/api/v1/member", {
+    fetch("/api/v1/member", {
       method: 'POST',
       redirect: 'follow',
       headers: {
@@ -186,7 +186,7 @@ class Register extends React.Component {
                                 <i className="ni ni-single-02" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="이름" type="text" value={this.state.userName} onChange={this.handleUserName} />
+                            <Input placeholder="아이디" type="text" value={this.state.userName} onChange={this.handleUserName} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>

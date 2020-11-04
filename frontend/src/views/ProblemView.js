@@ -60,7 +60,7 @@ class ProblemView extends React.Component {
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
 
-    fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
+    fetch("/api/v1/problem/" + this.state.problemId, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
