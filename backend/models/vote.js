@@ -54,7 +54,7 @@ module.exports = function(sequelize, DataTypes) {
       unique: "vote_ibfk_5"
     },
     type: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.CHAR(1),
       allowNull: false
     },
     created: {

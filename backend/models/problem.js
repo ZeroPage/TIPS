@@ -43,19 +43,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(4096),
       allowNull: true
     },
+    hint: {
+      type: DataTypes.STRING(4096),
+      allowNull: true
+    },
     created: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
-    },
-    vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
-    },
-    difficulty: {
-      type: DataTypes.INTEGER(1),
-      allowNull: false
     }
   }, {
     sequelize,

@@ -1,21 +1,21 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('answer', {
-    answer_id: {
+  return sequelize.define('class_member', {
+    class_member_id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    problem_id: {
+    class_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: 'problem',
-        key: 'problem_id'
+        model: 'class',
+        key: 'class_id'
       },
-      unique: "answer_ibfk_1"
+      unique: "class_member_ibfk_1"
     },
     member_id: {
       type: DataTypes.BIGINT,
@@ -24,15 +24,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'member',
         key: 'member_id'
       },
-      unique: "answer_ibfk_2"
-    },
-    content: {
-      type: "LONGTEXT",
-      allowNull: false
-    },
-    reference: {
-      type: DataTypes.STRING(4096),
-      allowNull: true
+      unique: "class_member_ibfk_2"
     },
     created: {
       type: DataTypes.DATE,
@@ -41,7 +33,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'answer',
+    tableName: 'class_member',
     schema: 'tips',
     timestamps: false
     });

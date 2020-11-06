@@ -1,36 +1,31 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('member', {
-    member_id: {
+  return sequelize.define('class', {
+    class_id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    username: {
+    name: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      unique: "username"
+      unique: "name"
     },
-    nickname: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: "nickname"
-    },
-    email: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: "email"
-    },
-    password: {
-      type: DataTypes.STRING(255),
+    description: {
+      type: "LONGTEXT",
       allowNull: false
     },
     created: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
+    },
+    is_default: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 0
     },
     is_admin: {
       type: DataTypes.INTEGER(1),
@@ -44,7 +39,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'member',
+    tableName: 'class',
     schema: 'tips',
     timestamps: false
     });

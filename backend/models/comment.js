@@ -61,11 +61,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.fn('current_timestamp')
-    },
-    vote: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: 0
     }
   }, {
     sequelize,
