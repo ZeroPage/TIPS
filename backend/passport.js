@@ -11,7 +11,7 @@ passport.use(new LocalStrategy({
   }, (req, username, password, done) => {
     models.member.findOne({ where: { username: username } })
     .then(member => {
-      if (!member ) {
+      if (!member) {
         return done(null, false, { message: 'Incorrect username.' });
       }
       if (!bcrypt.compareSync(password, member.password)) {
@@ -28,11 +28,13 @@ passport.use(new LocalStrategy({
 ));
 
 passport.serializeUser((member, done) => {
-  done(null, member);
+  done(null, member.member_id);
 });
 
-passport.deserializeUser((member, done) => {
-  done(null, member);
+passport.deserializeUser((member_id, done) => {
+  models.member.findByPk(member_id).then(member => {
+    done(null, member);
+  });
 });
 
 module.exports = passport;
