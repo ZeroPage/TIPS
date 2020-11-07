@@ -8,7 +8,9 @@ router.post('/login', passport.authenticate('local'), function(req, res, next) {
 
 router.post('/logout', function(req, res, next) {
   req.logout();
-  res.json({ success: 'ok' });
+  req.session.save(() => {
+    res.json({ success: 'ok' });
+  });
 });
 
 module.exports = router;
