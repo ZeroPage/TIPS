@@ -113,7 +113,7 @@ class ProblemEdit extends React.Component {
     }
 
     if(this.state.problemId !== 0) {
-      fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
+      fetch("/api/v1/problem/" + this.state.problemId, {
         method: 'PUT',
         redirect: 'follow',
         headers: {
@@ -326,6 +326,9 @@ class ProblemEdit extends React.Component {
                     <CKEditor
                       editor={ClassicEditor}
                       data={this.state.content}
+                      onInit={(event, editor) => {
+                        editor.resize_minHeight = 500;
+                      }}
                       onChange={(event, editor) => {
                           let data = editor.getData();
                           this.setState({content: data});

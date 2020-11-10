@@ -47,7 +47,7 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "proxy": "https://localhost:3000/",
+  "proxy": "http://localhost:3000/",
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^23.0.0",
     "@ckeditor/ckeditor5-react": "^2.1.0",

@@ -78,27 +78,34 @@ class Login extends React.Component {
       return;
     }
 
-    fetch("http://localhost:3000/api/auth/login", {
+    fetch("/api/auth/login", {
       method: 'POST',
       redirect: 'follow',
-      credentials: 'include',
       headers: {
-        "Content-Type": "application/json;charset=utf-8"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         'username': this.state.username,
         'password': this.state.password
       })
     })
-    .then(res => {
-      if(res.url === "http://localhost:3000/") {
-        this.setState({check: <><br /><Alert className="alert-success">로그인에 성공하였습니다.</Alert></>});
-        this.props.history.push('/');
-      }
-      else {
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok") {
+          this.setState({check: <><br /><Alert className="alert-success">로그인에 성공하였습니다.</Alert></>});
+          this.props.history.push('/');
+        }
+        else {
+          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          return;
+        }
+      },
+      (error) => {
         this.setState({check: <><br /><Alert className="alert-danger">로그인에 실패하였습니다.</Alert></>});
+        console.log(error);
       }
-    })
+    );
   }
 
   render() {

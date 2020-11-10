@@ -56,6 +56,24 @@ class DemoNavbar extends React.Component {
     });
   };
 
+  logout = () => {
+    fetch("/api/auth/logout", {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if(result.success === "ok")
+        {
+          alert("로그아웃되었습니다.");
+        }
+      }
+    );
+  }
+
   render() {
     return (
       <>
@@ -136,6 +154,17 @@ class DemoNavbar extends React.Component {
                     >
                       <span className="nav-link-inner--text ml-1">
                         로그인
+                      </span>
+                    </Button>
+                  </NavItem>
+                  <NavItem className="d-none d-lg-block ml-lg-3">
+                    <Button
+                      className="btn-neutral btn-icon"
+                      color="default"
+                      onClick={() => this.logout()}
+                    >
+                      <span className="nav-link-inner--text ml-1">
+                        로그아웃
                       </span>
                     </Button>
                   </NavItem>

@@ -80,7 +80,7 @@ class ProblemView extends React.Component {
             content: result.content,
             difficulty: result.difficulty,
             vote: result.vote,
-            time: result.time_limit
+            time: 0 //result.time_limit
           });
         }
       },
@@ -173,8 +173,9 @@ class ProblemView extends React.Component {
                   </p>
                   <p className="text-center">
                     출처 : {this.state.reference}
-                  <br />
-                    남은 시간 : {this.state.time} sec
+                  {//<br />
+                    //남은 시간 : {this.state.time} sec
+                  }
                   </p>
                   <div className="text-center">
                       <Button color="default" id="HintButton" type="button">
@@ -195,9 +196,9 @@ class ProblemView extends React.Component {
                       <Button color="default" type="button" onClick={() => this.toggleModal()}>
                         공유 하기
                       </Button>
-                      <Button color="default" type="button" onClick={() => this.setState({time:0})}>
+                      {/*<Button color="default" type="button" onClick={() => this.setState({time:0})}>
                         답안 확인
-                      </Button>
+                      </Button>*/}
                       <Modal
                         className="modal-dialog-centered"
                         isOpen={this.state.isShare}
