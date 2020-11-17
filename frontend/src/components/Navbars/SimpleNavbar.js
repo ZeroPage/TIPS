@@ -133,7 +133,7 @@ class DemoNavbar extends React.Component {
                   <UncontrolledDropdown nav>
                     <i className="ni ni-ui-04 d-lg-none mr-1" />
                     <span className="nav-link-inner--text">
-                      <a href="" className="text-white">문제 검색</a>
+                      <a href="/problem-search-page" className="text-white">문제 검색</a>
                     </span>
                   </UncontrolledDropdown>
                   <span>&emsp;&emsp;</span>
@@ -157,7 +157,7 @@ class DemoNavbar extends React.Component {
                       </span>
                     </Button>
                   </NavItem>
-                  <NavItem className="d-none d-lg-block ml-lg-3">
+                  {/*<NavItem className="d-none d-lg-block ml-lg-3">
                     <Button
                       className="btn-neutral btn-icon"
                       color="default"
@@ -167,7 +167,7 @@ class DemoNavbar extends React.Component {
                         로그아웃
                       </span>
                     </Button>
-                  </NavItem>
+                  </NavItem>*/}
                   <NavItem className="d-none d-lg-block ml-lg-3">
                     <Button
                       className="btn-neutral btn-icon"
