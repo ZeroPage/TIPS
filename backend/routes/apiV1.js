@@ -3,7 +3,7 @@ var router = express.Router();
 var bcrypt = require('bcrypt');
 var models = require('../models');
 
-router.post('/member', function(req, res, next) {
+router.post('/members', function(req, res, next) {
   req.body.password = bcrypt.hashSync(req.body.password, 10);
   models.member.create(req.body, {
     fields: ['username', 'nickname', 'email', 'password'],
@@ -12,7 +12,7 @@ router.post('/member', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/member/:member_id', function(req, res, next) {
+router.get('/members/:member_id', function(req, res, next) {
   models.member.findByPk(req.params.member_id)
   .then(member => {
     if (member) {
@@ -30,7 +30,7 @@ router.get('/member/:member_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.put('/member/:member_id', function(req, res, next) {
+router.put('/members/:member_id', function(req, res, next) {
   models.member.update(req.body, {
     fields: ['nickname', 'email', 'password'],
     where: {
@@ -41,7 +41,7 @@ router.put('/member/:member_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/member/:member_id', function(req, res, next) {
+router.delete('/members/:member_id', function(req, res, next) {
   models.member.destroy({
     where: {
       member_id: req.params.member_id,
@@ -51,7 +51,7 @@ router.delete('/member/:member_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/problem/category', function(req, res, next) {
+router.get('/problems/categories', function(req, res, next) {
   models.problem_category.findAll({
     attributes: ['category_id', 'parent_id', 'name'],
   })
@@ -64,7 +64,7 @@ router.get('/problem/category', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.post('/problem', function(req, res, next) {
+router.post('/problems', function(req, res, next) {
   models.problem.create(req.body, {
     fields: ['category_id', 'member_id', 'title', 'content', 'time_limit', 'reference'],
   })
@@ -72,7 +72,7 @@ router.post('/problem', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/problem', function(req, res, next) {
+router.get('/problems', function(req, res, next) {
   models.problem.findAll({
     attributes: ['problem_id', 'category_id', 'member_id', 'title', 'created', 'vote', 'difficulty'],
   })
@@ -85,7 +85,7 @@ router.get('/problem', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/problem/:problem_id', function(req, res, next) {
+router.get('/problems/:problem_id', function(req, res, next) {
   models.problem.findByPk(req.params.problem_id)
   .then(problem => {
     if (problem) {
@@ -108,7 +108,7 @@ router.get('/problem/:problem_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.put('/problem/:problem_id', function(req, res, next) {
+router.put('/problems/:problem_id', function(req, res, next) {
   models.problem.update(req.body, {
     fields: ['category_id', 'title', 'content', 'time_limit', 'reference'],
     where: {
@@ -119,7 +119,7 @@ router.put('/problem/:problem_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/problem/:problem_id', function(req, res, next) {
+router.delete('/problems/:problem_id', function(req, res, next) {
   models.problem.destroy({
     where: {
       problem_id: req.params.problem_id,
@@ -185,7 +185,7 @@ router.get('/solve/member/:member_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.post('/answer', function(req, res, next) {
+router.post('/answers', function(req, res, next) {
   models.answer.create(req.body, {
     fields: ['problem_id', 'member_id', 'content', 'reference'],
   })
@@ -193,7 +193,7 @@ router.post('/answer', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/answer/:answer_id', function(req, res, next) {
+router.get('/answers/:answer_id', function(req, res, next) {
   models.answer.findByPk(req.params.answer_id)
   .then(answer => {
     if (answer) {
@@ -213,7 +213,7 @@ router.get('/answer/:answer_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.put('/answer/:answer_id', function(req, res, next) {
+router.put('/answers/:answer_id', function(req, res, next) {
   models.answer.update(req.body, {
     fields: ['content', 'reference'],
     where: {
@@ -224,7 +224,7 @@ router.put('/answer/:answer_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/answer/:answer_id', function(req, res, next) {
+router.delete('/answers/:answer_id', function(req, res, next) {
   models.answer.destroy({
     where: {
       answer_id: req.params.answer_id,
@@ -234,7 +234,7 @@ router.delete('/answer/:answer_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.post('/comment', function(req, res, next) {
+router.post('/comments', function(req, res, next) {
   models.comment.create(req.body, {
     fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
   })
@@ -242,7 +242,7 @@ router.post('/comment', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/comment/:comment_id', function(req, res, next) {
+router.get('/comments/:comment_id', function(req, res, next) {
   models.comment.findByPk(req.params.comment_id)
   .then(comment => {
     if (comment) {
@@ -264,7 +264,7 @@ router.get('/comment/:comment_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.put('/comment/:comment_id', function(req, res, next) {
+router.put('/comments/:comment_id', function(req, res, next) {
   models.comment.update(req.body, {
     fields: ['content', 'reference'],
     where: {
@@ -275,7 +275,7 @@ router.put('/comment/:comment_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/comment/:comment_id', function(req, res, next) {
+router.delete('/comments/:comment_id', function(req, res, next) {
   models.comment.destroy({
     where: {
       comment_id: req.params.comment_id,
@@ -285,7 +285,7 @@ router.delete('/comment/:comment_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.post('/vote', function(req, res, next) {
+router.post('/votes', function(req, res, next) {
   models.vote.create(req.body, {
     fields: ['member_id', 'problem_id', 'answer_id', 'document_id', 'comment_id', 'type'],
   })
@@ -293,7 +293,7 @@ router.post('/vote', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/vote/:vote_id', function(req, res, next) {
+router.get('/votes/:vote_id', function(req, res, next) {
   models.vote.findByPk(req.params.vote_id)
   .then(vote => {
     if (vote) {
@@ -314,7 +314,7 @@ router.get('/vote/:vote_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/vote/:vote_id', function(req, res, next) {
+router.delete('/votes/:vote_id', function(req, res, next) {
   models.vote.destroy({
     where: {
       vote_id: req.params.vote_id,
