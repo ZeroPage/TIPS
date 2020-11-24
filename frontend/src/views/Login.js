@@ -89,10 +89,9 @@ class Login extends React.Component {
         'password': this.state.password
       })
     })
-    .then(res => res.json())
     .then(
       (result) => {
-        if(result.success === "ok") {
+        if(result.ok) {
           this.setState({check: <><br /><Alert className="alert-success">로그인에 성공하였습니다.</Alert></>});
           this.props.history.push('/');
         }

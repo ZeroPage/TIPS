@@ -28,6 +28,7 @@ import Login from "views/Login.js";
 import Register from "views/Register.js";
 import ProblemList from "views/ProblemList.js";
 import ProblemView from "views/ProblemView.js";
+import ProblemSearch from "views/ProblemSearch.js";
 import ProblemEdit from "views/ProblemEdit.js";
 import Landing from "views/examples/Landing.js";
 import Profile from "views/examples/Profile.js";
@@ -42,6 +43,7 @@ ReactDOM.render(
       <Route path="/register-page" exact render={props => <Register {...props} />} />
       <Route path="/problem-list-page" exact render={props => <ProblemList {...props} />} />
       <Route path="/problem-view-page/:id" exact render={props => <ProblemView {...props} />} />
+      <Route path="/problem-search-page/" exact render={props => <ProblemSearch {...props} />} />
       <Route path="/problem-edit-page" exact render={props => <ProblemEdit {...props} />} />
       <Route path="/problem-edit-page/:id" exact render={props => <ProblemEdit {...props} />} />
       <Redirect to="/" />

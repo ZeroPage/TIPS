@@ -20,6 +20,10 @@ import React from "react";
 // reactstrap components
 import { Button, Card, Container, Form, Input, Modal, PopoverBody, UncontrolledPopover, Row, Col } from "reactstrap";
 
+// CKEditor component
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 
@@ -30,11 +34,10 @@ class ProblemView extends React.Component {
       title: "",
       memberId: "",
       categoryId: "",
+      content: "",
       timeLimit: "",
       reference: "",
-      content: "",
-      difficulty: "",
-      vote: "",
+      hint:"",
       problemId: this.props.match.params.id,
       isShare: false,
       time: ""
@@ -75,11 +78,10 @@ class ProblemView extends React.Component {
             title: result.title,
             memberId: result.member_id,
             categoryId: result.category_id,
+            content: result.content,
             timeLimit: result.time_limit,
             reference: result.reference,
-            content: result.content,
-            difficulty: result.difficulty,
-            vote: result.vote,
+            hint:result.hint,
             time: 0 //result.time_limit
           });
         }
@@ -91,31 +93,37 @@ class ProblemView extends React.Component {
   }
 
   render() {
-    let answerPanel = <br />;
-    if (this.state.time === 0) {
-      let answer = "";
-      console.log(this.state.problemId);
-      if (this.state.problemId == 1) {
-        answer = "<p>Hello World!</p>";
-      }
-      else if (this.state.problemId == 2) {
-        answer = "<p>1. 표준 프로토콜을 사용"
-        + "<br>2. 작은 소리를 크게 변환 -  리피터 설치 증폭 / 작은 소리도 이해 가능 - 복조기 성능 향상"
-        + "<br>3. 빠른 속도의 조절 필요 - 반송파 신호 조정 / 빠른 속도도 이해 가능 - 반송파 신호 중첩"
-        + "<br>4. 한사람만 발언 허용 - 반이중 기술 적용/ 동시에 발언 가능 - 전이중 기술 적용"
-        + "<br>5.물이 아닌 전송매체 변화 - 무선통신 매체사용 / 물속 에서도 대화 가능 - 음파통신 매체사용<\p>";
-      }
-      else {
-        answer = "답변이 등록 되어있지 않습니다.";
-      }
-
-      answerPanel = (
-        <div>
-          <h2 className="display-5">답변</h2>
-          <div dangerouslySetInnerHTML={{ __html: answer }}></div>
-        </div>
-      );
-    }
+    let answerPanel = (
+      <div>
+        <h2 className="display-5">답변</h2>
+        <CKEditor
+          editor={ClassicEditor}
+          data={this.state.content}
+          config={{language:"ko"}}
+          onChange={(event, editor) => {
+            //let data = editor.getData();
+            //this.setState({content: data});
+          }}
+        />
+        <br />
+        <Row>
+          <Col lg="11">
+            <p>
+              admin<br />
+              Hello World!<br />
+              Chung-ang Univ.<br />
+            </p>
+          </Col>
+          <Col lg="1">
+            <div className="text-center">
+              <i className="icon ni ni-like-2" />
+              <p>×</p>
+            </div>
+          </Col>
+        </Row>
+        {/*<div dangerouslySetInnerHTML={{ __html: answer }}></div>*/}
+      </div>
+    );
     return (
       <>
         <SimpleNavbar />
@@ -187,7 +195,7 @@ class ProblemView extends React.Component {
                         className="popover-default"
                       >
                         <PopoverBody>
-                          Hello World!
+                          {this.state.hint}
                         </PopoverBody>
                       </UncontrolledPopover>
                       <Button color="default" type="button" href={"/problem-edit-page/" + this.state.problemId}>
@@ -223,6 +231,7 @@ class ProblemView extends React.Component {
                         </div>
                       </Modal>
                   </div>
+                  <br />
                   {answerPanel}
                   <br />
                 </Form>
