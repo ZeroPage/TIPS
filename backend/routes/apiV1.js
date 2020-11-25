@@ -8,98 +8,257 @@ router.post('/members', function(req, res, next) {
   models.member.create(req.body, {
     fields: ['username', 'nickname', 'email', 'password'],
   })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  .then(() => res.status(201).end())
+  .catch(() => res.status(400).end());
+});
+
+router.get('/members', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.json({
+      member_id: req.user.member_id,
+      username: req.user.username,
+      nickname: req.user.nickname,
+      email: req.user.email,
+      created: req.user.created,
+      is_admin: Boolean(req.user.is_admin),
+      is_prime: Boolean(req.user.is_prime),
+    });
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.put('/members', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.member.update(req.body, {
+      fields: ['nickname', 'password'],
+      where: {
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.get('/members/:member_id', function(req, res, next) {
-  models.member.findByPk(req.params.member_id)
+  models.member.findByPk(req.params.member_id, {
+    attributes: ['member_id', 'username', 'nickname', 'email', 'created',
+      'is_admin', 'is_prime'],
+  })
   .then(member => {
     if (member) {
-      res.json({
-        success: 'ok',
-        username: member.username,
-        nickname: member.nickname,
-        email: member.email,
-        create: member.created,
-      });
+      member.is_admin = Boolean(member.is_admin);
+      member.is_prime = Boolean(member.is_prime);
+      res.json(member);
     } else {
-      res.json({ success: 'fail' });
+      res.status(404).end();
     }
   })
-  .catch(() => res.json({ success: 'fail' }));
+  .catch(() => res.status(400).end());
 });
 
-router.put('/members/:member_id', function(req, res, next) {
-  models.member.update(req.body, {
-    fields: ['nickname', 'email', 'password'],
-    where: {
-      member_id: req.params.member_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+router.post('/classes', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.class.create(req.body, {
+      fields: ['name', 'description'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
-router.delete('/members/:member_id', function(req, res, next) {
-  models.member.destroy({
+router.get('/classes', function(req, res, next) {
+  models.class.findAll()
+  .then(classes => {
+    for (let i in classes) {
+      classes[i].is_default = Boolean(classes[i].is_default);
+      classes[i].is_admin = Boolean(classes[i].is_admin);
+      classes[i].is_prime = Boolean(classes[i].is_prime);
+    }
+    res.json({
+      results: classes,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.put('/classes/:class_id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.class_member.count({
+      where: {
+        class_id: req.params.class_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(count => {
+      if (count >= 1) {
+        models.class.update(req.body, {
+          fields: ['description'],
+          where: {
+            class_id: req.params.class_id,
+          },
+        })
+        .then(() => res.end())
+        .catch(() => res.status(400).end());
+      } else {
+        res.status(401).end();
+      }
+    })
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.post('/classes/:class_id/members', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.class_member.create({
+      class_id: req.params.class_id,
+      member_id: req.user.member_id,
+    }, {
+      fields: ['class_id', 'member_id'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/classes/:class_id/members', function(req, res, next) {
+  models.class_member.findAll({
+    attributes: ['class_member_id', 'class_id', 'member_id', 'created'],
     where: {
-      member_id: req.params.member_id,
+      class_id: req.params.class_id,
     },
   })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  .then(class_members => {
+    res.json({
+      results: class_members,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.post('/problems', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.problem.create(req.body, {
+      fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/problems', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 10;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'DESC';
+
+  models.problem.findAndCountAll({
+    order: [[order, direction]],
+    attributes: ['problem_id', 'category_id', 'member_id',
+      'title', 'time_limit', 'reference', 'hint', 'created'],
+    offset: page,
+    limit: per_page,
+  })
+  .then(problems => {
+    res.json({
+      results: problems.rows,
+      total_counts: problems.count,
+    });
+  })
+  .catch(() => res.status(400).end());
 });
 
 router.get('/problems/categories', function(req, res, next) {
   models.problem_category.findAll({
-    attributes: ['category_id', 'parent_id', 'name'],
+    attributes: ['category_id', 'parent_id', 'name', 'description'],
   })
   .then(categories => {
     res.json({
-      success: 'ok',
-      category: categories,
+      results: categories,
     });
   })
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.post('/problems', function(req, res, next) {
-  models.problem.create(req.body, {
-    fields: ['category_id', 'member_id', 'title', 'content', 'time_limit', 'reference'],
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.get('/problems', function(req, res, next) {
-  models.problem.findAll({
-    attributes: ['problem_id', 'category_id', 'member_id', 'title', 'created', 'vote', 'difficulty'],
-  })
-  .then(problems => {
-    res.json({
-      success: 'ok',
-      problem: problems,
-    });
-  })
-  .catch(() => res.json({ success: 'fail' }));
+  .catch(() => res.status(400).end());
 });
 
 router.get('/problems/:problem_id', function(req, res, next) {
-  models.problem.findByPk(req.params.problem_id)
+  models.problem.findByPk(req.params.problem_id, {
+    attributes: ['problem_id', 'category_id', 'member_id',
+      'title', 'time_limit', 'created'],
+  })
   .then(problem => {
     if (problem) {
+      res.json(problem);
+    } else {
+      res.status(404).end();
+    }
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.put('/problems/:problem_id', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.member_id == req.params.problem_id) {
+    models.problem.update(req.body, {
+      fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+      where: {
+        problem_id: req.params.problem_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.delete('/problems/:problem_id', function(req, res, next) {
+  if (req.isAuthenticated() && req.user.member_id == req.params.problem_id) {
+    models.problem.destroy({
+      where: {
+        problem_id: req.params.problem_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.post('/answers', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.answer.create(req.body, {
+      fields: ['problem_id', 'content', 'reference'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/answers/:answer_id', function(req, res, next) {
+  models.answer.findByPk(req.params.answer_id)
+  .then(answer => {
+    if (answer) {
       res.json({
         success: 'ok',
-        category_id: problem.category_id,
-        member_id: problem.member_id,
-        title: problem.title,
-        content: problem.content,
-        time_limit: problem.time_limit,
-        reference: problem.reference,
-        created: problem.created,
-        vote: problem.vote,
-        difficulty: problem.difficulty,
+        problem_id: answer.problem_id,
+        member_id: answer.member_id,
+        content: answer.content,
+        reference: answer.reference,
+        created: answer.created,
+        vote: answer.vote,
       });
     } else {
       res.json({ success: 'fail' });
@@ -108,21 +267,21 @@ router.get('/problems/:problem_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.put('/problems/:problem_id', function(req, res, next) {
-  models.problem.update(req.body, {
-    fields: ['category_id', 'title', 'content', 'time_limit', 'reference'],
+router.put('/answers/:answer_id', function(req, res, next) {
+  models.answer.update(req.body, {
+    fields: ['content', 'reference'],
     where: {
-      problem_id: req.params.problem_id,
+      answer_id: req.params.answer_id,
     },
   })
   .then(() => res.json({ success: 'ok' }))
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/problems/:problem_id', function(req, res, next) {
-  models.problem.destroy({
+router.delete('/answers/:answer_id', function(req, res, next) {
+  models.answer.destroy({
     where: {
-      problem_id: req.params.problem_id,
+      answer_id: req.params.answer_id,
     },
   })
   .then(() => res.json({ success: 'ok' }))
@@ -182,55 +341,6 @@ router.get('/solve/member/:member_id', function(req, res, next) {
       solve: solves,
     });
   })
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.post('/answers', function(req, res, next) {
-  models.answer.create(req.body, {
-    fields: ['problem_id', 'member_id', 'content', 'reference'],
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.get('/answers/:answer_id', function(req, res, next) {
-  models.answer.findByPk(req.params.answer_id)
-  .then(answer => {
-    if (answer) {
-      res.json({
-        success: 'ok',
-        problem_id: answer.problem_id,
-        member_id: answer.member_id,
-        content: answer.content,
-        reference: answer.reference,
-        created: answer.created,
-        vote: answer.vote,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
-  })
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.put('/answers/:answer_id', function(req, res, next) {
-  models.answer.update(req.body, {
-    fields: ['content', 'reference'],
-    where: {
-      answer_id: req.params.answer_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.delete('/answers/:answer_id', function(req, res, next) {
-  models.answer.destroy({
-    where: {
-      answer_id: req.params.answer_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
   .catch(() => res.json({ success: 'fail' }));
 });
 
