@@ -418,34 +418,6 @@ router.put('/difficulty', function(req, res, next) {
   }
 });
 
-router.get('/difficulty/:difficulty_id', function(req, res, next) {
-  models.difficulty.findByPk(req.params.difficulty_id)
-  .then(difficulty => {
-    if (difficulty) {
-      res.json({
-        success: 'ok',
-        problem_id: difficulty.problem_id,
-        member_id: difficulty.member_id,
-        difficulty: difficulty.difficulty,
-        created: difficulty.created,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
-  })
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.delete('/difficulty/:difficulty_id', function(req, res, next) {
-  models.difficulty.destroy({
-    where: {
-      difficulty_id: req.params.difficulty_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
-});
-
 router.post('/votes', function(req, res, next) {
   models.vote.create(req.body, {
     fields: ['member_id', 'problem_id', 'answer_id', 'document_id', 'comment_id', 'type'],
