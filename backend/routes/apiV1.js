@@ -207,11 +207,12 @@ router.get('/problems/:problem_id', function(req, res, next) {
 });
 
 router.put('/problems/:problem_id', function(req, res, next) {
-  if (req.isAuthenticated() && req.user.member_id == req.params.problem_id) {
+  if (req.isAuthenticated()) {
     models.problem.update(req.body, {
       fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
       where: {
         problem_id: req.params.problem_id,
+        member_id: req.user.member_id,
       },
     })
     .then(() => res.end())
@@ -222,10 +223,11 @@ router.put('/problems/:problem_id', function(req, res, next) {
 });
 
 router.delete('/problems/:problem_id', function(req, res, next) {
-  if (req.isAuthenticated() && req.user.member_id == req.params.problem_id) {
+  if (req.isAuthenticated()) {
     models.problem.destroy({
       where: {
         problem_id: req.params.problem_id,
+        member_id: req.user.member_id,
       },
     })
     .then(() => res.end())
@@ -270,11 +272,12 @@ router.get('/answers', function(req, res, next) {
 });
 
 router.put('/answers/:answer_id', function(req, res, next) {
-  if (req.isAuthenticated() && req.user.member_id == req.params.answer_id) {
+  if (req.isAuthenticated()) {
     models.answer.update(req.body, {
       fields: ['content', 'reference'],
       where: {
         answer_id: req.params.answer_id,
+        member_id: req.user.member_id,
       },
     })
     .then(() => res.end())
@@ -285,10 +288,11 @@ router.put('/answers/:answer_id', function(req, res, next) {
 });
 
 router.delete('/answers/:answer_id', function(req, res, next) {
-  if (req.isAuthenticated() && req.user.member_id == req.params.answer_id) {
+  if (req.isAuthenticated()) {
     models.answer.destroy({
       where: {
         answer_id: req.params.answer_id,
+        member_id: req.user.member_id,
       },
     })
     .then(() => res.end())
@@ -359,11 +363,59 @@ router.get('/solve/member/:member_id', function(req, res, next) {
 });
 
 router.post('/difficulty', function(req, res, next) {
-  models.difficulty.create(req.body, {
-    fields: ['problem_id', 'member_id', 'difficulty'],
+  if (req.isAuthenticated()) {
+    models.difficulty.create(req.body, {
+      fields: ['problem_id', 'score', 'description'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/difficulty', function(req, res, next) {
+  models.difficulty.findAndCountAll({
+    order: [['created', 'DESC']],
+    where: {
+      problem_id: req.body.problem_id,
+    },
   })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  .then(difficulty => {
+    if (difficulty) {
+      models.difficulty.findOne({
+        attributes: [[models.sequelize.fn('AVG', models.sequelize.col('score')), 'score']],
+        where: {
+          problem_id: req.body.problem_id,
+        },
+      })
+      .then(avg => res.json({
+        results: difficulty.rows,
+        average: avg.score,
+        total_count: difficulty.count,
+      }))
+      .catch(() => res.status(400).end())
+    } else {
+      res.status(404).end();
+    }
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.put('/difficulty', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.answer.update(req.body, {
+      fields: ['score', 'description'],
+      where: {
+        member_id: req.user.member_id,
+        problem_id: req.body.problem_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.get('/difficulty/:difficulty_id', function(req, res, next) {
