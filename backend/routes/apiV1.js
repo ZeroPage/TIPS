@@ -173,7 +173,7 @@ router.get('/problems', function(req, res, next) {
   .then(problems => {
     res.json({
       results: problems.rows,
-      total_counts: problems.count,
+      total_count: problems.count,
     });
   })
   .catch(() => res.status(400).end());
@@ -247,45 +247,55 @@ router.post('/answers', function(req, res, next) {
   }
 });
 
-router.get('/answers/:answer_id', function(req, res, next) {
-  models.answer.findByPk(req.params.answer_id)
-  .then(answer => {
-    if (answer) {
-      res.json({
-        success: 'ok',
-        problem_id: answer.problem_id,
-        member_id: answer.member_id,
-        content: answer.content,
-        reference: answer.reference,
-        created: answer.created,
-        vote: answer.vote,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
+router.get('/answers', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 5;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'DESC';
+
+  models.answer.findAndCountAll({
+    order: [[order, direction]],
+    attributes: ['answer_id', 'problem_id', 'member_id',
+      'content', 'reference', 'created'],
+    offset: page,
+    limit: per_page,
   })
-  .catch(() => res.json({ success: 'fail' }));
+  .then(answers => {
+    res.json({
+      results: answers.rows,
+      total_count: answers.count,
+    });
+  })
+  .catch(() => res.status(400).end());
 });
 
 router.put('/answers/:answer_id', function(req, res, next) {
-  models.answer.update(req.body, {
-    fields: ['content', 'reference'],
-    where: {
-      answer_id: req.params.answer_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated() && req.user.member_id == req.params.answer_id) {
+    models.answer.update(req.body, {
+      fields: ['content', 'reference'],
+      where: {
+        answer_id: req.params.answer_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.delete('/answers/:answer_id', function(req, res, next) {
-  models.answer.destroy({
-    where: {
-      answer_id: req.params.answer_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated() && req.user.member_id == req.params.answer_id) {
+    models.answer.destroy({
+      where: {
+        answer_id: req.params.answer_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.post('/solve', function(req, res, next) {
