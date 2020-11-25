@@ -358,28 +358,24 @@ router.get('/solve/member/:member_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.post('/comments', function(req, res, next) {
-  models.comment.create(req.body, {
-    fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
+router.post('/difficulty', function(req, res, next) {
+  models.difficulty.create(req.body, {
+    fields: ['problem_id', 'member_id', 'difficulty'],
   })
   .then(() => res.json({ success: 'ok' }))
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/comments/:comment_id', function(req, res, next) {
-  models.comment.findByPk(req.params.comment_id)
-  .then(comment => {
-    if (comment) {
+router.get('/difficulty/:difficulty_id', function(req, res, next) {
+  models.difficulty.findByPk(req.params.difficulty_id)
+  .then(difficulty => {
+    if (difficulty) {
       res.json({
         success: 'ok',
-        parent_id: comment.parent_id,
-        member_id: comment.member_id,
-        problem_id: comment.problem_id,
-        answer_id: comment.answer_id,
-        document_id: comment.document_id,
-        content: comment.content,
-        created: comment.created,
-        vote: comment.vote,
+        problem_id: difficulty.problem_id,
+        member_id: difficulty.member_id,
+        difficulty: difficulty.difficulty,
+        created: difficulty.created,
       });
     } else {
       res.json({ success: 'fail' });
@@ -388,21 +384,10 @@ router.get('/comments/:comment_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.put('/comments/:comment_id', function(req, res, next) {
-  models.comment.update(req.body, {
-    fields: ['content', 'reference'],
+router.delete('/difficulty/:difficulty_id', function(req, res, next) {
+  models.difficulty.destroy({
     where: {
-      comment_id: req.params.comment_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.delete('/comments/:comment_id', function(req, res, next) {
-  models.comment.destroy({
-    where: {
-      comment_id: req.params.comment_id,
+      difficulty_id: req.params.difficulty_id,
     },
   })
   .then(() => res.json({ success: 'ok' }))
@@ -448,24 +433,28 @@ router.delete('/votes/:vote_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.post('/difficulty', function(req, res, next) {
-  models.difficulty.create(req.body, {
-    fields: ['problem_id', 'member_id', 'difficulty'],
+router.post('/comments', function(req, res, next) {
+  models.comment.create(req.body, {
+    fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
   })
   .then(() => res.json({ success: 'ok' }))
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/difficulty/:difficulty_id', function(req, res, next) {
-  models.difficulty.findByPk(req.params.difficulty_id)
-  .then(difficulty => {
-    if (difficulty) {
+router.get('/comments/:comment_id', function(req, res, next) {
+  models.comment.findByPk(req.params.comment_id)
+  .then(comment => {
+    if (comment) {
       res.json({
         success: 'ok',
-        problem_id: difficulty.problem_id,
-        member_id: difficulty.member_id,
-        difficulty: difficulty.difficulty,
-        created: difficulty.created,
+        parent_id: comment.parent_id,
+        member_id: comment.member_id,
+        problem_id: comment.problem_id,
+        answer_id: comment.answer_id,
+        document_id: comment.document_id,
+        content: comment.content,
+        created: comment.created,
+        vote: comment.vote,
       });
     } else {
       res.json({ success: 'fail' });
@@ -474,10 +463,21 @@ router.get('/difficulty/:difficulty_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.delete('/difficulty/:difficulty_id', function(req, res, next) {
-  models.difficulty.destroy({
+router.put('/comments/:comment_id', function(req, res, next) {
+  models.comment.update(req.body, {
+    fields: ['content', 'reference'],
     where: {
-      difficulty_id: req.params.difficulty_id,
+      comment_id: req.params.comment_id,
+    },
+  })
+  .then(() => res.json({ success: 'ok' }))
+  .catch(() => res.json({ success: 'fail' }));
+});
+
+router.delete('/comments/:comment_id', function(req, res, next) {
+  models.comment.destroy({
+    where: {
+      comment_id: req.params.comment_id,
     },
   })
   .then(() => res.json({ success: 'ok' }))
