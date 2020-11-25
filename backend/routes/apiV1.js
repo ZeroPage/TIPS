@@ -299,21 +299,25 @@ router.delete('/answers/:answer_id', function(req, res, next) {
 });
 
 router.post('/solve', function(req, res, next) {
-  models.solve.create(req.body, {
-    fields: ['problem_id', 'member_id', 'content', 'duration'],
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    models.solve.create(req.body, {
+      fields: ['problem_id', 'content', 'duration'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.get('/solve', function(req, res, next) {
   models.solve.findAll({
     attributes: ['solve_id', 'problem_id', 'member_id', 'content', 'date', 'duration'],
   })
-  .then(solves => {
+  .then(solve => {
     res.json({
       success: 'ok',
-      solve: solves,
+      solve: solve,
     });
   })
   .catch(() => res.json({ success: 'fail' }));
@@ -345,10 +349,10 @@ router.get('/solve/member/:member_id', function(req, res, next) {
       member_id: req.params.member_id,
     },
   })
-  .then(solves => {
+  .then(solve => {
     res.json({
       success: 'ok',
-      solve: solves,
+      solve: solve,
     });
   })
   .catch(() => res.json({ success: 'fail' }));
