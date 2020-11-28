@@ -485,6 +485,86 @@ router.get('/boards/:board_id/categories', function(req, res, next) {
   .catch(() => res.status(400).end());
 });
 
+router.post('/documents', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.document.create(req.body, {
+      fields: ['board_id', 'category_id', 'title', 'content', 'reference'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/documents', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 10;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'DESC';
+
+  models.document.findAndCountAll({
+    order: [[order, direction]],
+    attributes: ['document_id', 'board_id', 'category_id', 'member_id',
+      'title', 'created'],
+    offset: page,
+    limit: per_page,
+  })
+  .then(documents => {
+    res.json({
+      results: documents.rows,
+      total_count: documents.count,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.get('/documents/:document_id', function(req, res, next) {
+  models.document.findByPk(req.params.document_id, {
+    attributes: ['document_id', 'board_id', 'category_id', 'member_id',
+      'title', 'content', 'reference', 'created'],
+  })
+  .then(document => {
+    if (document) {
+      res.json(document);
+    } else {
+      res.status(404).end();
+    }
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.put('/documents/:document_id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.document.update(req.body, {
+      fields: ['category_id', 'title', 'content', 'reference'],
+      where: {
+        document_id: req.params.document_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.delete('/documents/:document_id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.document.destroy({
+      where: {
+        document_id: req.params.document_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
 router.post('/comments', function(req, res, next) {
   models.comment.create(req.body, {
     fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
