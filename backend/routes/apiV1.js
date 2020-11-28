@@ -166,7 +166,7 @@ router.get('/problems', function(req, res, next) {
   models.problem.findAndCountAll({
     order: [[order, direction]],
     attributes: ['problem_id', 'category_id', 'member_id',
-      'title', 'time_limit', 'reference', 'hint', 'created'],
+      'title', 'time_limit', 'created'],
     offset: page,
     limit: per_page,
   })
@@ -194,7 +194,7 @@ router.get('/problems/categories', function(req, res, next) {
 router.get('/problems/:problem_id', function(req, res, next) {
   models.problem.findByPk(req.params.problem_id, {
     attributes: ['problem_id', 'category_id', 'member_id',
-      'title', 'time_limit', 'created'],
+      'title', 'content', 'time_limit', 'reference', 'hint', 'created'],
   })
   .then(problem => {
     if (problem) {
