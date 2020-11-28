@@ -460,6 +460,31 @@ router.put('/votes', function(req, res, next) {
   }
 });
 
+router.get('/boards', function(req, res, next) {
+  models.board.findAll({
+    attributes: ['board_id', 'name', 'description'],
+  })
+  .then(boards => {
+    res.json({
+      results: boards,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.get('/boards/:board_id/categories', function(req, res, next) {
+  models.document_category.findAll({
+    where: req.params,
+    attributes: ['category_id', 'parent_id', 'board_id', 'name', 'description'],
+  })
+  .then(categories => {
+    res.json({
+      results: categories,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
 router.post('/comments', function(req, res, next) {
   models.comment.create(req.body, {
     fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
