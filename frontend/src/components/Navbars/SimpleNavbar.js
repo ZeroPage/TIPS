@@ -23,6 +23,9 @@ import Headroom from "headroom.js";
 import {
   Button,
   UncontrolledCollapse,
+  DropdownMenu,
+  DropdownItem,
+  DropdownToggle,
   UncontrolledDropdown,
   NavbarBrand,
   Navbar,
@@ -41,7 +44,9 @@ class DemoNavbar extends React.Component {
   }
   state = {
     collapseClasses: "",
-    collapseOpen: false
+    collapseOpen: false,
+    isLogin: true,
+    member: ""
   };
 
   onExiting = () => {
@@ -63,10 +68,9 @@ class DemoNavbar extends React.Component {
         "Content-Type": "application/json"
       }
     })
-    .then(res => res.json())
     .then(
       (result) => {
-        if(result.success === "ok")
+        if(result.ok)
         {
           alert("로그아웃되었습니다.");
         }
@@ -74,7 +78,25 @@ class DemoNavbar extends React.Component {
     );
   }
 
+  isLogin() {
+    fetch("/api/v1/member", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok)
+        {
+          console.log(result.json());
+        }
+      }
+    );
+  }
+
   render() {
+    this.isLogin();
     return (
       <>
         <header className="header-global">
@@ -124,62 +146,109 @@ class DemoNavbar extends React.Component {
                 <Nav className="navbar-nav-hover align-items-lg-center" navbar>
                   <span>&emsp;</span>
                   <UncontrolledDropdown nav>
-                    <i className="ni ni-ui-04 d-lg-none mr-1" />
-                    <span className="nav-link-inner--text">
-                      <a href="/problem-list-page" className="text-white">문제 보기</a>
-                    </span>
+                    <DropdownToggle nav>
+                      <i className="ni ni-collection d-lg-none mr-1" />
+                      <span className="nav-link-inner--text">문제</span>
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      <DropdownItem to="/problem-list-page" tag={Link}>
+                        전체
+                      </DropdownItem>
+                      <DropdownItem to="/" tag={Link}>
+                        카테고리
+                      </DropdownItem>
+                      <DropdownItem to="/" tag={Link}>
+                        문제집/모의 면접
+                      </DropdownItem>
+                    </DropdownMenu>
                   </UncontrolledDropdown>
-                  <span>&emsp;&emsp;</span>
                   <UncontrolledDropdown nav>
-                    <i className="ni ni-ui-04 d-lg-none mr-1" />
-                    <span className="nav-link-inner--text">
-                      <a href="/problem-search-page" className="text-white">문제 검색</a>
-                    </span>
+                    <DropdownToggle nav>
+                      <i className="ni ni-collection d-lg-none mr-1" />
+                      <span className="nav-link-inner--text">그룹</span>
+                    </DropdownToggle>
                   </UncontrolledDropdown>
-                  <span>&emsp;&emsp;</span>
                   <UncontrolledDropdown nav>
-                    <i className="ni ni-ui-04 d-lg-none mr-1" />
-                    <span className="nav-link-inner--text">
-                      <a href="" className="text-white">그룹 보기</a>
-                    </span>
+                    <DropdownToggle nav>
+                      <i className="ni ni-collection d-lg-none mr-1" />
+                      <span className="nav-link-inner--text">게시판</span>
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      <DropdownItem to="/" tag={Link}>
+                        공지사항
+                      </DropdownItem>
+                      <DropdownItem to="/" tag={Link}>
+                        자유게시판
+                      </DropdownItem>
+                      <DropdownItem to="/" tag={Link}>
+                        질의응답
+                      </DropdownItem>
+                    </DropdownMenu>
                   </UncontrolledDropdown>
                 </Nav>
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>
-                  <NavItem className="d-none d-lg-block ml-lg-3">
-                    <Button
-                      className="btn-neutral btn-icon"
-                      color="default"
-                      href="/login-page"
-                      target="_self"
-                    >
-                      <span className="nav-link-inner--text ml-1">
-                        로그인
-                      </span>
-                    </Button>
-                  </NavItem>
-                  {/*<NavItem className="d-none d-lg-block ml-lg-3">
-                    <Button
-                      className="btn-neutral btn-icon"
-                      color="default"
-                      onClick={() => this.logout()}
-                    >
-                      <span className="nav-link-inner--text ml-1">
-                        로그아웃
-                      </span>
-                    </Button>
-                  </NavItem>*/}
-                  <NavItem className="d-none d-lg-block ml-lg-3">
-                    <Button
-                      className="btn-neutral btn-icon"
-                      color="default"
-                      href="/register-page"
-                      target="_self"
-                    >
-                      <span className="nav-link-inner--text ml-1">
-                        회원가입
-                      </span>
-                    </Button>
-                  </NavItem>
+                  {
+                  !this.state.isLogin && 
+                  <>
+                    <NavItem className="d-none d-lg-block ml- lg-3">
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/login-page"
+                        target="_self"
+                      >
+                        <span className="nav-link-inner--text ml-1">
+                          로그인
+                        </span>
+                      </Button>
+                    </NavItem>
+                    <NavItem className="d-none d-lg-block ml-lg-3">
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        onClick={() => this.logout()}
+                      >
+                        <span className="nav-link-inner--text ml-1">
+                          로그아웃
+                        </span>
+                      </Button>
+                    </NavItem>
+                    <NavItem className="d-none d-lg-block ml-lg-3">
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/register-page"
+                        target="_self"
+                      >
+                        <span className="nav-link-inner--text ml-1">
+                          회원가입
+                        </span>
+                      </Button>
+                    </NavItem>
+                  </>
+                  }
+                  {
+                  this.state.isLogin && 
+                  <>
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">게시판</span>
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem to="/" tag={Link}>
+                          공지사항
+                        </DropdownItem>
+                        <DropdownItem to="/" tag={Link}>
+                          자유게시판
+                        </DropdownItem>
+                        <DropdownItem to="/" tag={Link}>
+                          질의응답
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                  </>
+                  }
                 </Nav>
               </UncontrolledCollapse>
             </Container>

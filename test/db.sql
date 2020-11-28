@@ -21,8 +21,8 @@ CREATE TABLE member(
     password VARCHAR(255) NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    is_admin TINYINT(1) NOT NULL DEFAULT 0,
-    is_prime TINYINT(1) NOT NULL DEFAULT 0,
+    is_admin TINYINT(1) NOT NULL DEFAULT 0 CHECK(is_admin IN (0, 1)),
+    is_prime TINYINT(1) NOT NULL DEFAULT 0 CHECK(is_prime IN (0, 1)),
 
     KEY(created),
     KEY(is_admin),
@@ -37,9 +37,9 @@ CREATE TABLE class(
     description LONGTEXT NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    is_default TINYINT(1) NOT NULL DEFAULT 0,
-    is_admin TINYINT(1) NOT NULL DEFAULT 0,
-    is_prime TINYINT(1) NOT NULL DEFAULT 0,
+    is_default TINYINT(1) NOT NULL DEFAULT 0 CHECK(is_default IN (0, 1)),
+    is_admin TINYINT(1) NOT NULL DEFAULT 0 CHECK(is_admin IN (0, 1)),
+    is_prime TINYINT(1) NOT NULL DEFAULT 0 CHECK(is_prime IN (0, 1)),
 
     KEY(created),
     KEY(is_default),
@@ -106,7 +106,7 @@ CREATE TABLE solve(
     member_id BIGINT NOT NULL,
 
     content LONGTEXT NOT NULL,
-    duration TIME NOT NULL,
+    duration SMALLINT NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     KEY(problem_id),
@@ -289,8 +289,8 @@ INSERT INTO problem_category(name, description) VALUES('network', 'network');
 INSERT INTO problem(category_id, member_id, title, content, time_limit, reference, hint) VALUES(1, 1, 'problem', 'problem', 30, 'reference', 'hint');
 INSERT INTO problem(category_id, member_id, title, content, time_limit, reference, hint) VALUES(1, 1, 'problem 2', 'problem 2', 120, 'reference 2', 'hint 2');
 
-INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve', '00:10:00');
-INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve 2', '00:05:00');
+INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve', '60');
+INSERT INTO solve(problem_id, member_id, content, duration) VALUES(1, 2, 'solve 2', '30');
 
 INSERT INTO answer(problem_id, member_id, content, reference) VALUES(1, 1, 'answer', 'reference');
 INSERT INTO answer(problem_id, member_id, content, reference) VALUES(1, 2, 'answer 2', 'reference 2');
