@@ -418,43 +418,46 @@ router.put('/difficulty', function(req, res, next) {
   }
 });
 
-router.post('/votes', function(req, res, next) {
-  models.vote.create(req.body, {
-    fields: ['member_id', 'problem_id', 'answer_id', 'document_id', 'comment_id', 'type'],
+router.get('/votes', function(req, res, next) {
+  req.body.type = 'u';
+  models.vote.count({
+    where: req.body,
   })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  .then(up_count => {
+    req.body.type = 'd';
+    models.vote.count({
+      where: req.body,
+    })
+    .then(down_count => res.json({ u: up_count, d: down_count }))
+    .catch(() => res.status(400).end());
+  })
+  .catch(() => res.status(400).end());
 });
 
-router.get('/votes/:vote_id', function(req, res, next) {
-  models.vote.findByPk(req.params.vote_id)
-  .then(vote => {
-    if (vote) {
-      res.json({
-        success: 'ok',
-        member_id: vote.member_id,
-        problem_id: vote.problem_id,
-        answer_id: vote.answer_id,
-        document_id: vote.document_id,
-        comment_id: vote.comment_id,
-        type: vote.type,
-        created: vote.created,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
-  })
-  .catch(() => res.json({ success: 'fail' }));
-});
+router.put('/votes', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
+    const where = Object.assign({}, req.body);
+    delete where.type;
 
-router.delete('/votes/:vote_id', function(req, res, next) {
-  models.vote.destroy({
-    where: {
-      vote_id: req.params.vote_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+    models.vote.findOrCreate({
+      where: where,
+      defaults: req.body,
+    })
+    .then(vote => {
+      if (!vote[1]) {
+        vote[0].type = req.body.type;
+        vote[0].save()
+        .then(() => res.end())
+        .catch(() => res.status(400).end());
+      } else {
+        res.status(201).end();
+      }
+    })
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.post('/comments', function(req, res, next) {
