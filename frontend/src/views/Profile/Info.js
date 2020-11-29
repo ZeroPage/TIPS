@@ -105,7 +105,7 @@ class ProfileInfo extends React.Component {
     event.preventDefault();
 
     //check form
-    if(this.state.nickName === "")
+    if(this.state.nickname === "")
     {
       this.setState({check: <><br /><Alert className="alert-danger">닉네임이 비어있습니다.</Alert></>});
       return;
@@ -114,62 +114,36 @@ class ProfileInfo extends React.Component {
       this.setState({check: <><br /><Alert className="alert-danger">암호 길이는 최소 4자 이상이어야 합니다.</Alert></>});
       return;
     }
-    else if (this.state.password !== this.state.passwordCheck) {
+    else if (this.state.password !== this.state.passwordcheck) {
       this.setState({check: <><br /><Alert className="alert-danger">암호 확인이 일치하지 않습니다.</Alert></>});
       return;
     }
-
     fetch("/api/v1/members", {
-    method: 'PUT',
-    headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(
-    (result) => {
-      if(result.ok)
-      {
-        result.json().then(data => {
-          this.setState({
-          isLogin: true,
-          member_id: data.member_id,
-          username: data.username,
-          nickname: data.nickname,
-          email: data.email,
-          created: data.created,
-          isAdmin: data.is_admin,
-          isPrime: data.is_prime
-          });
-        });
-      }
-    });
-
-    fetch("/api/v1/members", {
-      method: 'POST',
+      method: 'PUT',
       redirect: 'follow',
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "nickname": this.state.nickName,
+        "nickname": this.state.nickname,
         "password": this.state.password
       })
     })
-    .then(res => res.json())
     .then(
       (result) => {
-        if(result.success === "ok")
+        if(result.ok)
         {
           this.props.history.push('/');
           return;
         }
         else
         {
-          console.log(result);
+          this.setState({check: <><br /><Alert className="alert-danger">서버와의 연결이 불안정합니다.</Alert></>});
           return;
         }
       },
       (error) => {
+        this.setState({check: <><br /><Alert className="alert-danger">서버와의 연결이 불안정합니다.</Alert></>});
         console.log(error);
       }
     )
@@ -293,7 +267,7 @@ class ProfileInfo extends React.Component {
                         className="mt-4"
                         color="primary"
                         type="button"
-                        //onClick={this.handleSubmit}
+                        onClick={this.handleSubmit}
                         >
                         회원정보 수정
                         </Button>

@@ -176,9 +176,7 @@ class ProblemList extends React.Component {
                     <br />
 
                   </Container>
-                  <Row xs="3">
-                    <Col></Col>
-                    <Col>                      
+                  <div className="text-center">                    
                     <Pagination aria-label="Page navigation example">
                       <PaginationItem disabled>
                         <PaginationLink first href="#" />
@@ -218,9 +216,7 @@ class ProblemList extends React.Component {
                         <PaginationLink last href="#" />
                       </PaginationItem>
                     </Pagination>
-                    </Col>
-                    <Col></Col>
-                  </Row>
+                  </div>
                 </Form>
               </div>
             </Card>
