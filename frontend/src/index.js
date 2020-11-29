@@ -46,7 +46,7 @@ ReactDOM.render(
       <Route path="/login-page" exact render={props => <Login {...props} />} />
       <Route path="/register-page" exact render={props => <Register {...props} />} />
       <Route path="/profile-info-page" exact render={props => <ProfileInfo {...props} />} />
-      <Route path="/profile-edit-page" exact render={props => <ProfileActivity {...props} />} />
+      <Route path="/profile-activity-page" exact render={props => <ProfileActivity {...props} />} />
 
       <Route path="/problem-list-page" exact render={props => <ProblemList {...props} />} />
       <Route path="/problem-list-page/:id" exact render={props => <ProblemList {...props} />} />

@@ -37,25 +37,29 @@ import {
 } from "reactstrap";
 
 class DemoNavbar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      collapseClasses: "",
+      collapseOpen: false,
+      isLogin: false,
+      member_id: "",
+      username: "",
+      nickname: "",
+      email: "",
+      created: "",
+      isAdmin: false,
+      isPrime: false
+    };
+
+    this.getLogin();
+  }
+
   componentDidMount() {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     // initialise
     headroom.init();
-    this.isLogin();
   }
-  
-  state = {
-    collapseClasses: "",
-    collapseOpen: false,
-    isLogin: false,
-    member_id: "",
-    username: "",
-    nickname: "",
-    email: "",
-    created: "",
-    isAdmin: false,
-    isPrime: false
-  };
 
   onExiting = () => {
     this.setState({
@@ -92,7 +96,7 @@ class DemoNavbar extends React.Component {
     return value? value[2] : null;
   }
 
-  isLogin() {
+  getLogin() {
     fetch("/api/v1/members", {
       method: 'GET',
       headers: {
@@ -253,7 +257,7 @@ class DemoNavbar extends React.Component {
                           <DropdownItem to="/profile-info-page" tag={Link}>
                             회원 정보
                           </DropdownItem>
-                          <DropdownItem to="/profile-edit-page" tag={Link}>
+                          <DropdownItem to="/profile-activity-page" tag={Link}>
                             활동 내역
                           </DropdownItem>
                         </DropdownMenu>

@@ -28,9 +28,7 @@ import {
   InputGroupAddon,
   InputGroupText,
   InputGroup,
-  Container,
-  Row,
-  Col
+  Container
 } from "reactstrap";
 
 // core components

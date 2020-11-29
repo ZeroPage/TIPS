@@ -18,7 +18,7 @@
 import React from "react";
 
 // reactstrap components
-import { Button, ButtonGroup, Badge, Card, Container, Form, Row, Col, ListGroup, ListGroupItem, Pagination, PaginationItem, PaginationLink, Progress } from "reactstrap";
+import { Button, Badge, Card, Container, Form, Row, Col, ListGroup, ListGroupItem, Pagination, PaginationItem, PaginationLink, Progress } from "reactstrap";
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
@@ -31,17 +31,17 @@ class ProblemList extends React.Component {
       items: [],
       categories: [],
       count: 0,
-      isAdmin: false,
-      isPrime: false,
-      isPopular: true
+      is_admin: false,
+      is_prime: false,
+      is_popular: true
     };
 
-    this.getUser();
+    this.getLogin();
     this.getProblem();
     this.getCategory();
   }
 
-  getUser() {
+  getLogin() {
     fetch("/api/v1/members", {
       method: 'GET',
       headers: {
@@ -53,8 +53,8 @@ class ProblemList extends React.Component {
         if(result.ok) {
           result.json().then(data => {
             this.setState({
-              isAdmin: data.is_admin,
-              isPrime: data.is_prime
+              is_admin: data.is_admin,
+              is_prime: data.is_prime
             });
           });
         }
@@ -140,20 +140,26 @@ class ProblemList extends React.Component {
       ret.push(
         <ListGroupItem>
           <Row>
-            <Col xs="9">
-              <h5>
-                <a href={"/problem-view-page/" + item.problem_id}>
-                  {item.title}
-                </a>
-              </h5>
+            <Col xs="10">
+              <Row>
+                <Col xs="3">No. {item.problem_id}</Col>
+                <Col xs="9">
+                  <a href={"/problem-view-page/" + item.problem_id}>
+                    {item.title}
+                  </a>
+                </Col>
+              </Row>
               <Row>
                 <Col xs="8">
-                  <ButtonGroup size="sm">
-                    <Button href = '#'>{this.getCategoryName(item.category_id)}</Button>
-                  </ButtonGroup>
+                  <Badge className="text-uppercase" color="primary" pill>
+                    {this.getCategoryName(item.category_id)}
+                  </Badge>
                 </Col>
                 <Col xs="4">게시일 : {item.created.substring(0, 10)}</Col>
               </Row>
+            </Col>
+            <Col xs="0">
+              {/* 성공/실패 여부 넣기 */}
             </Col>
             <Col xs="2">
               난이도 : {difficulty}단계
@@ -243,17 +249,17 @@ class ProblemList extends React.Component {
                     <Row xs="3">
                       <Col>
                         <br />
-                        <Button disabled={!this.state.isPopular}>
+                        <Button disabled={this.state.is_popular}>
                           인기순
                         </Button>
-                        <Button disabled={this.state.isPopular}>
+                        <Button disabled={!this.state.is_popular}>
                           최신순
                         </Button>
                       </Col>
                       <Col />
                       <Col>
                       {
-                        (this.state.isAdmin || this.state.isPrime) &&
+                        (this.state.is_admin || this.state.is_prime) &&
                         <div className="text-right">
                           <Button
                             className="mt-4"
