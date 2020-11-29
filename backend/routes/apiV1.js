@@ -9,7 +9,13 @@ router.post('/members', function(req, res, next) {
     fields: ['username', 'nickname', 'email', 'password'],
   })
   .then(() => res.status(201).end())
-  .catch(() => res.status(400).end());
+  .catch(error => {
+    if (error instanceof models.Sequelize.UniqueConstraintError) {
+      res.status(409).end();
+    } else {
+      res.status(400).end();
+    }
+  });
 });
 
 router.get('/members', function(req, res, next) {
@@ -38,7 +44,13 @@ router.put('/members', function(req, res, next) {
       },
     })
     .then(() => res.end())
-    .catch(() => res.status(400).end());
+    .catch(error => {
+      if (error instanceof models.Sequelize.UniqueConstraintError) {
+        res.status(409).end();
+      } else {
+        res.status(400).end();
+      }
+    });
   } else {
     res.status(401).end();
   }
