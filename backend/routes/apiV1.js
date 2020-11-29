@@ -166,7 +166,7 @@ router.get('/problems', function(req, res, next) {
   models.problem.findAndCountAll({
     order: [[order, direction]],
     attributes: ['problem_id', 'category_id', 'member_id',
-      'title', 'time_limit', 'reference', 'hint', 'created'],
+      'title', 'time_limit', 'created'],
     offset: page,
     limit: per_page,
   })
@@ -194,7 +194,7 @@ router.get('/problems/categories', function(req, res, next) {
 router.get('/problems/:problem_id', function(req, res, next) {
   models.problem.findByPk(req.params.problem_id, {
     attributes: ['problem_id', 'category_id', 'member_id',
-      'title', 'time_limit', 'created'],
+      'title', 'content', 'time_limit', 'reference', 'hint', 'created'],
   })
   .then(problem => {
     if (problem) {
@@ -418,94 +418,218 @@ router.put('/difficulty', function(req, res, next) {
   }
 });
 
-router.post('/votes', function(req, res, next) {
-  models.vote.create(req.body, {
-    fields: ['member_id', 'problem_id', 'answer_id', 'document_id', 'comment_id', 'type'],
+router.get('/votes', function(req, res, next) {
+  req.body.type = 'u';
+  models.vote.count({
+    where: req.body,
   })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  .then(up_count => {
+    req.body.type = 'd';
+    models.vote.count({
+      where: req.body,
+    })
+    .then(down_count => res.json({ u: up_count, d: down_count }))
+    .catch(() => res.status(400).end());
+  })
+  .catch(() => res.status(400).end());
 });
 
-router.get('/votes/:vote_id', function(req, res, next) {
-  models.vote.findByPk(req.params.vote_id)
-  .then(vote => {
-    if (vote) {
-      res.json({
-        success: 'ok',
-        member_id: vote.member_id,
-        problem_id: vote.problem_id,
-        answer_id: vote.answer_id,
-        document_id: vote.document_id,
-        comment_id: vote.comment_id,
-        type: vote.type,
-        created: vote.created,
-      });
+router.put('/votes', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
+    const where = Object.assign({}, req.body);
+    delete where.type;
+
+    models.vote.findOrCreate({
+      where: where,
+      defaults: req.body,
+    })
+    .then(vote => {
+      if (!vote[1]) {
+        vote[0].type = req.body.type;
+        vote[0].save()
+        .then(() => res.end())
+        .catch(() => res.status(400).end());
+      } else {
+        res.status(201).end();
+      }
+    })
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/boards', function(req, res, next) {
+  models.board.findAll({
+    attributes: ['board_id', 'name', 'description'],
+  })
+  .then(boards => {
+    res.json({
+      results: boards,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.get('/boards/:board_id/categories', function(req, res, next) {
+  models.document_category.findAll({
+    where: req.params,
+    attributes: ['category_id', 'parent_id', 'board_id', 'name', 'description'],
+  })
+  .then(categories => {
+    res.json({
+      results: categories,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.post('/documents', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.document.create(req.body, {
+      fields: ['board_id', 'category_id', 'title', 'content', 'reference'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.get('/documents', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 10;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'DESC';
+
+  models.document.findAndCountAll({
+    order: [[order, direction]],
+    attributes: ['document_id', 'board_id', 'category_id', 'member_id',
+      'title', 'created'],
+    offset: page,
+    limit: per_page,
+  })
+  .then(documents => {
+    res.json({
+      results: documents.rows,
+      total_count: documents.count,
+    });
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.get('/documents/:document_id', function(req, res, next) {
+  models.document.findByPk(req.params.document_id, {
+    attributes: ['document_id', 'board_id', 'category_id', 'member_id',
+      'title', 'content', 'reference', 'created'],
+  })
+  .then(document => {
+    if (document) {
+      res.json(document);
     } else {
-      res.json({ success: 'fail' });
+      res.status(404).end();
     }
   })
-  .catch(() => res.json({ success: 'fail' }));
+  .catch(() => res.status(400).end());
 });
 
-router.delete('/votes/:vote_id', function(req, res, next) {
-  models.vote.destroy({
-    where: {
-      vote_id: req.params.vote_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+router.put('/documents/:document_id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.document.update(req.body, {
+      fields: ['category_id', 'title', 'content', 'reference'],
+      where: {
+        document_id: req.params.document_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
+});
+
+router.delete('/documents/:document_id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    models.document.destroy({
+      where: {
+        document_id: req.params.document_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.post('/comments', function(req, res, next) {
-  models.comment.create(req.body, {
-    fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
+    models.comment.create(req.body, {
+      fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
-router.get('/comments/:comment_id', function(req, res, next) {
-  models.comment.findByPk(req.params.comment_id)
-  .then(comment => {
-    if (comment) {
-      res.json({
-        success: 'ok',
-        parent_id: comment.parent_id,
-        member_id: comment.member_id,
-        problem_id: comment.problem_id,
-        answer_id: comment.answer_id,
-        document_id: comment.document_id,
-        content: comment.content,
-        created: comment.created,
-        vote: comment.vote,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
+router.get('/comments', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 10;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'ASC';
+
+  models.comment.findAndCountAll({
+    order: [[order, direction]],
+    where: req.body,
+    attributes: ['comment_id', 'parent_id', 'member_id',
+      'problem_id', 'answer_id', 'document_id', 'content', 'created'],
+    offset: page,
+    limit: per_page,
   })
-  .catch(() => res.json({ success: 'fail' }));
+  .then(comments => {
+    res.json({
+      results: comments.rows,
+      total_count: comments.count,
+    });
+  })
+  .catch(() => res.status(400).end());
 });
 
 router.put('/comments/:comment_id', function(req, res, next) {
-  models.comment.update(req.body, {
-    fields: ['content', 'reference'],
-    where: {
-      comment_id: req.params.comment_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    models.comment.update(req.body, {
+      fields: ['content'],
+      where: {
+        comment_id: req.params.comment_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.delete('/comments/:comment_id', function(req, res, next) {
-  models.comment.destroy({
-    where: {
-      comment_id: req.params.comment_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    models.comment.destroy({
+      where: {
+        comment_id: req.params.comment_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 module.exports = router;
