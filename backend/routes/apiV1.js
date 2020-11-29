@@ -9,7 +9,13 @@ router.post('/members', function(req, res, next) {
     fields: ['username', 'nickname', 'email', 'password'],
   })
   .then(() => res.status(201).end())
-  .catch(() => res.status(400).end());
+  .catch(error => {
+    if (error instanceof models.Sequelize.UniqueConstraintError) {
+      res.status(409).end();
+    } else {
+      res.status(400).end();
+    }
+  });
 });
 
 router.get('/members', function(req, res, next) {
@@ -30,6 +36,7 @@ router.get('/members', function(req, res, next) {
 
 router.put('/members', function(req, res, next) {
   if (req.isAuthenticated()) {
+    req.body.password = bcrypt.hashSync(req.body.password, 10);
     models.member.update(req.body, {
       fields: ['nickname', 'password'],
       where: {
@@ -37,7 +44,13 @@ router.put('/members', function(req, res, next) {
       },
     })
     .then(() => res.end())
-    .catch(() => res.status(400).end());
+    .catch(error => {
+      if (error instanceof models.Sequelize.UniqueConstraintError) {
+        res.status(409).end();
+      } else {
+        res.status(400).end();
+      }
+    });
   } else {
     res.status(401).end();
   }
@@ -55,6 +68,26 @@ router.get('/members/:member_id', function(req, res, next) {
       res.json(member);
     } else {
       res.status(404).end();
+    }
+  })
+  .catch(() => res.status(400).end());
+});
+
+router.get('/members/check', function(req, res, next) {
+  models.member.count({
+    where: {
+      [models.Sequelize.Op.or]: [
+        { username: req.body.username || null },
+        { nickname: req.body.nickname || null },
+        { email: req.body.email || null },
+      ],
+    },
+  })
+  .then(count => {
+    if (count) {
+      res.status(409).end();
+    } else {
+      res.end();
     }
   })
   .catch(() => res.status(400).end());
