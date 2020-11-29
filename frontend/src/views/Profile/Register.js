@@ -110,7 +110,7 @@ class Register extends React.Component {
       return;
     }
 
-    fetch("/api/v1/member", {
+    fetch("/api/v1/members", {
       method: 'POST',
       redirect: 'follow',
       headers: {

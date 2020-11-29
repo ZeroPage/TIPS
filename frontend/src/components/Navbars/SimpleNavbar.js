@@ -35,6 +35,7 @@ import {
   Row,
   Col
 } from "reactstrap";
+import { getAllJSDocTagsOfKind } from "typescript";
 
 class DemoNavbar extends React.Component {
   componentDidMount() {
@@ -42,11 +43,18 @@ class DemoNavbar extends React.Component {
     // initialise
     headroom.init();
   }
+  
   state = {
     collapseClasses: "",
     collapseOpen: false,
-    isLogin: true,
-    member: ""
+    isLogin: false,
+    member_id: "",
+    username: "",
+    nickname: "",
+    email: "",
+    created: "",
+    isAdmin: false,
+    isPrime: false
   };
 
   onExiting = () => {
@@ -73,13 +81,19 @@ class DemoNavbar extends React.Component {
         if(result.ok)
         {
           alert("로그아웃되었습니다.");
+          window.location.reload();
         }
       }
     );
   }
 
+  getCookie(name) {
+    var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return value? value[2] : null;
+  }
+
   isLogin() {
-    fetch("/api/v1/member", {
+    fetch("/api/v1/members", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
@@ -89,7 +103,18 @@ class DemoNavbar extends React.Component {
       (result) => {
         if(result.ok)
         {
-          console.log(result.json());
+          result.json().then(data => {
+            this.setState({
+              isLogin: true,
+              member_id: data.member_id,
+              username: data.username,
+              nickname: data.nickname,
+              email: data.email,
+              created: data.created,
+              isAdmin: data.is_admin,
+              isPrime: data.is_prime
+            });
+          });
         }
       }
     );
@@ -206,17 +231,6 @@ class DemoNavbar extends React.Component {
                       <Button
                         className="btn-neutral btn-icon"
                         color="default"
-                        onClick={() => this.logout()}
-                      >
-                        <span className="nav-link-inner--text ml-1">
-                          로그아웃
-                        </span>
-                      </Button>
-                    </NavItem>
-                    <NavItem className="d-none d-lg-block ml-lg-3">
-                      <Button
-                        className="btn-neutral btn-icon"
-                        color="default"
                         href="/register-page"
                         target="_self"
                       >
@@ -230,23 +244,33 @@ class DemoNavbar extends React.Component {
                   {
                   this.state.isLogin && 
                   <>
-                    <UncontrolledDropdown nav>
-                      <DropdownToggle nav>
-                        <i className="ni ni-collection d-lg-none mr-1" />
-                        <span className="nav-link-inner--text">게시판</span>
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem to="/" tag={Link}>
-                          공지사항
-                        </DropdownItem>
-                        <DropdownItem to="/" tag={Link}>
-                          자유게시판
-                        </DropdownItem>
-                        <DropdownItem to="/" tag={Link}>
-                          질의응답
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                    <Nav className="navbar-nav-hover align-items-lg-center" navbar>
+                      <UncontrolledDropdown nav>
+                        <DropdownToggle nav>
+                          <i className="ni ni-collection d-lg-none mr-1" />
+                          <span className="nav-link-inner--text">{this.state.nickname}님 환영합니다.</span>
+                        </DropdownToggle>
+                        <DropdownMenu>
+                          <DropdownItem to="/profile-info-page" tag={Link}>
+                            회원 정보
+                          </DropdownItem>
+                          <DropdownItem to="/profile-edit-page" tag={Link}>
+                            활동 내역
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </UncontrolledDropdown>
+                    </Nav>
+                    <NavItem className="d-none d-lg-block ml-lg-3">
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        onClick={() => this.logout()}
+                      >
+                        <span className="nav-link-inner--text ml-1">
+                          로그아웃
+                        </span>
+                      </Button>
+                    </NavItem>
                   </>
                   }
                 </Nav>
