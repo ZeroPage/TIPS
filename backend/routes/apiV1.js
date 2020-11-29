@@ -30,6 +30,7 @@ router.get('/members', function(req, res, next) {
 
 router.put('/members', function(req, res, next) {
   if (req.isAuthenticated()) {
+    req.body.password = bcrypt.hashSync(req.body.password, 10);
     models.member.update(req.body, {
       fields: ['nickname', 'password'],
       where: {
