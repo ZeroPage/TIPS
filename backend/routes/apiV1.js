@@ -566,54 +566,70 @@ router.delete('/documents/:document_id', function(req, res, next) {
 });
 
 router.post('/comments', function(req, res, next) {
-  models.comment.create(req.body, {
-    fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
+    models.comment.create(req.body, {
+      fields: ['parent_id', 'member_id', 'problem_id', 'answer_id', 'document_id', 'content'],
+    })
+    .then(() => res.status(201).end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
-router.get('/comments/:comment_id', function(req, res, next) {
-  models.comment.findByPk(req.params.comment_id)
-  .then(comment => {
-    if (comment) {
-      res.json({
-        success: 'ok',
-        parent_id: comment.parent_id,
-        member_id: comment.member_id,
-        problem_id: comment.problem_id,
-        answer_id: comment.answer_id,
-        document_id: comment.document_id,
-        content: comment.content,
-        created: comment.created,
-        vote: comment.vote,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
+router.get('/comments', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 10;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'ASC';
+
+  models.comment.findAndCountAll({
+    order: [[order, direction]],
+    where: req.body,
+    attributes: ['comment_id', 'parent_id', 'member_id',
+      'problem_id', 'answer_id', 'document_id', 'content', 'created'],
+    offset: page,
+    limit: per_page,
   })
-  .catch(() => res.json({ success: 'fail' }));
+  .then(comments => {
+    res.json({
+      results: comments.rows,
+      total_count: comments.count,
+    });
+  })
+  .catch(() => res.status(400).end());
 });
 
 router.put('/comments/:comment_id', function(req, res, next) {
-  models.comment.update(req.body, {
-    fields: ['content', 'reference'],
-    where: {
-      comment_id: req.params.comment_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    models.comment.update(req.body, {
+      fields: ['content'],
+      where: {
+        comment_id: req.params.comment_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.delete('/comments/:comment_id', function(req, res, next) {
-  models.comment.destroy({
-    where: {
-      comment_id: req.params.comment_id,
-    },
-  })
-  .then(() => res.json({ success: 'ok' }))
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    models.comment.destroy({
+      where: {
+        comment_id: req.params.comment_id,
+        member_id: req.user.member_id,
+      },
+    })
+    .then(() => res.end())
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 module.exports = router;
