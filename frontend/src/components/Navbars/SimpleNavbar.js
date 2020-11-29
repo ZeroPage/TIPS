@@ -35,13 +35,13 @@ import {
   Row,
   Col
 } from "reactstrap";
-import { getAllJSDocTagsOfKind } from "typescript";
 
 class DemoNavbar extends React.Component {
   componentDidMount() {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     // initialise
     headroom.init();
+    this.isLogin();
   }
   
   state = {
@@ -121,7 +121,6 @@ class DemoNavbar extends React.Component {
   }
 
   render() {
-    this.isLogin();
     return (
       <>
         <header className="header-global">

@@ -35,6 +35,7 @@ import {
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
+import Template from "views/Template.js";
 
 class ProfileInfo extends React.Component {
   constructor(props) {
@@ -154,44 +155,7 @@ class ProfileInfo extends React.Component {
       <>
         <SimpleNavbar />
         <main ref="main">
-          <section className="section section-lg section-shaped pb-250">
-            {/* Circles background */}
-            <div className="shape shape-style-1 shape-default alpha-4">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-            <Container className="py-lg-md d-flex">
-              <div className="col px-0">
-                <Row>
-                  <Col className="text-center" lg="6">
-                    <h1 className="display-3 text-white">&nbsp;</h1>
-                  </Col>
-                </Row>
-              </div>
-            </Container>
-
-            {/* SVG separator */}
-            <div className="separator separator-bottom separator-skew">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="fill-white"
-                  points="2560 0 2560 100 0 100"
-                />
-              </svg>
-            </div>
-          </section>
+          <Template />
           <Container>
             <Card className="card-profile shadow mt--300">
               <div className="px-4">
@@ -207,7 +171,7 @@ class ProfileInfo extends React.Component {
                             <i className="ni ni-single-02" />
                             </InputGroupText>
                         </InputGroupAddon>
-                        <Input placeholder="아이디" type="text" value={this.state.username} />
+                        <Input placeholder="아이디" disabled type="text" value={this.state.username} />
                         </InputGroup>
                     </FormGroup>
                     <FormGroup>
@@ -227,7 +191,7 @@ class ProfileInfo extends React.Component {
                             <i className="ni ni-email-83" />
                             </InputGroupText>
                         </InputGroupAddon>
-                        <Input placeholder="E-mail" type="email" value={this.state.email} />
+                        <Input placeholder="E-mail" disabled type="email" value={this.state.email} />
                         </InputGroup>
                     </FormGroup>
                     <FormGroup>

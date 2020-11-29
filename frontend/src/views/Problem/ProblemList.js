@@ -22,201 +22,264 @@ import { Button, ButtonGroup, Badge, Card, Container, Form, Row, Col, ListGroup,
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
+import Template from "views/Template.js";
 
 class ProblemList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [],
-      category: [],
-      isConnect: false,
-      isLogin: true,
+      categories: [],
+      count: 0,
+      isAdmin: false,
+      isPrime: false,
+      isPopular: true
     };
+
+    this.getUser();
+    this.getProblem();
+    this.getCategory();
   }
 
+  getUser() {
+    fetch("/api/v1/members", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            this.setState({
+              isAdmin: data.is_admin,
+              isPrime: data.is_prime
+            });
+          });
+        }
+      }
+    );
+  }
+
+  getProblem() {
+    fetch("/api/v1/problems", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            this.setState({
+              items: data.results,
+              count: parseInt(data.total_count)
+            });
+          });
+        }
+      }
+    );
+  }
+
+  getCategory() {
+    fetch("/api/v1/problems/categories", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            this.setState({categories: data.results});
+          });
+        }
+      }
+    );
+  }
+
+  getCategoryName(find_id) {
+    for(var i=0;i<this.state.categories.length;i++) {
+      if(this.state.categories[i].category_id === find_id) {
+        return this.state.categories[i].name;
+      }
+    }
+    return "";
+  }
+
+  getDifficulty(problem_id) {
+    var ret = 0;
+    /*fetch("/api/v1/difficulty", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        'problem_id': problem_id
+      })
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            ret = data.average;
+          });
+        }
+      }
+    );*/
+    return ret;
+  }
+
+  getList() {
+    var ret = [];
+    this.state.items.forEach(item => {
+      var difficulty = this.getDifficulty(item.problem_id);
+      ret.push(
+        <ListGroupItem>
+          <Row>
+            <Col xs="9">
+              <h5>
+                <a href={"/problem-view-page/" + item.problem_id}>
+                  {item.title}
+                </a>
+              </h5>
+              <Row>
+                <Col xs="8">
+                  <ButtonGroup size="sm">
+                    <Button href = '#'>{this.getCategoryName(item.category_id)}</Button>
+                  </ButtonGroup>
+                </Col>
+                <Col xs="4">게시일 : {item.created.substring(0, 10)}</Col>
+              </Row>
+            </Col>
+            <Col xs="2">
+              난이도 : {difficulty}단계
+              <Progress max="5" value={difficulty} color="default" />
+            </Col>
+          </Row>
+        </ListGroupItem>
+      );
+    });
+    return ret;
+  }
+
+  getPagination() {
+    const TOTAL_PAGE = parseInt(this.state.count / 10) + 1;
+    const PAGE_NUM = 2;
+    var pageid = parseInt(this.props.match.params.id);
+    if(!pageid) pageid = 1; //id값이 없으면 기본값 1
+
+    var ret = [];
+    ret.push(
+      <PaginationItem>
+        <PaginationLink first href={"/problem-list-page/" + 1} />
+      </PaginationItem>
+    );
+    if(pageid != 1) {
+      ret.push(
+        <PaginationItem>
+          <PaginationLink previous href={"/problem-list-page/" + (pageid - 1)} />
+        </PaginationItem>
+      );
+    }
+
+    for(var id = Math.max(pageid - PAGE_NUM, 1);id <= Math.min(pageid + PAGE_NUM, TOTAL_PAGE);id++) {
+      if(pageid == id) {
+        ret.push(
+        <PaginationItem active>
+          <PaginationLink>
+            {id}
+          </PaginationLink>
+        </PaginationItem>
+        );
+      }
+      else {
+        ret.push(
+          <PaginationItem>
+            <PaginationLink href={"/problem-list-page/" + id}>
+              {id}
+            </PaginationLink>
+          </PaginationItem>
+          );
+      }
+
+      if(id % 10 == 0) {
+        ret.push(<br />);
+      }
+    }
+
+    if(pageid != TOTAL_PAGE) {
+      ret.push(
+        <PaginationItem>
+          <PaginationLink next href={"/problem-list-page/" + (pageid + 1)} />
+        </PaginationItem>
+      );
+    }
+    ret.push(
+      <PaginationItem>
+        <PaginationLink last href={"/problem-list-page/" + TOTAL_PAGE} />
+      </PaginationItem>
+    );
+
+    return ret;
+  }
 
   render() {
     return (
       <>
         <SimpleNavbar />
         <main ref="main">
-          <section className="section section-lg section-shaped pb-250">
-            {/* Circles background */}
-            <div className="shape shape-style-1 shape-default alpha-4">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-            <Container className="py-lg-md d-flex">
-              <div className="col px-0">
-                <Row>
-                  <Col className="text-center" lg="6">
-                    <h1 className="display-3 text-white">&nbsp;</h1>
-                  </Col>
-                </Row>
-              </div>
-            </Container>
-
-            {/* SVG separator */}
-            <div className="separator separator-bottom separator-skew">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="fill-white"
-                  points="2560 0 2560 100 0 100"
-                />
-              </svg>
-            </div>
-          </section>
+          <Template />
           <Container>
             <Card className="card-profile shadow mt--300">
               <div className="px-4">
                 <Form>
                   <br />
                   <h1 className="display-3 text-center">문제 목록</h1>
-                  <br />
                   <Container>
-
-                    <ListGroup flush>
-                      <ListGroupItem disabled tag="a" href="#">
-                        <Row>
-                        <Col xs="auto">
-                          <ButtonGroup size="lg">
-                            <Button>인기순</Button>
-                            <Button>날짜순</Button>
-                          </ButtonGroup>
-                        </Col>
-                      </Row>
-                      </ListGroupItem>
-                      <ListGroupItem>
-                        <Row>
-                          <Col xs="9">
-                            <a href={"problem-view-page/"}>배치가 가운데로 잘 안되는듯</a>
-                            <Row>
-                              <Col xs="8">
-                                <ButtonGroup size="sm">
-                                  <Button href = '#'>자료구조</Button>
-                                </ButtonGroup>
-                              </Col>
-                              <Col xs="4">게시일 : 2020.01.02</Col>
-                            </Row>
-                          </Col>
-                          <Col xs="1">111<Badge color="light">추천</Badge></Col>
-                        </Row>
-                      </ListGroupItem>
-                      <ListGroupItem>
-                        <Row>
-                          <Col xs="9">
-                            <a href={"problem-view-page/"}>배치가 가운데로 잘 안되는듯</a>
-                            <Row>
-                              <Col xs="8">
-                                <ButtonGroup size="sm">
-                                  <Button href = '#'>OS</Button>
-                                </ButtonGroup>
-                              </Col>
-                              <Col xs="4"></Col>
-                            </Row>
-                          </Col>
-                          <Col xs="1"><Badge color="primary">성공</Badge></Col>
-                          
-                          <Col xs="2">
-                      난이도 : 1단계
-                        <Progress max="5" value="1" color="default" /></Col>
-                        </Row>
-                      </ListGroupItem>
-                      
-                      <ListGroupItem>
-                        <Row>
-                          <Col xs="9">
-                            <a href={"problem-view-page/"}>배치가 가운데로 잘 안되는듯</a>
-                            <Row>
-                              <Col xs="8">
-                                <ButtonGroup size="sm">
-                                  <Button href = '#'>OS</Button>
-                                </ButtonGroup>
-                              </Col>
-                              <Col xs="4"></Col>
-                            </Row>
-                          </Col>
-                          <Col xs="1"><Badge color="danger">실패</Badge></Col>
-                          
-                          <Col xs="2">
-                      난이도 : 4단계
-                        <Progress max="5" value="4" color="default" /></Col>
-                        </Row>
-                      </ListGroupItem>
-                    </ListGroup>
-
-
-
-
-                    {
-                      this.state.isLogin &&
-                      <div className="text-center">
-                        <Button
-                          className="mt-4"
-                          color="primary"
-                          type="button"
-                          href="/problem-edit-page"
-                        >
-                          문제 추가버튼 : 링크를 위해 남겨놓음
+                    <Row xs="3">
+                      <Col>
+                        <br />
+                        <Button disabled={!this.state.isPopular}>
+                          인기순
                         </Button>
-                      </div>
-                    }
+                        <Button disabled={this.state.isPopular}>
+                          최신순
+                        </Button>
+                      </Col>
+                      <Col />
+                      <Col>
+                      {
+                        (this.state.isAdmin || this.state.isPrime) &&
+                        <div className="text-right">
+                          <Button
+                            className="mt-4"
+                            color="primary"
+                            type="button"
+                            href="/problem-edit-page"
+                          >
+                            문제 추가
+                          </Button>
+                        </div>
+                      }
+                      </Col>
+                    </Row>
                     <br />
-
+                    <ListGroup>
+                      {this.getList()}
+                    </ListGroup>
+                    <br />
+                    <Row xs="3">
+                      <Col />
+                      <Pagination>
+                        {this.getPagination()}
+                      </Pagination>
+                      <Col />
+                    </Row>
                   </Container>
-                  <div className="text-center">                    
-                    <Pagination aria-label="Page navigation example">
-                      <PaginationItem disabled>
-                        <PaginationLink first href="#" />
-                      </PaginationItem>
-                      <PaginationItem disabled>
-                        <PaginationLink previous href="#" />
-                      </PaginationItem>
-                      <PaginationItem active>
-                        <PaginationLink href="#">
-                          1
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">
-                          2
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">
-                          3
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">
-                          4
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">
-                          5
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink next href="#" />
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink last href="#" />
-                      </PaginationItem>
-                    </Pagination>
-                  </div>
                 </Form>
               </div>
             </Card>

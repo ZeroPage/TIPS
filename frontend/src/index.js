@@ -49,6 +49,7 @@ ReactDOM.render(
       <Route path="/profile-edit-page" exact render={props => <ProfileActivity {...props} />} />
 
       <Route path="/problem-list-page" exact render={props => <ProblemList {...props} />} />
+      <Route path="/problem-list-page/:id" exact render={props => <ProblemList {...props} />} />
       <Route path="/problem-view-page/:id" exact render={props => <ProblemView {...props} />} />
       <Route path="/problem-edit-page" exact render={props => <ProblemEdit {...props} />} />
       <Route path="/problem-edit-page/:id" exact render={props => <ProblemEdit {...props} />} />

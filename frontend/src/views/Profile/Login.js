@@ -96,12 +96,12 @@ class Login extends React.Component {
           this.props.history.push('/');
         }
         else {
-          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          this.setState({check: <><br /><Alert className="alert-danger">아이디 또는 패스워드를 확인해주세요.</Alert></>});
           return;
         }
       },
       (error) => {
-        this.setState({check: <><br /><Alert className="alert-danger">로그인에 실패하였습니다.</Alert></>});
+        this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
         console.log(error);
       }
     );
@@ -138,7 +138,11 @@ class Login extends React.Component {
                                 <i className="ni ni-single-02" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="아이디" type="text" value={this.state.username} onChange={this.handleUsername} />
+                            <Input placeholder="아이디"
+                              type="text"
+                              value={this.state.username}
+                              onChange={this.handleUsername}
+                            />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup className="mb-3">
