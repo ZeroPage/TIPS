@@ -56,7 +56,9 @@ CREATE TABLE class_member(
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE KEY(class_id, member_id),
+
     KEY(created),
+
     FOREIGN KEY(class_id) REFERENCES class(class_id),
     FOREIGN KEY(member_id) REFERENCES member(member_id)
 );
@@ -70,7 +72,6 @@ CREATE TABLE problem_category(
     name VARCHAR(255) NOT NULL,
     description LONGTEXT NOT NULL,
 
-    KEY(parent_id),
     KEY(name),
 
     FOREIGN KEY(parent_id) REFERENCES problem_category(category_id)
@@ -89,8 +90,6 @@ CREATE TABLE problem(
     hint VARCHAR(4096),
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    KEY(category_id),
-    KEY(member_id),
     KEY(title),
     KEY(time_limit),
     KEY(created),
@@ -109,8 +108,6 @@ CREATE TABLE solve(
     duration SMALLINT NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    KEY(problem_id),
-    KEY(member_id),
     KEY(duration),
     KEY(created),
 
@@ -128,8 +125,6 @@ CREATE TABLE answer(
     reference VARCHAR(4096),
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    KEY(problem_id),
-    KEY(member_id),
     KEY(created),
 
     FOREIGN KEY(problem_id) REFERENCES problem(problem_id),
@@ -154,8 +149,6 @@ CREATE TABLE document_category(
     name VARCHAR(255) NOT NULL,
     description LONGTEXT NOT NULL,
 
-    KEY(parent_id),
-    KEY(board_id),
     KEY(name),
 
     FOREIGN KEY(parent_id) REFERENCES document_category(category_id),
@@ -174,9 +167,6 @@ CREATE TABLE document(
     reference VARCHAR(4096),
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    KEY(board_id),
-    KEY(category_id),
-    KEY(member_id),
     KEY(title),
     KEY(created),
 
@@ -198,11 +188,6 @@ CREATE TABLE comment(
     content LONGTEXT NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    KEY(parent_id),
-    KEY(member_id),
-    KEY(problem_id),
-    KEY(answer_id),
-    KEY(document_id),
     KEY(created),
 
     FOREIGN KEY(parent_id) REFERENCES comment(comment_id),
@@ -231,11 +216,6 @@ CREATE TABLE vote(
     UNIQUE KEY(member_id, document_id),
     UNIQUE KEY(member_id, comment_id),
 
-    KEY(member_id),
-    KEY(problem_id),
-    KEY(answer_id),
-    KEY(document_id),
-    KEY(comment_id),
     KEY(type),
     KEY(created),
 
@@ -258,8 +238,6 @@ CREATE TABLE difficulty(
 
     UNIQUE KEY(member_id, problem_id),
 
-    KEY(member_id),
-    KEY(problem_id),
     KEY(score),
     KEY(created),
 
