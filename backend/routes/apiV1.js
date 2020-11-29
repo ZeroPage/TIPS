@@ -73,6 +73,26 @@ router.get('/members/:member_id', function(req, res, next) {
   .catch(() => res.status(400).end());
 });
 
+router.get('/members/check', function(req, res, next) {
+  models.member.count({
+    where: {
+      [models.Sequelize.Op.or]: [
+        { username: req.body.username || null },
+        { nickname: req.body.nickname || null },
+        { email: req.body.email || null },
+      ],
+    },
+  })
+  .then(count => {
+    if (count) {
+      res.status(409).end();
+    } else {
+      res.end();
+    }
+  })
+  .catch(() => res.status(400).end());
+});
+
 router.post('/classes', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.class.create(req.body, {
