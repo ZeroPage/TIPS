@@ -346,8 +346,9 @@ router.delete('/problems/:problem_id', function(req, res, next) {
 
 router.post('/answers', function(req, res, next) {
   if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
     models.answer.create(req.body, {
-      fields: ['problem_id', 'content', 'reference'],
+      fields: ['problem_id', 'member_id', 'content', 'reference'],
     })
     .then(() => res.status(201).end())
     .catch(() => res.status(400).end());
