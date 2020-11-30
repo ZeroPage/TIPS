@@ -99,7 +99,13 @@ router.post('/classes', function(req, res, next) {
       fields: ['name', 'description'],
     })
     .then(() => res.status(201).end())
-    .catch(() => res.status(400).end());
+    .catch(error => {
+      if (error instanceof models.Sequelize.UniqueConstraintError) {
+        res.status(409).end();
+      } else {
+        res.status(400).end();
+      }
+    });
   } else {
     res.status(401).end();
   }
@@ -122,24 +128,36 @@ router.get('/classes', function(req, res, next) {
 
 router.put('/classes/:class_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.class_member.count({
+    models.class.count({
       where: {
         class_id: req.params.class_id,
-        member_id: req.user.member_id,
       },
     })
     .then(count => {
-      if (count >= 1) {
-        models.class.update(req.body, {
-          fields: ['description'],
+      if (count) {
+        models.class_member.count({
           where: {
             class_id: req.params.class_id,
+            member_id: req.user.member_id,
           },
         })
-        .then(() => res.end())
+        .then(count => {
+          if (count >= 1) {
+            models.class.update(req.body, {
+              fields: ['description'],
+              where: {
+                class_id: req.params.class_id,
+              },
+            })
+            .then(() => res.end())
+            .catch(() => res.status(400).end());
+          } else {
+            res.status(401).end();
+          }
+        })
         .catch(() => res.status(400).end());
       } else {
-        res.status(401).end();
+        res.status(404).end();
       }
     })
     .catch(() => res.status(400).end());
@@ -150,13 +168,31 @@ router.put('/classes/:class_id', function(req, res, next) {
 
 router.post('/classes/:class_id/members', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.class_member.create({
-      class_id: req.params.class_id,
-      member_id: req.user.member_id,
-    }, {
-      fields: ['class_id', 'member_id'],
+    models.class.count({
+      where: {
+        class_id: req.params.class_id,
+      },
     })
-    .then(() => res.status(201).end())
+    .then(count => {
+      if (count) {
+        models.class_member.create({
+          class_id: req.params.class_id,
+          member_id: req.user.member_id,
+        }, {
+          fields: ['class_id', 'member_id'],
+        })
+        .then(() => res.status(201).end())
+        .catch(error => {
+          if (error instanceof models.Sequelize.UniqueConstraintError) {
+            res.status(409).end();
+          } else {
+            res.status(400).end();
+          }
+        });
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -164,16 +200,28 @@ router.post('/classes/:class_id/members', function(req, res, next) {
 });
 
 router.get('/classes/:class_id/members', function(req, res, next) {
-  models.class_member.findAll({
-    attributes: ['class_member_id', 'class_id', 'member_id', 'created'],
+  models.class.count({
     where: {
       class_id: req.params.class_id,
     },
   })
-  .then(class_members => {
-    res.json({
-      results: class_members,
-    });
+  .then(count => {
+    if (count) {
+      models.class_member.findAll({
+        attributes: ['class_member_id', 'class_id', 'member_id', 'created'],
+        where: {
+          class_id: req.params.class_id,
+        },
+      })
+      .then(class_members => {
+        res.json({
+          results: class_members,
+        });
+      })
+      .catch(() => res.status(400).end());
+    } else {
+      res.status(404).end();
+    }
   })
   .catch(() => res.status(400).end());
 });
