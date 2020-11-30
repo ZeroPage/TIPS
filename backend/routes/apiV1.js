@@ -257,11 +257,23 @@ router.get('/problems', function(req, res, next) {
   const per_page = Number(req.query.per_page) || 10;
   const order = req.query.order || 'created';
   const direction = req.query.direction || 'DESC';
+  let where = {};
+
+  if (req.query.category_id) {
+    where.category_id = req.query.category_id;
+  }
+  if (req.query.title) {
+    where.title = { [models.Sequelize.Op.like]: req.query.title };
+  }
+  if (req.query.content) {
+    where.content = { [models.Sequelize.Op.like]: req.query.content };
+  }
 
   models.problem.findAndCountAll({
     order: [[order, direction]],
     attributes: ['problem_id', 'category_id', 'member_id',
       'title', 'time_limit', 'created'],
+    where: where,
     offset: page,
     limit: per_page,
   })
