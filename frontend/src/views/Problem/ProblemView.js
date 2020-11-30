@@ -96,7 +96,7 @@ class ProblemView extends React.Component {
   }
 
   handleAnswerSubmit() {
-    fetch("/api/v1/answers/", {
+    fetch("/api/v1/answers", {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
@@ -128,7 +128,7 @@ class ProblemView extends React.Component {
   }
 
   handleAnswerDelete() {
-    fetch("/api/v1/answers/" + "2", {
+    fetch("/api/v1/answers/" + "1", {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json"
@@ -261,25 +261,18 @@ class ProblemView extends React.Component {
   
   getMember(member_id) {
     return member_id;
-    /*var res = "";
-
-    fetch("/api/v1/members/" + member_id, {
+    /*const result = await fetch("/api/v1/members/" + member_id, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
       }
     })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            res = data.nickname;
-          });
-        }
-      }
-    );
     
-    return res;*/
+    if(result.ok) {
+      const data = await result.json();
+      return data.nickname;
+    }
+    return "";*/
   }
 
   getCategoryName(find_id) {
@@ -386,12 +379,12 @@ class ProblemView extends React.Component {
     ret.push(
       <Row xs='2'>
         <Col>
-          <h5>총 {this.state.answer_count}개의 답변</h5>
+          <h5>총 {this.state.answer_count}개의 풀이</h5>
         </Col>
         <Col>
           <div class="text-right">
             <Button size="sm" disabled={this.state.is_popular}>
-              인기순
+              추천순
             </Button>
             <Button size="sm" disabled={!this.state.is_popular}>
               최신순
@@ -443,7 +436,7 @@ class ProblemView extends React.Component {
     if(this.state.answer_count !== this.state.answers.length) {
       ret.push(
         <Button color="primary" size="lg" href="/problem-solve-page" block>
-          답변 더 보기
+          풀이 더 보기
         </Button>
       );
     }
@@ -452,7 +445,7 @@ class ProblemView extends React.Component {
 
     if(this.state.member_id !== 0) {
       ret.push(
-        <div>
+        <div className="text-center">
           <h2>풀이작성</h2>
           <CKEditor
             editor={ClassicEditor}

@@ -29,7 +29,7 @@
   },
   "homepage": "https://demos.creative-tim.com/argon-design-system-react/",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "set HTTPS=true && react-scripts start",
     "build": "react-scripts build && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -58,6 +58,7 @@
     "moment": "2.24.0",
     "node-sass": "4.13.1",
     "nouislider": "14.1.1",
+    "query-string": "^6.13.7",
     "react": "16.12.0",
     "react-datetime": "^3.0.4",
     "react-dom": "16.12.0",

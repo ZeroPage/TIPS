@@ -16,9 +16,12 @@
 
 */
 import React from "react";
+import queryString from 'query-string';
 
 // reactstrap components
-import { Button, Badge, Card, Container, Form, Row, Col, ListGroup, ListGroupItem, Pagination, PaginationItem, PaginationLink, Progress } from "reactstrap";
+import { Button, Badge, Card, Container, Form, Row, Col,
+  FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText,
+  ListGroup, ListGroupItem, Pagination, PaginationItem, PaginationLink, Progress } from "reactstrap";
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
@@ -27,9 +30,15 @@ import Template from "views/Template.js";
 class ProblemList extends React.Component {
   constructor(props) {
     super(props);
+
+    const { search } = this.props.location;
+    const queryObj = queryString.parse(search);
+    const { category_id } = queryObj;
+
     this.state = {
       items: [],
       categories: [],
+      category_id: category_id,
       count: 0,
       is_admin: false,
       is_prime: false,
@@ -39,6 +48,12 @@ class ProblemList extends React.Component {
     this.getLogin();
     this.getCategory();
     this.getProblem();
+
+    this.handleCategoryId = this.handleCategoryId.bind(this);
+  }
+
+  handleCategoryId(event) {
+    this.setState({category_id: event.target.value});
   }
 
   getLogin() {
@@ -102,6 +117,8 @@ class ProblemList extends React.Component {
   }
 
   getCategoryName(find_id) {
+    if(find_id === 0) return "전체";
+
     for(var i=0;i<this.state.categories.length;i++) {
       if(this.state.categories[i].category_id === find_id) {
         return this.state.categories[i].name;
@@ -244,19 +261,70 @@ class ProblemList extends React.Component {
               <div className="px-4">
                 <Form>
                   <br />
-                  <h1 className="display-3 text-center">문제 목록</h1>
+                  <h1 className="display-3 text-center">{this.getCategoryName(parseInt(this.state.category_id))} 문제 목록</h1>
                   <Container>
-                    <Row xs="3">
+                    <Row>
+                      <Col xs="4">
+                      {
+                        this.state.category_id !== 0 &&
+                        <Input type="select" name="카테고리 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
+                          {
+                            this.state.categories.map(category => {
+                              console.log(<option value={"" + category.category_id}>
+                              {category.name}
+                            </option>);
+                              <option value={"" + category.category_id}>
+                                {category.name}
+                              </option>
+                            })
+                          }
+                          <option value="1">
+                            1
+                          </option>
+                          <option value="2">
+                            2
+                          </option>
+                        </Input>
+                      }
+                      </Col>
+                      <Col>
+                        <div className="text-right">
+                          <Button disabled={this.state.is_popular}>
+                            추천순
+                          </Button>
+                          <Button disabled={!this.state.is_popular}>
+                            최신순
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                    <br />
+                    <ListGroup>
+                      {this.getList()}
+                    </ListGroup>
+                    <Row>
                       <Col>
                         <br />
-                        <Button disabled={this.state.is_popular}>
-                          인기순
-                        </Button>
-                        <Button disabled={!this.state.is_popular}>
-                          최신순
-                        </Button>
+                        <Row>
+                          <Col xs="8">
+                            <FormGroup>
+                              <InputGroup className="mb-4">
+                                <InputGroupAddon addonType="prepend">
+                                  <InputGroupText>
+                                    <i className="ni ni-zoom-split-in" />
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <Input placeholder="Search" type="text" />
+                              </InputGroup>
+                            </FormGroup>
+                          </Col>
+                          <Col xs="4">
+                            <Button>
+                              검색
+                            </Button>
+                          </Col>
+                        </Row>
                       </Col>
-                      <Col />
                       <Col>
                       {
                         (this.state.is_admin || this.state.is_prime) &&
@@ -273,11 +341,6 @@ class ProblemList extends React.Component {
                       }
                       </Col>
                     </Row>
-                    <br />
-                    <ListGroup>
-                      {this.getList()}
-                    </ListGroup>
-                    <br />
                     <Row xs="3">
                       <Col />
                       <Pagination>

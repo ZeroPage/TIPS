@@ -185,9 +185,12 @@ class DemoNavbar extends React.Component {
                       <DropdownItem to="/" tag={Link}>
                         카테고리
                       </DropdownItem>
-                      <DropdownItem to="/" tag={Link}>
-                        문제집/모의 면접
-                      </DropdownItem>
+                      {
+                        this.state.isLogin &&
+                        <DropdownItem to="/" tag={Link}>
+                          문제집/모의 면접
+                        </DropdownItem>
+                      }
                     </DropdownMenu>
                   </UncontrolledDropdown>
                   {
@@ -207,13 +210,13 @@ class DemoNavbar extends React.Component {
                         <span className="nav-link-inner--text">게시판</span>
                       </DropdownToggle>
                       <DropdownMenu>
-                        <DropdownItem to="/" tag={Link}>
+                        <DropdownItem to="/board-list-page/1" tag={Link}>
                           공지사항
                         </DropdownItem>
-                        <DropdownItem to="/" tag={Link}>
+                        <DropdownItem to="/board-list-page/2" tag={Link}>
                           자유게시판
                         </DropdownItem>
-                        <DropdownItem to="/" tag={Link}>
+                        <DropdownItem to="/board-list-page/3" tag={Link}>
                           질의응답
                         </DropdownItem>
                       </DropdownMenu>

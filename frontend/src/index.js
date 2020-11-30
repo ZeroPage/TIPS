@@ -49,15 +49,14 @@ ReactDOM.render(
       <Route path="/profile-activity-page" exact render={props => <ProfileActivity {...props} />} />
 
       <Route path="/problem-list-page" exact render={props => <ProblemList {...props} />} />
-      <Route path="/problem-list-page/:id" exact render={props => <ProblemList {...props} />} />
       <Route path="/problem-view-page/:id" exact render={props => <ProblemView {...props} />} />
       <Route path="/problem-edit-page" exact render={props => <ProblemEdit {...props} />} />
       <Route path="/problem-edit-page/:id" exact render={props => <ProblemEdit {...props} />} />
 
       <Route path="/board-list-page/:id" exact render={props => <BoardList {...props} />} />
-      <Route path="/board-view-page/:id" exact render={props => <BoardView {...props} />} />
-      <Route path="/board-edit-page" exact render={props => <BoardEdit {...props} />} />
+      <Route path="/board-view-page/:id/:id2" exact render={props => <BoardView {...props} />} />
       <Route path="/board-edit-page/:id" exact render={props => <BoardEdit {...props} />} />
+      <Route path="/board-edit-page/:id/:id2" exact render={props => <BoardEdit {...props} />} />
       <Redirect to="/" />
     </Switch>
   </BrowserRouter>,

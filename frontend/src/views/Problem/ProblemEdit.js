@@ -278,7 +278,7 @@ class ProblemEdit extends React.Component {
                     <br />
                     <Row>
                       <Col lg="4">
-                        <Input type="select" name="분류 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
+                        <Input type="select" name="카테고리 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
                           {
                             this.state.categories.map(item => (
                               <option value={item.category_id}>

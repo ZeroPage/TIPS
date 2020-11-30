@@ -123,12 +123,12 @@ class Register extends React.Component {
         "password": this.state.password
       })
     })
-    .then(res => res.json())
     .then(
       (result) => {
-        if(result.success === "ok")
+        if(result.ok)
         {
           this.setState({check: <><br /><Alert className="alert-success">회원가입이 완료되었습니다.</Alert></>});
+          alert("회원가입이 완료되었습니다.");
           this.props.history.push('/');
           return;
         }

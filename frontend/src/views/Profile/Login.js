@@ -19,7 +19,6 @@ import React from "react";
 
 // reactstrap components
 import {
-  Alert,
   Button,
   Card,
   CardBody,
@@ -41,8 +40,7 @@ class Login extends React.Component {
     super(props);
     this.state = {
       username: "",
-      password: "",
-      check: ""
+      password: ""
     };
 
     this.handleUsername = this.handleUsername.bind(this);
@@ -69,12 +67,12 @@ class Login extends React.Component {
 
     if(this.state.username === "")
     {
-      this.setState({check: <><br /><Alert className="alert-danger">이름을 입력하세요.</Alert></>});
+      alert("아이디를 입력하세요.");
       return;
     }
     if(this.state.password === "")
     {
-      this.setState({check: <><br /><Alert className="alert-danger">비밀번호를 입력하세요.</Alert></>});
+      alert("비밀번호를 입력하세요");
       return;
     }
 
@@ -92,16 +90,15 @@ class Login extends React.Component {
     .then(
       (result) => {
         if(result.ok) {
-          this.setState({check: <><br /><Alert className="alert-success">로그인에 성공하였습니다.</Alert></>});
           this.props.history.push('/');
         }
         else {
-          this.setState({check: <><br /><Alert className="alert-danger">아이디 또는 패스워드를 확인해주세요.</Alert></>});
+          alert("아이디 또는 패스워드가 잘못되었습니다.");
           return;
         }
       },
       (error) => {
-        this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+        alert("서버 연결 오류입니다. 관리자한테 문의바랍니다.");
         console.log(error);
       }
     );
@@ -128,7 +125,6 @@ class Login extends React.Component {
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
                       <h1 className="display-3 text-center">TIPS 로그인</h1>
-                      {this.state.check}
                       <br />
                       <Form role="form">
                         <FormGroup className="mb-3">
@@ -162,7 +158,8 @@ class Login extends React.Component {
                           </InputGroup>
                         </FormGroup>
                         <div className="custom-control custom-control-alternative custom-checkbox">
-                          <input
+                          <br />
+                          {/*<input
                             className="custom-control-input"
                             id=" customCheckLogin"
                             type="checkbox"
@@ -172,7 +169,7 @@ class Login extends React.Component {
                             htmlFor=" customCheckLogin"
                           >
                             <span>자동 로그인</span>
-                          </label>
+                          </label>*/}
                         </div>
                         <div className="text-center">
                           <Button
