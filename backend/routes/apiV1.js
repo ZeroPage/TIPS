@@ -228,10 +228,24 @@ router.get('/classes/:class_id/members', function(req, res, next) {
 
 router.post('/problems', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.problem.create(req.body, {
-      fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+    models.problem_category.count({
+      where: {
+        category_id: req.body.category_id,
+      },
     })
-    .then(() => res.status(201).end())
+    .then(count => {
+      if (count) {
+        req.body.member_id = req.user.member_id;
+        models.problem.create(req.body, {
+          fields: ['category_id', 'member_id', 'title', 'content',
+            'time_limit', 'reference', 'hint'],
+        })
+        .then(() => res.status(201).end())
+        .catch(() => res.status(400).end());
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
