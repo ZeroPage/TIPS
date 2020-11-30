@@ -250,6 +250,20 @@ class ProblemList extends React.Component {
     return ret;
   }
 
+  addCategory() {
+    var ret = [];
+    
+    for(var i=0;i<this.state.categories.length;i++) {
+      ret.push(
+        <option value={this.state.categories[i].category_id}>
+          {this.state.categories[i].name}
+        </option>
+      );
+    }
+
+    return ret;
+  }
+
   render() {
     return (
       <>
@@ -266,24 +280,9 @@ class ProblemList extends React.Component {
                     <Row>
                       <Col xs="4">
                       {
-                        this.state.category_id !== 0 &&
+                        parseInt(this.state.category_id) !== 0 &&
                         <Input type="select" name="카테고리 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
-                          {
-                            this.state.categories.map(category => {
-                              console.log(<option value={"" + category.category_id}>
-                              {category.name}
-                            </option>);
-                              <option value={"" + category.category_id}>
-                                {category.name}
-                              </option>
-                            })
-                          }
-                          <option value="1">
-                            1
-                          </option>
-                          <option value="2">
-                            2
-                          </option>
+                          {this.addCategory()}
                         </Input>
                       }
                       </Col>

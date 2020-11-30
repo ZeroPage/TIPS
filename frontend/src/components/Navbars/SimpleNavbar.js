@@ -179,10 +179,10 @@ class DemoNavbar extends React.Component {
                       <span className="nav-link-inner--text">문제</span>
                     </DropdownToggle>
                     <DropdownMenu>
-                      <DropdownItem to="/problem-list-page" tag={Link}>
+                      <DropdownItem href="/problem-list-page?category_id=0" onClick="window.location.href='/problem-list-page?category_id=0';">
                         전체
                       </DropdownItem>
-                      <DropdownItem to="/" tag={Link}>
+                      <DropdownItem href="/problem-list-page?category_id=1" onClick="window.location.href='/problem-list-page?category_id=1';">
                         카테고리
                       </DropdownItem>
                       {
@@ -198,7 +198,9 @@ class DemoNavbar extends React.Component {
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
-                        <span className="nav-link-inner--text">그룹</span>
+                        <span className="nav-link-inner--text">
+                          그룹
+                        </span>
                       </DropdownToggle>
                     </UncontrolledDropdown>
                   }

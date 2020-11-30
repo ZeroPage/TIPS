@@ -44,8 +44,7 @@ class Register extends React.Component {
       nickName: "",
       email: "",
       password: "",
-      passwordCheck: "",
-      check: ""
+      passwordCheck: ""
     };
 
     this.handleUserName = this.handleUserName.bind(this);
@@ -88,25 +87,25 @@ class Register extends React.Component {
     //check form
     if(this.state.userName === "")
     {
-      this.setState({check: <><br /><Alert className="alert-danger">이름이 비어있습니다.</Alert></>});
+      alert("아이디가 비어있습니다.");
       return;
     }
     if(this.state.nickName === "")
     {
-      this.setState({check: <><br /><Alert className="alert-danger">닉네임이 비어있습니다.</Alert></>});
+      alert("닉네임이 비어있습니다.");
       return;
     } 
     if(this.state.email === "")
     {
-      this.setState({check: <><br /><Alert className="alert-danger">이메일이 비어있습니다.</Alert></>});
+      alert("이메일이 비어있습니다.");
       return;
     } 
     if (this.state.password === "" || this.state.password.length < 4) {
-      this.setState({check: <><br /><Alert className="alert-danger">암호 길이는 최소 4자 이상이어야 합니다.</Alert></>});
+      alert("암호 길이는 4자 이상이어야 합니다.");
       return;
     }
     else if (this.state.password !== this.state.passwordCheck) {
-      this.setState({check: <><br /><Alert className="alert-danger">암호 확인이 일치하지 않습니다.</Alert></>});
+      alert("암호 확인이 일치하지 않습니다.");
       return;
     }
 
@@ -127,14 +126,13 @@ class Register extends React.Component {
       (result) => {
         if(result.ok)
         {
-          this.setState({check: <><br /><Alert className="alert-success">회원가입이 완료되었습니다.</Alert></>});
           alert("회원가입이 완료되었습니다.");
           this.props.history.push('/');
           return;
         }
         else
         {
-          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          alert("회원가입에 실패하였습니다.");
           console.log(result);
           return;
         }
@@ -186,7 +184,7 @@ class Register extends React.Component {
                                 <i className="ni ni-single-02" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="아이디" type="text" value={this.state.userName} onChange={this.handleUserName} />
+                            <Input placeholder="아이디" type="text" value={this.state.userName} onChange={this.handleUserName} onBlur={} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>

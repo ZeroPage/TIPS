@@ -40,11 +40,13 @@ class ProblemView extends React.Component {
       categories: [],
       answer_count: 0,
       answers: [],
-      content: ""
+      content: "",
+      member_nickname:[]
     };
 
     this.getLogin();
     this.getCategory();
+    this.getMember();
     this.getProblem();
 
     this.hanbleShare = this.handleShare.bind(this);
@@ -102,7 +104,7 @@ class ProblemView extends React.Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "problem_id": 0,
+        "problem_id": this.state.problem_id,
         "content": this.state.content,
         "reference": ""
       })
@@ -259,20 +261,31 @@ class ProblemView extends React.Component {
   }
 
   
-  getMember(member_id) {
-    return member_id;
-    /*const result = await fetch("/api/v1/members/" + member_id, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    
-    if(result.ok) {
-      const data = await result.json();
-      return data.nickname;
+  getMember() {
+    var res = [""];
+    for(var i=1;i<=10;i++)
+    {
+      fetch("/api/v1/members/" + i, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(
+        (result) => {
+          if(result.ok) {
+            result.json().then(data => {
+              res.push(data.nickname);
+              this.setState({member_nickname: res});
+            });
+          }
+        }
+      );
     }
-    return "";*/
+  }
+
+  getMemberNickname(member_id) {
+    return this.state.member_nickname[member_id];
   }
 
   getCategoryName(find_id) {
@@ -311,7 +324,7 @@ class ProblemView extends React.Component {
             <br />
             게시일 : {('' + this.state.problems.created).substring(0, 10)}
             <br />
-            작성자 : {this.getMember(this.state.problems.member_id)}
+            작성자 : {this.getMemberNickname(this.state.problems.member_id)}
           </div>
           {
             (this.state.member_id === this.state.problems.member_id || this.state.is_admin) &&
@@ -401,7 +414,7 @@ class ProblemView extends React.Component {
           <Row>
             <Col xs="2">
               <div className="text-center">
-                {this.getMember(answer.member_id)}
+                {this.getMemberNickname(answer.member_id)}
                 <br />
                 {('' + answer.created).substring(0, 10)}
                 <Button href='#' color='none'>
@@ -415,9 +428,7 @@ class ProblemView extends React.Component {
               </div>
             </Col>
             <Col xs="9">
-              <div class="comment">
-                {answer.content}
-              </div>
+              <div dangerouslySetInnerHTML={{ __html: answer.content }} />
             </Col>
             <Col xs="1">
               {
@@ -447,6 +458,7 @@ class ProblemView extends React.Component {
       ret.push(
         <div className="text-center">
           <h2>풀이작성</h2>
+          <br />
           <CKEditor
             editor={ClassicEditor}
             data={this.state.content}
