@@ -190,29 +190,35 @@ class DemoNavbar extends React.Component {
                       </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
-                  <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">그룹</span>
-                    </DropdownToggle>
-                  </UncontrolledDropdown>
-                  <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">게시판</span>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      <DropdownItem to="/" tag={Link}>
-                        공지사항
-                      </DropdownItem>
-                      <DropdownItem to="/" tag={Link}>
-                        자유게시판
-                      </DropdownItem>
-                      <DropdownItem to="/" tag={Link}>
-                        질의응답
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
+                  {
+                    this.state.isLogin &&
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">그룹</span>
+                      </DropdownToggle>
+                    </UncontrolledDropdown>
+                  }
+                  {
+                    this.state.isLogin &&
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">게시판</span>
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem to="/" tag={Link}>
+                          공지사항
+                        </DropdownItem>
+                        <DropdownItem to="/" tag={Link}>
+                          자유게시판
+                        </DropdownItem>
+                        <DropdownItem to="/" tag={Link}>
+                          질의응답
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                  }
                 </Nav>
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>
                   {

@@ -37,8 +37,8 @@ class ProblemList extends React.Component {
     };
 
     this.getLogin();
-    this.getProblem();
     this.getCategory();
+    this.getProblem();
   }
 
   getLogin() {
@@ -62,6 +62,24 @@ class ProblemList extends React.Component {
     );
   }
 
+  getCategory() {
+    fetch("/api/v1/problems/categories", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            this.setState({categories: data.results});
+          });
+        }
+      }
+    );
+  }
+
   getProblem() {
     fetch("/api/v1/problems", {
       method: 'GET',
@@ -77,24 +95,6 @@ class ProblemList extends React.Component {
               items: data.results,
               count: parseInt(data.total_count)
             });
-          });
-        }
-      }
-    );
-  }
-
-  getCategory() {
-    fetch("/api/v1/problems/categories", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            this.setState({categories: data.results});
           });
         }
       }
