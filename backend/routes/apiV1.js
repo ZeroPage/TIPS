@@ -263,10 +263,10 @@ router.get('/problems', function(req, res, next) {
     where.category_id = req.query.category_id;
   }
   if (req.query.title) {
-    where.title = { [models.Sequelize.Op.like]: req.query.title };
+    where.title = { [models.Sequelize.Op.like]: '%' + req.query.title + '%' };
   }
   if (req.query.content) {
-    where.content = { [models.Sequelize.Op.like]: req.query.content };
+    where.content = { [models.Sequelize.Op.like]: '%' + req.query.content + '%' };
   }
 
   models.problem.findAndCountAll({
