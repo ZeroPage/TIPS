@@ -77,9 +77,9 @@ router.get('/members-check', function(req, res, next) {
   models.member.count({
     where: {
       [models.Sequelize.Op.or]: [
-        { username: req.body.username || null },
-        { nickname: req.body.nickname || null },
-        { email: req.body.email || null },
+        { username: req.query.username || null },
+        { nickname: req.query.nickname || null },
+        { email: req.query.email || null },
       ],
     },
   })
