@@ -73,7 +73,7 @@ router.get('/members/:member_id', function(req, res, next) {
   .catch(() => res.status(400).end());
 });
 
-router.get('/members/check', function(req, res, next) {
+router.get('/members-check', function(req, res, next) {
   models.member.count({
     where: {
       [models.Sequelize.Op.or]: [
