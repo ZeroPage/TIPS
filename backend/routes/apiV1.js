@@ -483,7 +483,7 @@ router.delete('/answers/:answer_id', function(req, res, next) {
 router.post('/solve', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.solve.create(req.body, {
-      fields: ['problem_id', 'content', 'duration'],
+      fields: ['problem_id', 'member_id', 'content', 'duration'],
     })
     .then(() => res.status(201).end())
     .catch(() => res.status(400).end());
