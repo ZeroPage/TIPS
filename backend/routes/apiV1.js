@@ -795,7 +795,7 @@ router.get('/comments', function(req, res, next) {
     where: req.query,
     attributes: ['comment_id', 'parent_id', 'member_id',
       'problem_id', 'answer_id', 'document_id', 'content', 'created'],
-    offset: page* per_page,
+    offset: page * per_page,
     limit: per_page,
   })
   .then(comments => {
