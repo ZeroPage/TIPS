@@ -670,11 +670,33 @@ router.get('/documents', function(req, res, next) {
   const per_page = Number(req.query.per_page) || 10;
   const order = req.query.order || 'created';
   const direction = req.query.direction || 'DESC';
+  let where = {};
+
+  if (req.query.board_id) {
+    where.board_id = req.query.board_id;
+    if (req.query.category_id) {
+      where.category_id = req.query.category_id;
+    }
+  }
+  if (req.query.title) {
+    where.title = { [Op.like]: '%' + req.query.title + '%' };
+  }
+  if (req.query.content) {
+    where.content = { [Op.like]: '%' + req.query.content + '%' };
+  }
+  if (req.query.search) {
+    where[Op.or] = [
+      { title: { [Op.like]: '%' + req.query.search + '%' } },
+      { content: { [Op.like]: '%' + req.query.search + '%' } },
+      { reference: { [Op.like]: '%' + req.query.search + '%' } },
+    ];
+  }
 
   models.document.findAndCountAll({
     order: [[order, direction]],
     attributes: ['document_id', 'board_id', 'category_id', 'member_id',
       'title', 'created'],
+    where: where,
     offset: page * per_page,
     limit: per_page,
   })
