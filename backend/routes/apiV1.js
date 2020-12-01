@@ -454,7 +454,7 @@ router.get('/solve/:solve_id', function(req, res, next) {
   .catch(() => res.json({ success: 'fail' }));
 });
 
-router.get('/solve/member/:member_id', function(req, res, next) {
+router.get('/solve/members/:member_id', function(req, res, next) {
   models.solve.findAll({
     attributes: ['solve_id', 'problem_id', 'content', 'duration', 'created'],
     where: {
