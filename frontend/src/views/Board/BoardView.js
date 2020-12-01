@@ -453,7 +453,7 @@ class BoardView extends React.Component {
     ret.push(
       <Row xs='2'>
         <Col>
-          <h5>총 {this.state.comments.length}개의 답변</h5>
+          <h5>총 {this.state.comments.length}개의 댓글</h5>
         </Col>
         <Col>
           {/*<div class="text-right">
@@ -513,7 +513,7 @@ class BoardView extends React.Component {
     if(this.state.member_id !== 0) {
       ret.push(
         <div className="text-center">
-          <h2>답변 작성</h2>
+          <h2>댓글 작성</h2>
           <br />
           <CKEditor
             editor={ClassicEditor}
