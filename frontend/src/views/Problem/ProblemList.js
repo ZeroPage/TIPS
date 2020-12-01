@@ -68,7 +68,6 @@ class ProblemList extends React.Component {
   }
 
   handleSearchText(event) {
-    console.log(event.target.value);
     this.setState({search_text: event.target.value});
   }
 
@@ -130,7 +129,7 @@ class ProblemList extends React.Component {
     if(parseInt(this.state.category_id)) fetch_url = fetch_url + `category_id=${this.state.category_id}&`;
     if(parseInt(this.state.page)) fetch_url = fetch_url + `page=${this.state.page}&`;
     if(this.state.order) fetch_url = fetch_url + `order=${this.state.order}&`;
-    if(this.state.search) fetch_url = fetch_url + `title=${this.state.search}&`;
+    if(this.state.search) fetch_url = fetch_url + `search=${this.state.search}&`;
 
     fetch(fetch_url, {
       method: 'GET',

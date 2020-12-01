@@ -69,7 +69,6 @@ class BoardList extends React.Component {
   }
 
   handleSearchText(event) {
-    console.log(event.target.value);
     this.setState({search_text: event.target.value});
   }
 
@@ -113,7 +112,7 @@ class BoardList extends React.Component {
   }
 
   getCategory() {
-    var fetch_url = "​/api​/v1​/boards​/" + this.state.board_id + "/categories";
+    var fetch_url = "/api/v1/boards/" + this.state.board_id + "/categories";
     console.log(fetch_url);
     fetch(fetch_url, {
       method: 'GET',
@@ -134,11 +133,11 @@ class BoardList extends React.Component {
   }
 
   getDocument() {
-    var fetch_url = `/api/v1/documents?board_id=${this.state.board_id}`;
+    var fetch_url = `/api/v1/documents?board_id=${this.state.board_id}&`;
     if(parseInt(this.state.category_id)) fetch_url = fetch_url + `category_id=${this.state.category_id}&`;
     if(parseInt(this.state.page)) fetch_url = fetch_url + `page=${this.state.page}&`;
     if(this.state.order) fetch_url = fetch_url + `order=${this.state.order}&`;
-    if(this.state.search) fetch_url = fetch_url + `title=${this.state.search}&`;
+    if(this.state.search) fetch_url = fetch_url + `search=${this.state.search}&`;
 
     fetch(fetch_url, {
       method: 'GET',
@@ -287,6 +286,12 @@ class BoardList extends React.Component {
     return ret;
   }
 
+  getBoard() {
+    if(this.state.board_id == 1) return "공지";
+    if(this.state.board_id == 2) return "자유";
+    if(this.state.board_id == 3) return "QnA";
+  }
+
   render() {
     return (
       <>
@@ -298,7 +303,7 @@ class BoardList extends React.Component {
               <div className="px-4">
                 <Form>
                   <br />
-                  <h1 className="display-3 text-center">{this.getCategoryName(parseInt(this.state.category_id))} 게시글 목록</h1>
+                  <h1 className="display-3 text-center">{this.getBoard()} 게시글 목록</h1>
                   <Container>
                     <Row>
                       <Col xs="4">
@@ -347,7 +352,7 @@ class BoardList extends React.Component {
                       </Col>
                       <Col>
                       {
-                        (this.state.is_admin || this.state.is_prime) &&
+                        (this.state.board_id != 1 || this.state.is_admin || this.state.is_prime) &&
                         <div className="text-right">
                           <Button
                             className="mt-4"
