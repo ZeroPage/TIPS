@@ -40,11 +40,15 @@ class Register extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userName: "",
-      nickName: "",
+      username: "",
+      nickname: "",
       email: "",
       password: "",
-      passwordCheck: ""
+      passwordCheck: "",
+      checkUsername: 0,
+      checkNickname: 0,
+      checkEmail: 0,
+      focus: "none"
     };
 
     this.handleUserName = this.handleUserName.bind(this);
@@ -53,6 +57,10 @@ class Register extends React.Component {
     this.handlePassword = this.handlePassword.bind(this);
     this.handlePasswordCheck = this.handlePasswordCheck.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.checkUsername = this.checkUsername.bind(this);
+    this.checkNickname = this.checkNickname.bind(this);
+    this.checkEmail = this.checkEmail.bind(this);
   }
 
   componentDidMount() {
@@ -62,11 +70,11 @@ class Register extends React.Component {
   }
 
   handleUserName(event) {
-    this.setState({userName: event.target.value});
+    this.setState({username: event.target.value});
   }
   
   handleNickName(event) {
-    this.setState({nickName: event.target.value});
+    this.setState({nickname: event.target.value});
   }
 
   handleEmail(event) {
@@ -84,23 +92,27 @@ class Register extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
 
+    this.checkUsername();
+    this.checkNickname();
+    this.checkEmail();
+
     //check form
-    if(this.state.userName === "")
+    if(this.state.checkUsername !== 200)
     {
-      alert("아이디가 비어있습니다.");
+      alert("아이디를 확인해주세요.");
       return;
     }
-    if(this.state.nickName === "")
+    if(this.state.checkNickname !== 200)
     {
-      alert("닉네임이 비어있습니다.");
+      alert("닉네임을 확인해주세요.");
       return;
     } 
-    if(this.state.email === "")
+    if(this.state.checkEmail !== 200)
     {
-      alert("이메일이 비어있습니다.");
+      alert("이메일을 확인해주세요.");
       return;
     } 
-    if (this.state.password === "" || this.state.password.length < 4) {
+    if (this.state.password.length < 4) {
       alert("암호 길이는 4자 이상이어야 합니다.");
       return;
     }
@@ -116,8 +128,8 @@ class Register extends React.Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "username": this.state.userName,
-        "nickname": this.state.nickName,
+        "username": this.state.username,
+        "nickname": this.state.nickname,
         "email": this.state.email,
         "password": this.state.password
       })
@@ -144,15 +156,107 @@ class Register extends React.Component {
     )
   }
 
+  checkUsername() {
+    fetch("/api/v1/members-check?username=" + this.state.username, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        this.setState({checkUsername: result.status});
+      }
+    );
+  }
+
+  checkNickname() {
+    fetch("/api/v1/members-check?nickname=" + this.state.nickname, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        this.setState({checkNickname: result.status});
+      }
+    );
+  }
+
+  checkEmail() {
+    fetch("/api/v1/members-check?email=" + this.state.email, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok && (this.state.email.indexOf("@") === -1 || this.state.email.indexOf(".") === -1)) {
+          this.setState({checkEmail: 400});
+        }
+        else {
+          this.setState({checkEmail: result.status});
+        }
+      }
+    );
+  }
+
   render() {
-    let password = () => {
-      if (this.state.password === "" || this.state.password.length < 4) {
-        return <small className="text-danger">암호 길이는 최소 4자 이상이어야 합니다.</small>;
+    const username = () => {
+      if(this.state.checkUsername === 200) {
+        return <small className="text-success">사용 가능한 아이디입니다.</small>; 
       }
-      else if (this.state.password !== this.state.passwordCheck) {
-        return <small className="text-danger">암호 확인이 일치하지 않습니다.</small>;
+      if(this.state.checkUsername === 400) {
+        return <small className="text-danger">올바르지 않은 아이디입니다.</small>; 
       }
-      return <small className="text-success">암호 확인이 일치합니다.</small>;
+      if(this.state.checkUsername === 409) {
+        return <small className="text-danger">이미 존재하는 아이디입니다.</small>; 
+      }
+      return <small className="text-danger">&nbsp;</small>;
+    };
+    const nickname = () => {
+      if(this.state.checkNickname === 200) {
+        return <small className="text-success">사용 가능한 닉네임입니다.</small>; 
+      }
+      if(this.state.checkNickname === 400) {
+        return <small className="text-danger">올바르지 않은 닉네임입니다.</small>; 
+      }
+      if(this.state.checkNickname === 409) {
+        return <small className="text-danger">이미 존재하는 닉네임입니다.</small>; 
+      }
+      return <small className="text-danger">&nbsp;</small>;
+    };
+    const email = () => {
+      if(this.state.checkEmail === 200) {
+        return <small className="text-success">사용 가능한 이메일입니다.</small>;
+      }
+      if(this.state.checkEmail === 400) {
+        return <small className="text-danger">올바르지 않은 이메일입니다.</small>; 
+      }
+      if(this.state.checkEmail === 409) {
+        return <small className="text-danger">이미 존재하는 이메일입니다.</small>; 
+      }
+      return <small className="text-danger">&nbsp;</small>;
+    }
+    const password = () => {
+      if (this.state.password === "") {
+        return <small className="text-danger">&nbsp;</small>;
+      }
+      if (this.state.password.length < 4) {
+        return <small className="text-danger">비밀번호 길이는 최소 4자 이상이어야 합니다.</small>;
+      }
+      return <small className="text-success">사용 가능한 비밀번호입니다.</small>;
+    };
+    const passwordCheck = () => {
+      if (this.state.passwordCheck === "") {
+        return <small className="text-danger">&nbsp;</small>;
+      }
+      if (this.state.password !== this.state.passwordCheck) {
+        return <small className="text-danger">비밀번호 확인이 일치하지 않습니다.</small>;
+      }
+      return <small className="text-success">비밀번호 확인이 일치합니다.</small>;
     };
     return (
       <>
@@ -178,36 +282,43 @@ class Register extends React.Component {
                       <br />
                       <Form role="form">
                         <FormGroup>
+                          {username()}
                           <InputGroup className="input-group-alternative mb-3">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
                                 <i className="ni ni-single-02" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="아이디" type="text" value={this.state.userName} onChange={this.handleUserName} onBlur={} />
+                            <Input placeholder="아이디" type="text"
+                              value={this.state.username} onChange={this.handleUserName} onBlur={this.checkUsername} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>
+                          {nickname()}
                           <InputGroup className="input-group-alternative mb-3">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
                                 <i className="ni ni-circle-08" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="닉네임" type="text" value={this.state.nickName} onChange={this.handleNickName} />
+                            <Input placeholder="닉네임" type="text"
+                              value={this.state.nickname} onChange={this.handleNickName} onBlur={this.checkNickname} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>
+                          {email()}
                           <InputGroup className="input-group-alternative mb-3">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="E-mail" type="email" value={this.state.email} onChange={this.handleEmail} />
-                          </InputGroup>
+                            <Input placeholder="E-mail" type="email"
+                              value={this.state.email} onChange={this.handleEmail} onBlur={this.checkEmail} />
+                          </InputGroup> 
                         </FormGroup>
                         <FormGroup>
+                          {password()}
                           <InputGroup className="input-group-alternative">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
@@ -224,6 +335,7 @@ class Register extends React.Component {
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>
+                          {passwordCheck()}
                           <InputGroup className="input-group-alternative">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
@@ -239,9 +351,6 @@ class Register extends React.Component {
                             />
                           </InputGroup>
                         </FormGroup>
-                        <div className="text-muted font-italic">
-                          {password()}
-                        </div>
                         <div className="text-center">
                           <Button
                             className="mt-4"
