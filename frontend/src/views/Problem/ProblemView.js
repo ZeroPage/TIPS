@@ -403,7 +403,7 @@ class ProblemView extends React.Component {
     ret.push(<h1 className="display-3 text-center">{this.state.problem.title}</h1>);
     ret.push(
       <Row>
-        <Col xs="4">
+        <Col xs="6">
           <h5 className="text-left">
             No. {this.state.problem_id}
           </h5>
@@ -415,8 +415,7 @@ class ProblemView extends React.Component {
             {this.getCategoryName(this.state.problem.category_id)}
           </Badge>
         </Col>
-        <Col xs="4" />
-        <Col xs="4">
+        <Col xs="6">
           <div className="text-right">
             제한 시간 : {this.state.problem.time_limit}초
             <br />

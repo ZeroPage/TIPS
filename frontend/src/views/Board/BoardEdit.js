@@ -94,10 +94,10 @@ class BoardEdit extends React.Component {
       alert("카테고리가 비어있습니다.");
       return;
     } 
-    if (this.state.reference === "") {
+    /*if (this.state.reference === "") {
       alert("출처가 비어있습니다.");
       return;
-    }
+    }*/
 
     if(this.state.document_id) {
       fetch("/api/v1/documents/" + this.state.document_id, {

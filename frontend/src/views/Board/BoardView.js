@@ -378,7 +378,7 @@ class BoardView extends React.Component {
     ret.push(<h1 className="display-3 text-center">{this.state.document.title}</h1>);
     ret.push(
       <Row>
-        <Col xs="4">
+        <Col xs="6">
           <h5 className="text-left">
             No. {this.state.document_id}
           </h5>
@@ -387,8 +387,7 @@ class BoardView extends React.Component {
             {this.getCategoryName(this.state.document.category_id)}
           </Badge>
         </Col>
-        <Col xs="4" />
-        <Col xs="4">
+        <Col xs="6">
           <div className="text-right">
             게시일 : {('' + this.state.document.created).substring(0, 10)}
             <br />
