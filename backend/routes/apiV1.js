@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcrypt');
 var models = require('../models');
+var Op = models.Sequelize.Op
 
 router.post('/members', function(req, res, next) {
   req.body.password = bcrypt.hashSync(req.body.password, 10);
@@ -76,7 +77,7 @@ router.get('/members/:member_id', function(req, res, next) {
 router.get('/members-check', function(req, res, next) {
   models.member.count({
     where: {
-      [models.Sequelize.Op.or]: [
+      [Op.or]: [
         { username: req.query.username || null },
         { nickname: req.query.nickname || null },
         { email: req.query.email || null },
@@ -263,10 +264,18 @@ router.get('/problems', function(req, res, next) {
     where.category_id = req.query.category_id;
   }
   if (req.query.title) {
-    where.title = { [models.Sequelize.Op.like]: '%' + req.query.title + '%' };
+    where.title = { [Op.like]: '%' + req.query.title + '%' };
   }
   if (req.query.content) {
-    where.content = { [models.Sequelize.Op.like]: '%' + req.query.content + '%' };
+    where.content = { [Op.like]: '%' + req.query.content + '%' };
+  }
+  if (req.query.search) {
+    where[Op.or] = [
+      { title: { [Op.like]: '%' + req.query.search + '%' } },
+      { content: { [Op.like]: '%' + req.query.search + '%' } },
+      { reference: { [Op.like]: '%' + req.query.search + '%' } },
+      { hint: { [Op.like]: '%' + req.query.search + '%' } },
+    ];
   }
 
   models.problem.findAndCountAll({
@@ -315,14 +324,30 @@ router.get('/problems/:problem_id', function(req, res, next) {
 
 router.put('/problems/:problem_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.problem.update(req.body, {
-      fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+    models.problem.findOne({
       where: {
         problem_id: req.params.problem_id,
-        member_id: req.user.member_id,
       },
     })
-    .then(() => res.end())
+    .then(problem => {
+      if (problem) {
+        if (problem.member_id === req.user.member_id) {
+          models.problem.update(req.body, {
+            fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+            where: {
+              problem_id: req.params.problem_id,
+              member_id: req.user.member_id,
+            },
+          })
+          .then(() => res.end())
+          .catch(() => res.status(400).end());
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -331,13 +356,29 @@ router.put('/problems/:problem_id', function(req, res, next) {
 
 router.delete('/problems/:problem_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.problem.destroy({
+    models.problem.findOne({
       where: {
         problem_id: req.params.problem_id,
-        member_id: req.user.member_id,
       },
     })
-    .then(() => res.end())
+    .then(problem => {
+      if (problem) {
+        if (problem.member_id === req.user.member_id) {
+          models.problem.destroy({
+            where: {
+              problem_id: req.params.problem_id,
+              member_id: req.user.member_id,
+            },
+          })
+          .then(() => res.end())
+          .catch(() => res.status(400).end());
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -346,11 +387,23 @@ router.delete('/problems/:problem_id', function(req, res, next) {
 
 router.post('/answers', function(req, res, next) {
   if (req.isAuthenticated()) {
-    req.body.member_id = req.user.member_id;
-    models.answer.create(req.body, {
-      fields: ['problem_id', 'member_id', 'content', 'reference'],
+    models.problem.count({
+      where: {
+        problem_id: req.body.problem_id,
+      },
     })
-    .then(() => res.status(201).end())
+    .then(count => {
+      if (count) {
+        req.body.member_id = req.user.member_id;
+        models.answer.create(req.body, {
+          fields: ['problem_id', 'member_id', 'content', 'reference'],
+        })
+        .then(() => res.status(201).end())
+        .catch(() => res.status(400).end());
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -362,19 +415,33 @@ router.get('/answers', function(req, res, next) {
   const per_page = Number(req.query.per_page) || 5;
   const order = req.query.order || 'created';
   const direction = req.query.direction || 'DESC';
+  let where = {};
 
-  models.answer.findAndCountAll({
-    order: [[order, direction]],
-    attributes: ['answer_id', 'problem_id', 'member_id',
-      'content', 'reference', 'created'],
-    offset: page,
-    limit: per_page,
+  models.problem.count({
+    where: {
+      problem_id: req.query.problem_id,
+    },
   })
-  .then(answers => {
-    res.json({
-      results: answers.rows,
-      total_count: answers.count,
-    });
+  .then(count => {
+    if (count) {
+      models.answer.findAndCountAll({
+        order: [[order, direction]],
+        attributes: ['answer_id', 'problem_id', 'member_id',
+          'content', 'reference', 'created'],
+        where: { problem_id: req.query.problem_id },
+        offset: page,
+        limit: per_page,
+      })
+      .then(answers => {
+        res.json({
+          results: answers.rows,
+          total_count: answers.count,
+        });
+      })
+      .catch(() => res.status(400).end());
+    } else {
+      res.status(404).end();
+    }
   })
   .catch(() => res.status(400).end());
 });
