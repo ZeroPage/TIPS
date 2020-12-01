@@ -482,6 +482,7 @@ router.delete('/answers/:answer_id', function(req, res, next) {
 
 router.post('/solve', function(req, res, next) {
   if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
     models.solve.create(req.body, {
       fields: ['problem_id', 'member_id', 'content', 'duration'],
     })
@@ -493,49 +494,53 @@ router.post('/solve', function(req, res, next) {
 });
 
 router.get('/solve', function(req, res, next) {
-  models.solve.findAll({
-    attributes: ['solve_id', 'problem_id', 'member_id', 'content', 'date', 'duration'],
-  })
-  .then(solve => {
-    res.json({
-      success: 'ok',
-      solve: solve,
-    });
-  })
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    const page = Number(req.query.page) - 1 || 0;
+    const per_page = Number(req.query.per_page) || 5;
+    const order = req.query.order || 'created';
+    const direction = req.query.direction || 'DESC';
+  
+    models.solve.findAndCountAll({
+      order: [[order, direction]],
+      attributes: ['solve_id', 'problem_id', 'member_id',
+        'duration', 'created'],
+      where: { member_id: req.user.member_id },
+      offset: page * per_page,
+      limit: per_page,
+    })
+    .then(solve => {
+      res.json({
+        results: solve.rows,
+        total_count: solve.count,
+      });
+    })
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.get('/solve/:solve_id', function(req, res, next) {
-  models.solve.findByPk(req.params.solve_id)
-  .then(solve => {
-    if (solve) {
-      res.json({
-        success: 'ok',
-        problem_id: solve.problem_id,
-        member_id: solve.member_id,
-        content: solve.content,
-        duration: solve.duration,
-        created: solve.created,
-      });
-    } else {
-      res.json({ success: 'fail' });
-    }
-  })
-  .catch(() => res.json({ success: 'fail' }));
-});
-
-router.get('/solve/members/:member_id', function(req, res, next) {
-  models.solve.findAll({
-    attributes: ['solve_id', 'problem_id', 'content', 'duration', 'created'],
-    where: { member_id: req.params.member_id },
-  })
-  .then(solve => {
-    res.json({
-      success: 'ok',
-      solve: solve,
-    });
-  })
-  .catch(() => res.json({ success: 'fail' }));
+  if (req.isAuthenticated()) {
+    models.solve.findByPk(req.params.solve_id, {
+      attributes: ['solve_id', 'problem_id', 'member_id',
+        'content', 'duration', 'created'],
+    })
+    .then(solve => {
+      if (solve) {
+        if (solve.member_id === req.user.member_id) {
+          res.json(solve);
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(() => res.status(400).end());
+  } else {
+    res.status(401).end();
+  }
 });
 
 router.post('/difficulty', function(req, res, next) {
