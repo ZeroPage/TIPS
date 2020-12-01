@@ -447,14 +447,30 @@ router.get('/answers', function(req, res, next) {
 
 router.put('/answers/:answer_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.answer.update(req.body, {
-      fields: ['content', 'reference'],
+    models.answer.findOne({
       where: {
         answer_id: req.params.answer_id,
-        member_id: req.user.member_id,
       },
     })
-    .then(() => res.end())
+    .then(answer => {
+      if (answer) {
+        if (answer.member_id === req.user.member_id) {
+          models.answer.update(req.body, {
+            fields: ['content', 'reference'],
+            where: {
+              answer_id: req.params.answer_id,
+              member_id: req.user.member_id,
+            },
+          })
+          .then(() => res.end())
+          .catch(() => res.status(400).end());
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -463,13 +479,29 @@ router.put('/answers/:answer_id', function(req, res, next) {
 
 router.delete('/answers/:answer_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.answer.destroy({
+    models.answer.findOne({
       where: {
         answer_id: req.params.answer_id,
-        member_id: req.user.member_id,
       },
     })
-    .then(() => res.end())
+    .then(answer => {
+      if (answer) {
+        if (answer.member_id === req.user.member_id) {
+          models.answer.destroy({
+            where: {
+              answer_id: req.params.answer_id,
+              member_id: req.user.member_id,
+            },
+          })
+          .then(() => res.end())
+          .catch(() => res.status(400).end());
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
