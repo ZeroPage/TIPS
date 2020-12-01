@@ -117,29 +117,6 @@ class PracticeSolve extends React.Component {
     );
   }
 
-  getDifficulty() {
-    var ret = 0;
-    /*fetch("/api/v1/difficulty", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        'problem_id': this.state.problem_id
-      })
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            ret = data.average;
-          });
-        }
-      }
-    );*/
-    return ret;
-  }
-
   getProblem() {
     var problem_list = [];
     this.state.problem_id.forEach(id => {
@@ -163,9 +140,27 @@ class PracticeSolve extends React.Component {
                 (result) => {
                   if(result.ok) {
                     result.json().then(data_member => {
-                      data_problem.member_nickname = data_member.nickname;
-                      problem_list.push(data_problem);
-                      this.setState({problems: problem_list});
+                      /*fetch("/api/v1/difficulty", {
+                        method: 'GET',
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                          'problem_id': data_problem.problem_id
+                        })
+                      })
+                      .then(
+                        (result) => {
+                          if(result.ok) {
+                            result.json().then(data_difficulty => {*/
+                              data_problem.difficulty = 1; //data_difficulty.average;
+                              data_problem.member_nickname = data_member.nickname;
+                              problem_list.push(data_problem);
+                              this.setState({problems: problem_list});
+                            /*});
+                          }
+                        }
+                      );*/
                     });
                   }
                   else {
@@ -230,8 +225,8 @@ class PracticeSolve extends React.Component {
             <br />
             작성자 : {problem.member_id}
             <br />
-            난이도 : {this.getDifficulty()}단계
-            <Progress max="5" value={this.getDifficulty()} color="default" />
+            난이도 : {problem.difficulty}단계
+            <Progress max="5" value={problem.difficulty} color="default" />
           </div>
         </Col>
       </Row>
