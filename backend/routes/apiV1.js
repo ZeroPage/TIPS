@@ -324,14 +324,30 @@ router.get('/problems/:problem_id', function(req, res, next) {
 
 router.put('/problems/:problem_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.problem.update(req.body, {
-      fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+    models.problem.findOne({
       where: {
         problem_id: req.params.problem_id,
-        member_id: req.user.member_id,
       },
     })
-    .then(() => res.end())
+    .then(problem => {
+      if (problem) {
+        if (problem.member_id === req.user.member_id) {
+          models.problem.update(req.body, {
+            fields: ['category_id', 'title', 'content', 'time_limit', 'reference', 'hint'],
+            where: {
+              problem_id: req.params.problem_id,
+              member_id: req.user.member_id,
+            },
+          })
+          .then(() => res.end())
+          .catch(() => res.status(400).end());
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -340,13 +356,29 @@ router.put('/problems/:problem_id', function(req, res, next) {
 
 router.delete('/problems/:problem_id', function(req, res, next) {
   if (req.isAuthenticated()) {
-    models.problem.destroy({
+    models.problem.findOne({
       where: {
         problem_id: req.params.problem_id,
-        member_id: req.user.member_id,
       },
     })
-    .then(() => res.end())
+    .then(problem => {
+      if (problem) {
+        if (problem.member_id === req.user.member_id) {
+          models.problem.destroy({
+            where: {
+              problem_id: req.params.problem_id,
+              member_id: req.user.member_id,
+            },
+          })
+          .then(() => res.end())
+          .catch(() => res.status(400).end());
+        } else {
+          res.status(401).end();
+        }
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
