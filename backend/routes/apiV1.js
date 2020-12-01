@@ -40,9 +40,7 @@ router.put('/members', function(req, res, next) {
     req.body.password = bcrypt.hashSync(req.body.password, 10);
     models.member.update(req.body, {
       fields: ['nickname', 'password'],
-      where: {
-        member_id: req.user.member_id,
-      },
+      where: { member_id: req.user.member_id },
     })
     .then(() => res.end())
     .catch(error => {
@@ -130,9 +128,7 @@ router.get('/classes', function(req, res, next) {
 router.put('/classes/:class_id', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.class.count({
-      where: {
-        class_id: req.params.class_id,
-      },
+      where: { class_id: req.params.class_id },
     })
     .then(count => {
       if (count) {
@@ -146,9 +142,7 @@ router.put('/classes/:class_id', function(req, res, next) {
           if (count >= 1) {
             models.class.update(req.body, {
               fields: ['description'],
-              where: {
-                class_id: req.params.class_id,
-              },
+              where: { class_id: req.params.class_id },
             })
             .then(() => res.end())
             .catch(() => res.status(400).end());
@@ -170,9 +164,7 @@ router.put('/classes/:class_id', function(req, res, next) {
 router.post('/classes/:class_id/members', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.class.count({
-      where: {
-        class_id: req.params.class_id,
-      },
+      where: { class_id: req.params.class_id },
     })
     .then(count => {
       if (count) {
@@ -202,22 +194,16 @@ router.post('/classes/:class_id/members', function(req, res, next) {
 
 router.get('/classes/:class_id/members', function(req, res, next) {
   models.class.count({
-    where: {
-      class_id: req.params.class_id,
-    },
+    where: { class_id: req.params.class_id },
   })
   .then(count => {
     if (count) {
       models.class_member.findAll({
         attributes: ['class_member_id', 'class_id', 'member_id', 'created'],
-        where: {
-          class_id: req.params.class_id,
-        },
+        where: { class_id: req.params.class_id },
       })
       .then(class_members => {
-        res.json({
-          results: class_members,
-        });
+        res.json({ results: class_members });
       })
       .catch(() => res.status(400).end());
     } else {
@@ -230,9 +216,7 @@ router.get('/classes/:class_id/members', function(req, res, next) {
 router.post('/problems', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.problem_category.count({
-      where: {
-        category_id: req.body.category_id,
-      },
+      where: { category_id: req.body.category_id },
     })
     .then(count => {
       if (count) {
@@ -325,9 +309,7 @@ router.get('/problems/:problem_id', function(req, res, next) {
 router.put('/problems/:problem_id', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.problem.findOne({
-      where: {
-        problem_id: req.params.problem_id,
-      },
+      where: { problem_id: req.params.problem_id },
     })
     .then(problem => {
       if (problem) {
@@ -357,9 +339,7 @@ router.put('/problems/:problem_id', function(req, res, next) {
 router.delete('/problems/:problem_id', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.problem.findOne({
-      where: {
-        problem_id: req.params.problem_id,
-      },
+      where: { problem_id: req.params.problem_id },
     })
     .then(problem => {
       if (problem) {
@@ -388,9 +368,7 @@ router.delete('/problems/:problem_id', function(req, res, next) {
 router.post('/answers', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.problem.count({
-      where: {
-        problem_id: req.body.problem_id,
-      },
+      where: { problem_id: req.body.problem_id },
     })
     .then(count => {
       if (count) {
@@ -417,9 +395,7 @@ router.get('/answers', function(req, res, next) {
   const direction = req.query.direction || 'DESC';
 
   models.problem.count({
-    where: {
-      problem_id: req.query.problem_id,
-    },
+    where: { problem_id: req.query.problem_id },
   })
   .then(count => {
     if (count) {
@@ -448,9 +424,7 @@ router.get('/answers', function(req, res, next) {
 router.put('/answers/:answer_id', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.answer.findOne({
-      where: {
-        answer_id: req.params.answer_id,
-      },
+      where: { answer_id: req.params.answer_id },
     })
     .then(answer => {
       if (answer) {
@@ -480,9 +454,7 @@ router.put('/answers/:answer_id', function(req, res, next) {
 router.delete('/answers/:answer_id', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.answer.findOne({
-      where: {
-        answer_id: req.params.answer_id,
-      },
+      where: { answer_id: req.params.answer_id },
     })
     .then(answer => {
       if (answer) {
@@ -555,9 +527,7 @@ router.get('/solve/:solve_id', function(req, res, next) {
 router.get('/solve/members/:member_id', function(req, res, next) {
   models.solve.findAll({
     attributes: ['solve_id', 'problem_id', 'content', 'duration', 'created'],
-    where: {
-      member_id: req.params.member_id,
-    },
+    where: { member_id: req.params.member_id },
   })
   .then(solve => {
     res.json({
@@ -583,17 +553,13 @@ router.post('/difficulty', function(req, res, next) {
 router.get('/difficulty', function(req, res, next) {
   models.difficulty.findAndCountAll({
     order: [['created', 'DESC']],
-    where: {
-      problem_id: req.query.problem_id,
-    },
+    where: { problem_id: req.query.problem_id },
   })
   .then(difficulty => {
     if (difficulty) {
       models.difficulty.findOne({
         attributes: [[models.sequelize.fn('AVG', models.sequelize.col('score')), 'score']],
-        where: {
-          problem_id: req.query.problem_id,
-        },
+        where: { problem_id: req.query.problem_id },
       })
       .then(avg => res.json({
         results: difficulty.rows,
@@ -680,7 +646,7 @@ router.get('/boards', function(req, res, next) {
 
 router.get('/boards/:board_id/categories', function(req, res, next) {
   models.document_category.findAll({
-    where: req.params,
+    where: { board_id: req.params.board_id },
     attributes: ['category_id', 'parent_id', 'board_id', 'name', 'description'],
   })
   .then(categories => {
