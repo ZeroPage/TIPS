@@ -29,7 +29,7 @@ class PracticeSolve extends React.Component {
     this.state = {
       member_id: 0,
       current_problem: 0,
-      problem_id: [1, 2, 3],
+      problem_id: [3,1,2], //[30, 71, 100, 104, 107],
       problems: [],
       answers: [],
       content: "",
@@ -140,27 +140,25 @@ class PracticeSolve extends React.Component {
                 (result) => {
                   if(result.ok) {
                     result.json().then(data_member => {
-                      /*fetch("/api/v1/difficulty", {
+                      fetch("/api/v1/difficulty?problem_id=" + data_problem.problem_id, {
                         method: 'GET',
                         headers: {
                           "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                          'problem_id': data_problem.problem_id
-                        })
+                        }
                       })
                       .then(
                         (result) => {
                           if(result.ok) {
-                            result.json().then(data_difficulty => {*/
-                              data_problem.difficulty = 1; //data_difficulty.average;
+                            result.json().then(data_difficulty => {
+                              data_problem.difficulty = parseInt(data_difficulty.average);
+                              if(!data_problem.difficulty) data_problem.difficulty = 0;
                               data_problem.member_nickname = data_member.nickname;
                               problem_list.push(data_problem);
                               this.setState({problems: problem_list});
-                            /*});
+                            });
                           }
                         }
-                      );*/
+                      );
                     });
                   }
                   else {

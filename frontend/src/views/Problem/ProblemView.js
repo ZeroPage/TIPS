@@ -295,9 +295,25 @@ class ProblemView extends React.Component {
                       (result) => {
                         if(result.ok) {
                           result.json().then(data_vote => {
-                            data_problem.vote = data_vote.u;
-                            data_problem.member_nickname = data_member.nickname;
-                            this.setState({problem: data_problem});
+                            fetch("/api/v1/difficulty?problem_id=" + data_problem.problem_id, {
+                              method: 'GET',
+                              headers: {
+                                "Content-Type": "application/json"
+                              }
+                            })
+                            .then(
+                              (result) => {
+                                if(result.ok) {
+                                  result.json().then(data_difficulty => {
+                                    data_problem.difficulty = parseInt(data_difficulty.average);
+                                    if(!data_problem.difficulty) data_problem.difficulty = 0;
+                                    data_problem.vote = data_vote.u;
+                                    data_problem.member_nickname = data_member.nickname;
+                                    this.setState({problem: data_problem});
+                                  });
+                                }
+                              }
+                            );
                           });
                         }
                       }

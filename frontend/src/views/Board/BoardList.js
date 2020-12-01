@@ -358,7 +358,7 @@ class BoardList extends React.Component {
                             className="mt-4"
                             color="primary"
                             type="button"
-                            href="/problem-edit-page"
+                            href={"/board-edit-page?board_id=" + this.state.board_id}
                           >
                             게시글 추가
                           </Button>
