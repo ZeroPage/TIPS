@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcrypt');
 var models = require('../models');
+var Op = models.Sequelize.Op
 
 router.post('/members', function(req, res, next) {
   req.body.password = bcrypt.hashSync(req.body.password, 10);
@@ -76,7 +77,7 @@ router.get('/members/:member_id', function(req, res, next) {
 router.get('/members-check', function(req, res, next) {
   models.member.count({
     where: {
-      [models.Sequelize.Op.or]: [
+      [Op.or]: [
         { username: req.query.username || null },
         { nickname: req.query.nickname || null },
         { email: req.query.email || null },
@@ -263,10 +264,18 @@ router.get('/problems', function(req, res, next) {
     where.category_id = req.query.category_id;
   }
   if (req.query.title) {
-    where.title = { [models.Sequelize.Op.like]: '%' + req.query.title + '%' };
+    where.title = { [Op.like]: '%' + req.query.title + '%' };
   }
   if (req.query.content) {
-    where.content = { [models.Sequelize.Op.like]: '%' + req.query.content + '%' };
+    where.content = { [Op.like]: '%' + req.query.content + '%' };
+  }
+  if (req.query.search) {
+    where[Op.or] = [
+      { title: { [Op.like]: '%' + req.query.search + '%' } },
+      { content: { [Op.like]: '%' + req.query.search + '%' } },
+      { reference: { [Op.like]: '%' + req.query.search + '%' } },
+      { hint: { [Op.like]: '%' + req.query.search + '%' } },
+    ];
   }
 
   models.problem.findAndCountAll({
