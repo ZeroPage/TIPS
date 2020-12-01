@@ -1,0 +1,19 @@
+.check-box{
+    width:17px; height: 17px; background: #fa3062; cursor: pointer; border-radius: 3px;float: right;
+}
+.two{
+    display: flex;
+    justify-content: center;
+}
+.main{
+    display: inline-block;
+    vertical-align: top;
+}
+.sub{
+    display: inline-block;
+    vertical-align: top;
+}
+.right-button{
+    float: right;
+    
+}

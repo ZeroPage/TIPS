@@ -19,7 +19,7 @@ import React from "react";
 
 // reactstrap components
 import {
-  Button, Card, Container, Form, Input, ListGroup, ListGroupItem, Row, Col
+  Button, Card, Container, Form, ListGroup, ListGroupItem, Row, Col
 } from "reactstrap";
 
 // core components
@@ -71,11 +71,11 @@ class GroupView extends React.Component {
     .then(
       (result) => {
         if(result.ok) {
-          alert("그룹 추가가 완료되었습니다.");
+          alert("그룹 가입이 완료되었습니다.");
           window.location.reload();
         }
         else {
-          alert("그룹을 추가할 수 없습니다.");
+          alert("그룹 가입에 실패하였습니다.");
           console.log(result.statusText);
         }
       }
@@ -135,6 +135,7 @@ class GroupView extends React.Component {
       }
     );
 
+    var answer_info = [];
     fetch("/api/v1/classes/" + this.state.group_id + "/members", {
       method: 'GET',
       headers: {
@@ -145,8 +146,25 @@ class GroupView extends React.Component {
       (result) => {
         if(result.ok) {
           result.json().then(data => {
-            this.setState({
-              items: data.results
+            data.results.forEach(data_class => {
+              fetch("/api/v1/members/" + data_class.member_id, {
+                method: 'GET',
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              })
+              .then(
+                (result) => {
+                  if(result.ok) {
+                    result.json().then(member_data => {
+                      console.log(data_class);
+                      data_class.member_nickname = member_data.nickname;
+                      answer_info.push(data_class);
+                      this.setState({items: answer_info});
+                    });
+                  }
+                }
+              );
             });
           });
         }
@@ -166,7 +184,7 @@ class GroupView extends React.Component {
       list.push(
       <ListGroupItem>
         <Row>
-          <Col xs="8">{item.member_id}</Col>
+          <Col xs="8">{item.member_nickname}</Col>
           <Col xs="4">가입일 : {item.created.substring(0, 10)}</Col>
         </Row>
       </ListGroupItem>
@@ -217,7 +235,7 @@ class GroupView extends React.Component {
        {list}
       </ListGroup>
     );
-    
+
     return ret;
   }
 

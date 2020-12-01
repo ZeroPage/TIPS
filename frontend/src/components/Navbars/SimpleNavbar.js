@@ -179,16 +179,13 @@ class DemoNavbar extends React.Component {
                       <span className="nav-link-inner--text">문제</span>
                     </DropdownToggle>
                     <DropdownMenu>
-                      <DropdownItem href="/problem-list-page?category_id=0" onClick="window.location.href='/problem-list-page?category_id=0';">
-                        전체
-                      </DropdownItem>
-                      <DropdownItem href="/problem-list-page?category_id=1" onClick="window.location.href='/problem-list-page?category_id=1';">
-                        카테고리
+                      <DropdownItem href="/problem-list-page" onClick="window.location.href='/problem-list-page';">
+                        문제목록
                       </DropdownItem>
                       {
                         this.state.isLogin &&
-                        <DropdownItem to="/" tag={Link}>
-                          문제집/모의 면접
+                        <DropdownItem href="/practice-main-page" onClick="window.location.href='/practice-main-page';">
+                          모의고사
                         </DropdownItem>
                       }
                     </DropdownMenu>
@@ -215,13 +212,13 @@ class DemoNavbar extends React.Component {
                         <span className="nav-link-inner--text">게시판</span>
                       </DropdownToggle>
                       <DropdownMenu>
-                        <DropdownItem to="/board-list-page/1" tag={Link}>
+                        <DropdownItem href="/board-list-page/1" onClick="window.location.href='/board-list-page/1';">
                           공지사항
                         </DropdownItem>
-                        <DropdownItem to="/board-list-page/2" tag={Link}>
+                        <DropdownItem href="/board-list-page/2" onClick="window.location.href='/board-list-page/2';">
                           자유게시판
                         </DropdownItem>
-                        <DropdownItem to="/board-list-page/3" tag={Link}>
+                        <DropdownItem href="/board-list-page/3" onClick="window.location.href='/board-list-page/3';">
                           질의응답
                         </DropdownItem>
                       </DropdownMenu>
@@ -271,9 +268,11 @@ class DemoNavbar extends React.Component {
                           <DropdownItem to="/profile-info-page" tag={Link}>
                             회원 정보
                           </DropdownItem>
+                          {/*
                           <DropdownItem to="/profile-activity-page" tag={Link}>
                             활동 내역
                           </DropdownItem>
+                          */}
                         </DropdownMenu>
                       </UncontrolledDropdown>
                     </Nav>

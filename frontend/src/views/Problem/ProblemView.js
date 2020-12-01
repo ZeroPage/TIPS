@@ -27,6 +27,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 import Template from "views/Template.js";
+import { isThisTypeNode } from "typescript";
 
 class ProblemView extends React.Component {
   constructor(props) {
@@ -46,7 +47,6 @@ class ProblemView extends React.Component {
 
     this.getLogin();
     this.getCategory();
-    this.getMember();
     this.getProblem();
 
     this.hanbleShare = this.handleShare.bind(this);
@@ -154,7 +154,6 @@ class ProblemView extends React.Component {
         return;
       }
     )
-    console.log(this.value);
   }
 
   getLogin() {
@@ -207,12 +206,28 @@ class ProblemView extends React.Component {
       (result) => {
         if(result.ok) {
           result.json().then(data => {
-            this.setState({problems: data});
+            fetch("/api/v1/members/" + data.member_id, {
+              method: 'GET',
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+            .then(
+              (result) => {
+                if(result.ok) {
+                  result.json().then(member_data => {
+                    data.member_nickname = member_data.nickname;
+                    this.setState({problems: data});
+                  });
+                }
+              }
+            );
           });
         }
       }
     );
 
+    var answer_info = [];
     fetch("/api/v1/answers", {
       method: 'GET',
       headers: {
@@ -223,9 +238,26 @@ class ProblemView extends React.Component {
       (result) => {
         if(result.ok) {
           result.json().then(data => {
-            this.setState({
-              answer_count: data.total_count,
-              answers: data.results
+            this.setState({answer_count: data.total_count});
+            data.results.forEach(data_answer => {
+              fetch("/api/v1/members/" + data_answer.member_id, {
+                method: 'GET',
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              })
+              .then(
+                (result) => {
+                  if(result.ok) {
+                    result.json().then(member_data => {
+                      console.log(data_answer);
+                      data_answer.member_nickname = member_data.nickname;
+                      answer_info.push(data_answer);
+                      this.setState({answers: answer_info});
+                    });
+                  }
+                }
+              );
             });
           });
         }
@@ -234,7 +266,6 @@ class ProblemView extends React.Component {
         }
       }
     );
-    console.log(this.state.answers);
   }
 
   getDifficulty() {
@@ -258,34 +289,6 @@ class ProblemView extends React.Component {
       }
     );*/
     return ret;
-  }
-
-  
-  getMember() {
-    var res = [""];
-    for(var i=1;i<=10;i++)
-    {
-      fetch("/api/v1/members/" + i, {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(
-        (result) => {
-          if(result.ok) {
-            result.json().then(data => {
-              res.push(data.nickname);
-              this.setState({member_nickname: res});
-            });
-          }
-        }
-      );
-    }
-  }
-
-  getMemberNickname(member_id) {
-    return this.state.member_nickname[member_id];
   }
 
   getCategoryName(find_id) {
@@ -324,7 +327,7 @@ class ProblemView extends React.Component {
             <br />
             게시일 : {('' + this.state.problems.created).substring(0, 10)}
             <br />
-            작성자 : {this.getMemberNickname(this.state.problems.member_id)}
+            작성자 : {this.state.problems.member_nickname}
           </div>
           {
             (this.state.member_id === this.state.problems.member_id || this.state.is_admin) &&
@@ -414,7 +417,7 @@ class ProblemView extends React.Component {
           <Row>
             <Col xs="2">
               <div className="text-center">
-                {this.getMemberNickname(answer.member_id)}
+                {answer.member_nickname}
                 <br />
                 {('' + answer.created).substring(0, 10)}
                 <Button href='#' color='none'>

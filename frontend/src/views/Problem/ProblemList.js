@@ -33,16 +33,19 @@ class ProblemList extends React.Component {
 
     const { search } = this.props.location;
     const queryObj = queryString.parse(search);
-    const { category_id } = queryObj;
+    const { category_id, page, order, search_text } = queryObj;
 
     this.state = {
+      category_id: category_id,
+      page: page,
+      order: order,
+      search: search_text,
+      search_text: search_text,
       items: [],
       categories: [],
-      category_id: category_id,
       count: 0,
       is_admin: false,
-      is_prime: false,
-      is_popular: true
+      is_prime: false
     };
 
     this.getLogin();
@@ -50,10 +53,37 @@ class ProblemList extends React.Component {
     this.getProblem();
 
     this.handleCategoryId = this.handleCategoryId.bind(this);
+    this.handleSearchText = this.handleSearchText.bind(this);
+  }
+
+  componentDidMount() {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+    this.refs.main.scrollTop = 0;
   }
 
   handleCategoryId(event) {
     this.setState({category_id: event.target.value});
+    this.redirect(event.target.value, this.state.page, this.state.order, this.state.search);
+  }
+
+  handleSearchText(event) {
+    console.log(event.target.value);
+    this.setState({search_text: event.target.value});
+  }
+
+  redirectUrl(category_id, page, order, search) {
+    var redirect_url = "?";
+    if(category_id) redirect_url = redirect_url + `category_id=${category_id}&`;
+    if(page) redirect_url = redirect_url + `page=${page}&`;
+    if(order) redirect_url = redirect_url + `order=${order}&`;
+    if(search) redirect_url = redirect_url + `search_text=${search}&`;
+    return redirect_url;
+  }
+
+  redirect(category_id, page, order, search) {
+    this.props.history.push(this.redirectUrl(category_id, page, order, search));
+    window.location.reload();
   }
 
   getLogin() {
@@ -96,7 +126,13 @@ class ProblemList extends React.Component {
   }
 
   getProblem() {
-    fetch("/api/v1/problems", {
+    var fetch_url = "/api/v1/problems?";
+    if(parseInt(this.state.category_id)) fetch_url = fetch_url + `category_id=${this.state.category_id}&`;
+    if(parseInt(this.state.page)) fetch_url = fetch_url + `page=${this.state.page}&`;
+    if(this.state.order) fetch_url = fetch_url + `order=${this.state.order}&`;
+    if(this.state.search) fetch_url = fetch_url + `title=${this.state.search}&`;
+
+    fetch(fetch_url, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
@@ -117,7 +153,7 @@ class ProblemList extends React.Component {
   }
 
   getCategoryName(find_id) {
-    if(find_id === 0) return "전체";
+    if(!find_id) return "전체";
 
     for(var i=0;i<this.state.categories.length;i++) {
       if(this.state.categories[i].category_id === find_id) {
@@ -169,7 +205,7 @@ class ProblemList extends React.Component {
               <Row>
                 <Col xs="8">
                   <Badge className="text-uppercase" color="primary" pill>
-                    {this.getCategoryName(item.category_id)}
+                    {this.getCategoryName(parseInt(item.category_id))}
                   </Badge>
                 </Col>
                 <Col xs="4">게시일 : {item.created.substring(0, 10)}</Col>
@@ -192,25 +228,25 @@ class ProblemList extends React.Component {
   getPagination() {
     const TOTAL_PAGE = parseInt(this.state.count / 10) + 1;
     const PAGE_NUM = 2;
-    var pageid = parseInt(this.props.match.params.id);
-    if(!pageid) pageid = 1; //id값이 없으면 기본값 1
+    var page_id = parseInt(this.state.page);
+    if(!page_id) page_id = 1; //id값이 없으면 기본값 1
 
     var ret = [];
     ret.push(
       <PaginationItem>
-        <PaginationLink first href={"/problem-list-page/" + 1} />
+        <PaginationLink first href={this.redirectUrl(this.state.category_id, 1, this.state.order, this.state.search)} />
       </PaginationItem>
     );
-    if(pageid != 1) {
+    if(page_id != 1) {
       ret.push(
         <PaginationItem>
-          <PaginationLink previous href={"/problem-list-page/" + (pageid - 1)} />
+          <PaginationLink previous href={this.redirectUrl(this.state.category_id, page_id - 1, this.state.order, this.state.search)} />
         </PaginationItem>
       );
     }
 
-    for(var id = Math.max(pageid - PAGE_NUM, 1);id <= Math.min(pageid + PAGE_NUM, TOTAL_PAGE);id++) {
-      if(pageid == id) {
+    for(var id = Math.max(page_id - PAGE_NUM, 1);id <= Math.min(page_id + PAGE_NUM, TOTAL_PAGE);id++) {
+      if(page_id == id) {
         ret.push(
         <PaginationItem active>
           <PaginationLink>
@@ -222,7 +258,7 @@ class ProblemList extends React.Component {
       else {
         ret.push(
           <PaginationItem>
-            <PaginationLink href={"/problem-list-page/" + id}>
+            <PaginationLink href={this.redirectUrl(this.state.category_id, 1, this.state.order, this.state.search)}>
               {id}
             </PaginationLink>
           </PaginationItem>
@@ -234,16 +270,16 @@ class ProblemList extends React.Component {
       }
     }
 
-    if(pageid != TOTAL_PAGE) {
+    if(page_id != TOTAL_PAGE) {
       ret.push(
         <PaginationItem>
-          <PaginationLink next href={"/problem-list-page/" + (pageid + 1)} />
+          <PaginationLink next href={this.redirectUrl(this.state.category_id, page_id + 1, this.state.order, this.state.search)} />
         </PaginationItem>
       );
     }
     ret.push(
       <PaginationItem>
-        <PaginationLink last href={"/problem-list-page/" + TOTAL_PAGE} />
+        <PaginationLink last href={this.redirectUrl(this.state.category_id, TOTAL_PAGE, this.state.order, this.state.search)} />
       </PaginationItem>
     );
 
@@ -253,6 +289,12 @@ class ProblemList extends React.Component {
   addCategory() {
     var ret = [];
     
+    ret.push(
+      <option value={0}>
+        전체
+      </option>
+    );
+
     for(var i=0;i<this.state.categories.length;i++) {
       ret.push(
         <option value={this.state.categories[i].category_id}>
@@ -279,19 +321,16 @@ class ProblemList extends React.Component {
                   <Container>
                     <Row>
                       <Col xs="4">
-                      {
-                        parseInt(this.state.category_id) !== 0 &&
-                        <Input type="select" name="카테고리 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
-                          {this.addCategory()}
-                        </Input>
-                      }
+                      <Input type="select" value={this.state.category_id} onChange={this.handleCategoryId}>
+                        {this.addCategory()}
+                      </Input>
                       </Col>
                       <Col>
                         <div className="text-right">
-                          <Button disabled={this.state.is_popular}>
+                          <Button disabled={false}>
                             추천순
                           </Button>
-                          <Button disabled={!this.state.is_popular}>
+                          <Button disabled={false}>
                             최신순
                           </Button>
                         </div>
@@ -313,12 +352,13 @@ class ProblemList extends React.Component {
                                     <i className="ni ni-zoom-split-in" />
                                   </InputGroupText>
                                 </InputGroupAddon>
-                                <Input placeholder="Search" type="text" />
+                                <Input placeholder="Search" type="text" value={this.state.search_text} onChange={this.handleSearchText}/>
                               </InputGroup>
                             </FormGroup>
                           </Col>
                           <Col xs="4">
-                            <Button>
+                            <Button color="default" type="button"
+                              href={this.redirectUrl(this.state.category_id, this.state.page, this.state.order, this.state.search_text)}>
                               검색
                             </Button>
                           </Col>
