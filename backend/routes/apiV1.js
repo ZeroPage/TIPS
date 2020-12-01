@@ -387,11 +387,23 @@ router.delete('/problems/:problem_id', function(req, res, next) {
 
 router.post('/answers', function(req, res, next) {
   if (req.isAuthenticated()) {
-    req.body.member_id = req.user.member_id;
-    models.answer.create(req.body, {
-      fields: ['problem_id', 'member_id', 'content', 'reference'],
+    models.problem.count({
+      where: {
+        problem_id: req.body.problem_id,
+      },
     })
-    .then(() => res.status(201).end())
+    .then(count => {
+      if (count) {
+        req.body.member_id = req.user.member_id;
+        models.answer.create(req.body, {
+          fields: ['problem_id', 'member_id', 'content', 'reference'],
+        })
+        .then(() => res.status(201).end())
+        .catch(() => res.status(400).end());
+      } else {
+        res.status(404).end();
+      }
+    })
     .catch(() => res.status(400).end());
   } else {
     res.status(401).end();
@@ -403,11 +415,17 @@ router.get('/answers', function(req, res, next) {
   const per_page = Number(req.query.per_page) || 5;
   const order = req.query.order || 'created';
   const direction = req.query.direction || 'DESC';
+  let where = {};
+
+  if (req.query.problem_id) {
+    where.problem_id = req.query.problem_id;
+  }
 
   models.answer.findAndCountAll({
     order: [[order, direction]],
     attributes: ['answer_id', 'problem_id', 'member_id',
       'content', 'reference', 'created'],
+    where: where,
     offset: page,
     limit: per_page,
   })
