@@ -27,7 +27,6 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 import Template from "views/Template.js";
-import { isThisTypeNode } from "typescript";
 
 class ProblemView extends React.Component {
   constructor(props) {
@@ -37,9 +36,9 @@ class ProblemView extends React.Component {
       problem: "",
       member_id: 0,
       is_admin: false,
-      is_popular: true,
       categories: [],
       answer_count: 0,
+      answer_page: 1,
       answers: [],
       content: "",
       member_nickname:[]
@@ -48,7 +47,8 @@ class ProblemView extends React.Component {
     this.getLogin();
     this.getCategory();
     this.getProblem();
-
+    this.getAnswer();
+    
     this.hanbleShare = this.handleShare.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAnswerSubmit = this.handleAnswerSubmit.bind(this);
@@ -130,30 +130,34 @@ class ProblemView extends React.Component {
   }
 
   handleAnswerDelete(event) {
-    fetch("/api/v1/answers/" + event.target.id, {
-      method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          alert("풀이 삭제가 완료되었습니다.");
-          window.location.reload();
-          return;
+    var result = window.confirm("풀이를 삭제하시겠습니까?");  
+    if(result)
+    {
+      fetch("/api/v1/answers/" + event.target.id, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json"
         }
-        else {
+      })
+      .then(
+        (result) => {
+          if(result.ok) {
+            alert("풀이 삭제가 완료되었습니다.");
+            window.location.reload();
+            return;
+          }
+          else {
+            alert("풀이 삭제에 실패하였습니다.");
+            return;
+          }
+        },
+        (error) => {
           alert("풀이 삭제에 실패하였습니다.");
+          console.log(error);
           return;
         }
-      },
-      (error) => {
-        alert("풀이 삭제에 실패하였습니다.");
-        console.log(error);
-        return;
-      }
-    );
+      );
+    }
   }
 
   getLogin() {
@@ -244,9 +248,13 @@ class ProblemView extends React.Component {
         }
       }
     );
+  }
 
-    var answer_info = [];
-    fetch("/api/v1/answers", {
+  getAnswer() {
+    var answer_info = this.state.answers;
+    var page = parseInt(this.state.answers.length / 5) + 1;
+    
+    fetch(`/api/v1/answers?problem_id=${this.state.problem_id}&page=${page}`, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
@@ -268,7 +276,6 @@ class ProblemView extends React.Component {
                 (result) => {
                   if(result.ok) {
                     result.json().then(member_data => {
-                      console.log(data_answer);
                       data_answer.member_nickname = member_data.nickname;
                       answer_info.push(data_answer);
                       this.setState({answers: answer_info});
@@ -284,29 +291,6 @@ class ProblemView extends React.Component {
         }
       }
     );
-  }
-
-  getDifficulty() {
-    var ret = 0;
-    /*fetch("/api/v1/difficulty", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        'problem_id': this.state.problem_id
-      })
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            ret = data.average;
-          });
-        }
-      }
-    );*/
-    return ret;
   }
 
   getCategoryName(find_id) {
@@ -407,7 +391,7 @@ class ProblemView extends React.Component {
     return ret;
   }
   
-  getAnswer() {
+  getAnswerInfo() {
     var ret = [];
 
     ret.push(
@@ -417,10 +401,10 @@ class ProblemView extends React.Component {
         </Col>
         <Col>
           <div class="text-right">
-            <Button size="sm" disabled={this.state.is_popular}>
+            <Button size="sm" disabled={false}>
               추천순
             </Button>
-            <Button size="sm" disabled={!this.state.is_popular}>
+            <Button size="sm" disabled={false}>
               최신순
             </Button>
           </div>
@@ -467,7 +451,7 @@ class ProblemView extends React.Component {
 
     if(this.state.answer_count !== this.state.answers.length) {
       ret.push(
-        <Button color="primary" size="lg" href="/problem-solve-page" block>
+        <Button color="primary" size="lg" onClick={this.getAnswer.bind(this)} block>
           풀이 더 보기
         </Button>
       );
@@ -510,7 +494,7 @@ class ProblemView extends React.Component {
                 <Form>
                   {this.getProblemInfo()}
                   <hr />
-                  {this.getAnswer()}
+                  {this.getAnswerInfo()}
                   <br />
                   <br />
                 </Form>
