@@ -34,10 +34,10 @@ class ProblemView extends React.Component {
     super(props);
     this.state = {
       problem_id: this.props.match.params.id,
+      problem: "",
       member_id: 0,
       is_admin: false,
       is_popular: true,
-      problems: [],
       categories: [],
       answer_count: 0,
       answers: [],
@@ -129,8 +129,8 @@ class ProblemView extends React.Component {
     )
   }
 
-  handleAnswerDelete() {
-    fetch("/api/v1/answers/" + "1", {
+  handleAnswerDelete(event) {
+    fetch("/api/v1/answers/" + event.target.id, {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json"
@@ -153,7 +153,7 @@ class ProblemView extends React.Component {
         console.log(error);
         return;
       }
-    )
+    );
   }
 
   getLogin() {
@@ -205,8 +205,8 @@ class ProblemView extends React.Component {
     .then(
       (result) => {
         if(result.ok) {
-          result.json().then(data => {
-            fetch("/api/v1/members/" + data.member_id, {
+          result.json().then(data_problem => {
+            fetch("/api/v1/members/" + data_problem.member_id, {
               method: 'GET',
               headers: {
                 "Content-Type": "application/json"
@@ -215,9 +215,27 @@ class ProblemView extends React.Component {
             .then(
               (result) => {
                 if(result.ok) {
-                  result.json().then(member_data => {
-                    data.member_nickname = member_data.nickname;
-                    this.setState({problems: data});
+                  result.json().then(data_member => {
+                    /*fetch("/api/v1/difficulty", {
+                      method: 'GET',
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                        'problem_id': data_problem.problem_id
+                      })
+                    })
+                    .then(
+                      (result) => {
+                        if(result.ok) {
+                          result.json().then(data_difficulty => {*/
+                            data_problem.difficulty = 1; //data_difficulty.average;
+                            data_problem.member_nickname = data_member.nickname;
+                            this.setState({problem: data_problem});
+                          /*});
+                        }
+                      }
+                    );*/
                   });
                 }
               }
@@ -305,32 +323,32 @@ class ProblemView extends React.Component {
 
     //Header
     ret.push(<br />);
-    ret.push(<h1 className="display-3 text-center">{this.state.problems.title}</h1>);
+    ret.push(<h1 className="display-3 text-center">{this.state.problem.title}</h1>);
     ret.push(
       <Row>
         <Col xs="4">
           <h5 className="text-left">
             No. {this.state.problem_id}
           </h5>
-          출처 : {this.state.problems.reference}
+          출처 : {this.state.problem.reference}
           <br />
-          난이도 : {this.getDifficulty()}단계
-          <Progress max="5" value={this.getDifficulty()} color="default" />
+          난이도 : {this.state.problem.difficulty}단계
+          <Progress max="5" value={this.state.problem.difficulty} color="default" />
           <Badge className="text-uppercase" color="primary" pill>
-            {this.getCategoryName(this.state.problems.category_id)}
+            {this.getCategoryName(this.state.problem.category_id)}
           </Badge>
         </Col>
         <Col xs="4" />
         <Col xs="4">
           <div className="text-right">
-            제한 시간 : {this.state.problems.time_limit}초
+            제한 시간 : {this.state.problem.time_limit}초
             <br />
-            게시일 : {('' + this.state.problems.created).substring(0, 10)}
+            게시일 : {('' + this.state.problem.created).substring(0, 10)}
             <br />
-            작성자 : {this.state.problems.member_nickname}
+            작성자 : {this.state.problem.member_nickname}
           </div>
           {
-            (this.state.member_id === this.state.problems.member_id || this.state.is_admin) &&
+            (this.state.member_id === this.state.problem.member_id || this.state.is_admin) &&
             <div className="text-right">
               <br />
               <Button color="primary" size="sm" type="button" href={"/problem-edit-page/" + this.state.problem_id}>
@@ -350,7 +368,7 @@ class ProblemView extends React.Component {
     //Body
     ret.push(
       <p className="lead">
-        <div dangerouslySetInnerHTML={{ __html: this.state.problems.content }} />
+        <div dangerouslySetInnerHTML={{ __html: this.state.problem.content }} />
       </p>
     );
 
@@ -369,7 +387,7 @@ class ProblemView extends React.Component {
               className="popover-primary"
             >
               <PopoverBody>
-                {this.state.problems.hint}
+                {this.state.problem.hint}
               </PopoverBody>
             </UncontrolledPopover>
             <Button color="primary" size="sm" type="button" onClick={this.handleShare} >
@@ -378,7 +396,7 @@ class ProblemView extends React.Component {
             <Button href='#' color='none'>
               <Row>
                 <Col>
-                  <i class="fa fa-thumbs-up" aria-hidden="true" />
+                  <i class="fa fa-thumbs-o-up" aria-hidden="true" />
                   {" "}0
                 </Col>
               </Row>
@@ -436,7 +454,7 @@ class ProblemView extends React.Component {
             <Col xs="1">
               {
                 this.state.member_id === answer.member_id &&
-                <Button value={answer.answer_id} color='none' onClick={this.handleAnswerDelete}>
+                <Button id={answer.answer_id} color='none' onClick={this.handleAnswerDelete}>
                   ×
                 </Button>
               }
