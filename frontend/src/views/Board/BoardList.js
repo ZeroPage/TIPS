@@ -325,8 +325,6 @@ class BoardList extends React.Component {
                         </Row>
                       </Col>
                       <Col>
-                      {
-                        (this.state.board_id != 1 || this.state.is_admin || this.state.is_prime) &&
                         <div className="text-right">
                           <Button
                             className="mt-4"
@@ -337,7 +335,6 @@ class BoardList extends React.Component {
                             게시글 추가
                           </Button>
                         </div>
-                      }
                       </Col>
                     </Row>
                     <Row xs="3">

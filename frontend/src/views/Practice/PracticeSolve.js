@@ -29,7 +29,7 @@ class PracticeSolve extends React.Component {
     this.state = {
       member_id: 0,
       current_problem: 0,
-      problem_id: [30, 71, 100, 104, 107],
+      problem_id: [30, 71, 100, 104, 107, 10],
       problems: [],
       answers: [],
       content: "",
@@ -76,7 +76,8 @@ class PracticeSolve extends React.Component {
     }
     this.setState({
       remain_time: this.state.problems[this.state.current_problem + 1].time_limit,
-      current_problem: this.state.current_problem + 1
+      current_problem: this.state.current_problem + 1,
+      content: ""
     });
   }
 
