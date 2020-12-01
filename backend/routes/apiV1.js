@@ -584,7 +584,7 @@ router.get('/difficulty', function(req, res, next) {
   models.difficulty.findAndCountAll({
     order: [['created', 'DESC']],
     where: {
-      problem_id: req.body.problem_id,
+      problem_id: req.query.problem_id,
     },
   })
   .then(difficulty => {
@@ -592,7 +592,7 @@ router.get('/difficulty', function(req, res, next) {
       models.difficulty.findOne({
         attributes: [[models.sequelize.fn('AVG', models.sequelize.col('score')), 'score']],
         where: {
-          problem_id: req.body.problem_id,
+          problem_id: req.query.problem_id,
         },
       })
       .then(avg => res.json({
@@ -625,14 +625,14 @@ router.put('/difficulty', function(req, res, next) {
 });
 
 router.get('/votes', function(req, res, next) {
-  req.body.type = 'u';
+  req.query.type = 'u';
   models.vote.count({
-    where: req.body,
+    where: req.query,
   })
   .then(up_count => {
-    req.body.type = 'd';
+    req.query.type = 'd';
     models.vote.count({
-      where: req.body,
+      where: req.query,
     })
     .then(down_count => res.json({ u: up_count, d: down_count }))
     .catch(() => res.status(400).end());
@@ -792,7 +792,7 @@ router.get('/comments', function(req, res, next) {
 
   models.comment.findAndCountAll({
     order: [[order, direction]],
-    where: req.body,
+    where: req.query,
     attributes: ['comment_id', 'parent_id', 'member_id',
       'problem_id', 'answer_id', 'document_id', 'content', 'created'],
     offset: page* per_page,
