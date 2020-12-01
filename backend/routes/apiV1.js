@@ -417,23 +417,31 @@ router.get('/answers', function(req, res, next) {
   const direction = req.query.direction || 'DESC';
   let where = {};
 
-  if (req.query.problem_id) {
-    where.problem_id = req.query.problem_id;
-  }
-
-  models.answer.findAndCountAll({
-    order: [[order, direction]],
-    attributes: ['answer_id', 'problem_id', 'member_id',
-      'content', 'reference', 'created'],
-    where: where,
-    offset: page,
-    limit: per_page,
+  models.problem.count({
+    where: {
+      problem_id: req.query.problem_id,
+    },
   })
-  .then(answers => {
-    res.json({
-      results: answers.rows,
-      total_count: answers.count,
-    });
+  .then(count => {
+    if (count) {
+      models.answer.findAndCountAll({
+        order: [[order, direction]],
+        attributes: ['answer_id', 'problem_id', 'member_id',
+          'content', 'reference', 'created'],
+        where: { problem_id: req.query.problem_id },
+        offset: page,
+        limit: per_page,
+      })
+      .then(answers => {
+        res.json({
+          results: answers.rows,
+          total_count: answers.count,
+        });
+      })
+      .catch(() => res.status(400).end());
+    } else {
+      res.status(404).end();
+    }
   })
   .catch(() => res.status(400).end());
 });
