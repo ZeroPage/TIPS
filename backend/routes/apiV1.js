@@ -662,6 +662,7 @@ router.get('/boards/:board_id/categories', function(req, res, next) {
 
 router.post('/documents', function(req, res, next) {
   if (req.isAuthenticated()) {
+    req.body.member_id = req.user.member_id;
     models.document.create(req.body, {
       fields: ['board_id', 'category_id', 'member_id',
         'title', 'content', 'reference'],
