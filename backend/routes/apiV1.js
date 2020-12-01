@@ -663,7 +663,8 @@ router.get('/boards/:board_id/categories', function(req, res, next) {
 router.post('/documents', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.document.create(req.body, {
-      fields: ['board_id', 'category_id', 'title', 'content', 'reference'],
+      fields: ['board_id', 'category_id', 'member_id',
+        'title', 'content', 'reference'],
     })
     .then(() => res.status(201).end())
     .catch(() => res.status(400).end());
