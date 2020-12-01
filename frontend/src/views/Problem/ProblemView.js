@@ -51,6 +51,8 @@ class ProblemView extends React.Component {
     
     this.hanbleShare = this.handleShare.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleProblemVote = this.handleProblemVote.bind(this);
+    this.handleAnswerVote = this.handleAnswerVote.bind(this);
     this.handleAnswerSubmit = this.handleAnswerSubmit.bind(this);
     this.handleAnswerDelete = this.handleAnswerDelete.bind(this);
   }
@@ -95,6 +97,69 @@ class ProblemView extends React.Component {
       )
     }
     return;
+  }
+
+  handleProblemVote() {
+    fetch("/api/v1/votes", {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "problem_id": this.state.problem_id,
+        "type": "u"
+      })
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          alert("추천이 완료되었습니다.");
+          window.location.reload();
+          return;
+        }
+        else {
+          alert("추천에 실패하였습니다.");
+          return;
+        }
+      },
+      (error) => {
+        alert("추천에 실패하였습니다.");
+        console.log(error);
+        return;
+      }
+    )
+  }
+
+  handleAnswerVote(event) {
+    console.log(event.target);
+    fetch("/api/v1/votes", {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "answer_id": event.target.id,
+        "type": "u"
+      })
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          alert("추천이 완료되었습니다.");
+          window.location.reload();
+          return;
+        }
+        else {
+          alert("추천에 실패하였습니다.");
+          return;
+        }
+      },
+      (error) => {
+        alert("추천에 실패하였습니다.");
+        console.log(error);
+        return;
+      }
+    )
   }
 
   handleAnswerSubmit() {
@@ -220,26 +285,23 @@ class ProblemView extends React.Component {
               (result) => {
                 if(result.ok) {
                   result.json().then(data_member => {
-                    /*fetch("/api/v1/difficulty", {
+                    fetch("/api/v1/votes?problem_id=" + this.state.problem_id, {
                       method: 'GET',
                       headers: {
                         "Content-Type": "application/json"
-                      },
-                      body: JSON.stringify({
-                        'problem_id': data_problem.problem_id
-                      })
+                      }
                     })
                     .then(
                       (result) => {
                         if(result.ok) {
-                          result.json().then(data_difficulty => {*/
-                            data_problem.difficulty = 1; //data_difficulty.average;
+                          result.json().then(data_vote => {
+                            data_problem.vote = data_vote.u;
                             data_problem.member_nickname = data_member.nickname;
                             this.setState({problem: data_problem});
-                          /*});
+                          });
                         }
                       }
-                    );*/
+                    );
                   });
                 }
               }
@@ -253,7 +315,7 @@ class ProblemView extends React.Component {
   getAnswer() {
     var answer_info = this.state.answers;
     var page = parseInt(this.state.answers.length / 5) + 1;
-    
+
     fetch(`/api/v1/answers?problem_id=${this.state.problem_id}&page=${page}`, {
       method: 'GET',
       headers: {
@@ -275,10 +337,26 @@ class ProblemView extends React.Component {
               .then(
                 (result) => {
                   if(result.ok) {
-                    result.json().then(member_data => {
-                      data_answer.member_nickname = member_data.nickname;
-                      answer_info.push(data_answer);
-                      this.setState({answers: answer_info});
+                    result.json().then(data_member => {
+                      fetch("/api/v1/votes?answer_id=" + data_answer.answer_id, {
+                        method: 'GET',
+                        headers: {
+                          "Content-Type": "application/json"
+                        }
+                      })
+                      .then(
+                        (result) => {
+                          if(result.ok) {
+                            result.json().then(data_vote => {
+                              data_answer.vote = data_vote.u;
+                              data_answer.member_nickname = data_member.nickname;
+                              answer_info.push(data_answer);
+                              this.setState({answers: answer_info});
+                            });
+                          }
+                        }
+                      );
+                      
                     });
                   }
                 }
@@ -377,11 +455,16 @@ class ProblemView extends React.Component {
             <Button color="primary" size="sm" type="button" onClick={this.handleShare} >
               문제 공유
             </Button>
-            <Button href='#' color='none'>
+            <Button id={this.state.problem_id} color='none' onClick={this.handleProblemVote}>
               <Row>
                 <Col>
-                  <i class="fa fa-thumbs-o-up" aria-hidden="true" />
-                  {" "}0
+                {
+                  parseInt(this.state.member_id) !== 0 &&
+                  <div>
+                    <i class="fa fa-thumbs-o-up" aria-hidden="true" />
+                    {" " + this.state.problem.vote}
+                  </div>
+                }
                 </Col>
               </Row>
             </Button>
@@ -422,12 +505,15 @@ class ProblemView extends React.Component {
                 {answer.member_nickname}
                 <br />
                 {('' + answer.created).substring(0, 10)}
-                <Button href='#' color='none'>
+                <Button id={answer.answer_id} color='none' onClick={this.handleAnswerVote}>
                   <Row>
-                    <Col>
-                      <i class="fa fa-thumbs-o-up" aria-hidden="true" />
-                      {" "}0
-                    </Col>
+                    {
+                      parseInt(this.state.member_id) !== 0 &&
+                      <Col id={answer.answer_id}>
+                        <i id={answer.answer_id} class="fa fa-thumbs-o-up" aria-hidden="true" />
+                        {" " + answer.vote}
+                      </Col>
+                    }
                   </Row>
                 </Button>
               </div>

@@ -68,9 +68,9 @@ ReactDOM.render(
       <Route path="/group-view-page/:id" exact render={props => <GroupView {...props} />} />
 
       <Route path="/board-list-page/:id" exact render={props => <BoardList {...props} />} />
-      <Route path="/board-view-page/:id/:id2" exact render={props => <BoardView {...props} />} />
+      <Route path="/board-view-page/:id" exact render={props => <BoardView {...props} />} />
+      <Route path="/board-edit-page" exact render={props => <BoardEdit {...props} />} />
       <Route path="/board-edit-page/:id" exact render={props => <BoardEdit {...props} />} />
-      <Route path="/board-edit-page/:id/:id2" exact render={props => <BoardEdit {...props} />} />
       <Redirect to="/" />
     </Switch>
   </BrowserRouter>,

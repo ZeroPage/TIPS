@@ -132,7 +132,6 @@ class ProblemList extends React.Component {
     if(this.state.order) fetch_url = fetch_url + `order=${this.state.order}&`;
     if(this.state.search) fetch_url = fetch_url + `title=${this.state.search}&`;
 
-    var problem_list = [];
     fetch(fetch_url, {
       method: 'GET',
       headers: {

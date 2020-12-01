@@ -249,6 +249,18 @@ class ProblemEdit extends React.Component {
     );
   }
 
+  getCategoryItem() {
+    var ret = [];
+    this.state.categories.forEach(item => {
+      ret.push(
+        <option key={item.category_id} value={item.category_id}>
+          {item.name}
+        </option>
+      );
+    });
+    return ret;
+  }
+
   render() {
     return (
       <>
@@ -279,13 +291,7 @@ class ProblemEdit extends React.Component {
                     <Row>
                       <Col lg="4">
                         <Input type="select" name="카테고리 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
-                          {
-                            this.state.categories.map(item => (
-                              <option value={item.category_id}>
-                                {item.name}
-                              </option>
-                            ))
-                          }
+                        {this.getCategoryItem()}
                         </Input>
                       </Col>
                       <Col lg="4">
