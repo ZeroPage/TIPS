@@ -16,6 +16,7 @@
 
 */
 import React from "react";
+import queryString from "query-string";
 
 // reactstrap components
 import {
@@ -34,149 +35,135 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
+import Template from "views/Template.js";
 
 class BoardEdit extends React.Component {
   constructor(props) {
     super(props);
+
+    const { search } = this.props.location;
+    const queryObj = queryString.parse(search);
+    const { board_id } = queryObj;
+
     this.state = {
+      board_id: parseInt(board_id),
+      document_id: this.props.match.params.id,
+      category_id: 1,
+      categories: [],
       title: "",
-      memberId: 1,
-      categoryId: 1,
-      timeLimit: "",
-      reference: "",
-      content: "",
-      problemId: this.props.match.params.id,
-      check: "",
-      category: []
+      contnet: "",
+      reference: ""
     };
 
-    if(this.state.problemId === undefined) {
-      this.state.problemId = 0;
-    }
-
-    this.handleTitle = this.handleTitle.bind(this);
-    this.handleMemberId = this.handleMemberId.bind(this);
     this.handleCategoryId = this.handleCategoryId.bind(this);
-    this.handleTimeLimit = this.handleTimeLimit.bind(this);
+    this.handleTitle = this.handleTitle.bind(this);
     this.handleReference = this.handleReference.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.redirect = this.redirect.bind(this);
   }
 
   handleTitle(event) {
     this.setState({title: event.target.value});
   }
-
-  handleMemberId(event) {
-    this.setState({memberId: event.target.value});
-  }
   
   handleCategoryId(event) {
-    this.setState({categoryId: event.target.value});
+    this.setState({category_id: event.target.value});
   }
 
-  handleTimeLimit(event) {
-    this.setState({timeLimit: event.target.value});
-  }
 
   handleReference(event) {
     this.setState({reference: event.target.value});
   }
 
-  redirect = () => {
-    if(this.state.problemId !== 0) {
-      this.props.history.push('/problem-view-page/'+this.state.problemId);
+  redirect() {
+    if(!this.state.document_id) {
+      this.props.history.push('/board-view-page/' + this.state.document_id);
     }
-    this.props.history.push('/problem-list-page');
+    this.props.history.push('/board-list-page/' + this.state.board_id);
   }
 
   handleSubmit(event) {
     event.preventDefault();
 
     //check form
-    if(this.state.title === "")
-    {
-      this.setState({check: <><br /><Alert className="alert-danger">제목이 비어있습니다.</Alert></>});
+    if(!this.state.title) {
+      alert("제목이 비어있습니다.");
       return;
     }
-    if(this.state.categoryId === "")
-    {
-      this.setState({check: <><br /><Alert className="alert-danger">분류가 비어있습니다.</Alert></>});
+    if(this.state.category_id === "") {
+      alert("카테고리가 비어있습니다.");
       return;
     } 
-    if (this.state.timeLimit === "") {
-      this.setState({check: <><br /><Alert className="alert-danger">시간 제한이 비어있습니다.</Alert></>});
-      return;
-    }
     if (this.state.reference === "") {
-      this.setState({check: <><br /><Alert className="alert-danger">출처가 비어있습니다.</Alert></>});
+      alert("출처가 비어있습니다.");
       return;
     }
 
-    if(this.state.problemId !== 0) {
-      fetch("/api/v1/problem/" + this.state.problemId, {
+    if(this.state.document_id) {
+      fetch("/api/v1/documents/" + this.state.document_id, {
         method: 'PUT',
         redirect: 'follow',
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          'title': this.state.title,
-          'category_id': this.state.categoryId,
-          'time_limit': this.state.timeLimit,
-          'reference': this.state.reference,
-          'content': this.state.content
+          category_id: this.state.category_id,
+          title: this.state.title,
+          content: this.state.content,
+          reference: this.state.reference
         })
       })
-      .then(res => res.json())
       .then(
         (result) => {
-          if(result.success === "ok") {
-            this.setState({check: <><br /><Alert className="alert-success">문제 수정이 완료되었습니다</Alert></>});
-            setInterval(() => this.redirect(), 2000);
-            return;
+          if(result.ok) {
+            result.json().then(data => {
+              alert("게시글 수정이 완료되었습니다.");
+              this.redirect();
+              return;
+            });
           }
           else {
-            this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+            alert("게시글 수정에 실패하였습니다.");
             return;
           }
         },
         (error) => {
-          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          alert("게시글 수정에 실패하였습니다.");
           console.log(error);
         }
       )
     }
     else {
-      fetch("/api/v1/problem", {
+      fetch("/api/v1/documents", {
         method: 'POST',
         redirect: 'follow',
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          'title': this.state.title,
-          'category_id': this.state.categoryId,
-          'member_id': this.state.memberId,
-          'time_limit': this.state.timeLimit,
-          'reference': this.state.reference,
-          'content': this.state.content
+          board_id: this.state.board_id,
+          category_id: this.state.category_id,
+          title: this.state.title,
+          content: this.state.content,
+          reference: this.state.reference
         })
       })
-      .then(res => res.json())
       .then(
         (result) => {
-          if(result.success === "ok") {
-            this.setState({check: <><br /><Alert className="alert-success">문제 추가가 완료되었습니다</Alert></>});
-            setInterval(() => this.redirect(), 2000);
-            return;
+          if(result.ok) {
+            result.json().then(data => {
+              alert("게시글 추가가 완료되었습니다.");
+              this.redirect();
+              return;
+            });
           }
           else {
-            this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+            alert("게시글 추가에 실패하였습니다.");
             return;
           }
         },
         (error) => {
-          this.setState({check: <><br /><Alert className="alert-danger">서버와 연결 과정에서 에러가 발생했습니다.</Alert></>});
+          alert("게시글 추가에 실패하였습니다.");
           console.log(error);
         }
       )
@@ -188,53 +175,53 @@ class BoardEdit extends React.Component {
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
     
-    fetch("http://localhost:3000/api/v1/problem/category", {
+    this.getCategory();
+    if(this.state.document_id) this.getDocumentData();
+  }
+
+  getCategory() {
+    fetch(`/api/v1/boards/${this.state.board_id}/categories`, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
       }
     })
-    .then(res => res.json())
     .then(
       (result) => {
-        if(result.success === "ok")
-        {
-          this.setState({
-            category: result.category
+        if(result.ok) {
+          result.json().then(data => {
+            this.setState({categories: data.results});
+            return;
           });
         }
-      },
-      (error) => console.log(error)
+      }
     )
+  }
 
-    if(this.state.problemId !== 0)
-    {
-      fetch("http://localhost:3000/api/v1/problem/" + this.state.problemId, {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => res.json())
-      .then(
-        (result) => {
-          if(result.success === "ok")
-          {
+  getDocumentData() {
+    fetch("/api/v1/documents/" + this.state.document_id, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
             this.setState({
-              title: result.title,
-              memberId: result.member_id,
-              categoryId: result.category_id,
-              timeLimit: result.time_limit,
-              reference: result.reference,
-              content: result.content
+              board_id: data.board_id,
+              document_id: data.document_id,
+              category_id: data.category_id,
+              title: data.title,
+              contnet: data.content,
+              reference: data.reference
             });
             return;
-          }
-          else return;
-        },
-        (error) => console.log(error)
-      )
-    }
+          });
+        }
+      }
+    );
   }
 
   render() {
@@ -242,45 +229,7 @@ class BoardEdit extends React.Component {
       <>
         <SimpleNavbar />
         <main ref="main">
-          <section className="section section-lg section-shaped pb-250">
-            {/* Circles background */}
-            <div className="shape shape-style-1 shape-default alpha-4">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-            <Container className="py-lg-md d-flex">
-              <div className="col px-0">
-                <Row>
-                  <Col className="text-center" lg="6">
-                    <h1 className="display-3 text-white">&nbsp;</h1>
-                  </Col>
-                </Row>
-              </div>
-            </Container>
-
-            {/* SVG separator */}
-            <div className="separator separator-bottom separator-skew">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="fill-white"
-                  points="2560 0 2560 100 0 100"
-                />
-              </svg>
-            </div>
-          </section>
-
+          <Template />
           
           <Container>
             <Card className="card-profile shadow mt--300">
@@ -288,16 +237,15 @@ class BoardEdit extends React.Component {
                 <Form>
                   <Container className="mb-5">
                     <br />
-                    {this.state.problemId === 0 && <h1 className="display-3 text-center">게시판 글쓰기</h1>}
-                    {this.state.problemId !== 0 && <h1 className="display-3 text-center">문제 수정</h1>}
-                    {this.state.check}
+                    {!this.state.document_id && <h1 className="display-3 text-center">게시글 추가</h1>}
+                    {this.state.document_id && <h1 className="display-3 text-center">게시글 수정</h1>}
                     <br />
                     <Row>
                       <Col lg="3">
-                        <Input type="select" name="분류 선택" value={this.state.categoryId} onChange={this.handleCategoryId}>
+                        <Input type="select" name="분류 선택" value={this.state.category_id} onChange={this.handleCategoryId}>
                           {
-                            this.state.category &&
-                            this.state.category.map(item => (
+                            this.state.categories &&
+                            this.state.categories.map(item => (
                               <option value={item.category_id}>
                                 {item.name}
                               </option>
@@ -323,9 +271,6 @@ class BoardEdit extends React.Component {
                     <CKEditor
                       editor={ClassicEditor}
                       data={this.state.content}
-                      onInit={(event, editor) => {
-                        editor.resize_minHeight = 500;
-                      }}
                       onChange={(event, editor) => {
                           let data = editor.getData();
                           this.setState({content: data});
@@ -335,7 +280,7 @@ class BoardEdit extends React.Component {
                     
                     <Row>
                       <Col lg="12">
-                        <Input placeholder="태그" type="text" value={this.state.reference} onChange={this.handleReference} />
+                        <Input placeholder="출처" type="text" value={this.state.reference} onChange={this.handleReference} />
                       </Col>
                     </Row>
                     <div className="text-center">
@@ -351,7 +296,7 @@ class BoardEdit extends React.Component {
                         className="mt-4"
                         color="primary"
                         type="button"
-                        href={this.state.problemId === 0 ? "/problem-list-page" : "/problem-view-page/" + this.state.problemId}
+                        href={this.state.document_id ? ('/board-view-page/' + this.state.document_id) : ('/board-list-page/' + this.state.board_id)}
                       >
                         돌아가기
                       </Button>
