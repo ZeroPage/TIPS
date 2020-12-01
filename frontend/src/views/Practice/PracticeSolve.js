@@ -29,7 +29,7 @@ class PracticeSolve extends React.Component {
     this.state = {
       member_id: 0,
       current_problem: 0,
-      problem_id: [3,1,2], //[30, 71, 100, 104, 107],
+      problem_id: [30, 71, 100, 104, 107],
       problems: [],
       answers: [],
       content: "",

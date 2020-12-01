@@ -299,12 +299,12 @@ class ProblemList extends React.Component {
                       </Col>
                       <Col>
                         <div className="text-right">
-                          <Button disabled={false}>
+                          {/*<Button disabled={false}>
                             추천순
                           </Button>
                           <Button disabled={false}>
                             최신순
-                          </Button>
+                          </Button>*/}
                         </div>
                       </Col>
                     </Row>

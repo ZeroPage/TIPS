@@ -131,7 +131,6 @@ class ProblemView extends React.Component {
   }
 
   handleAnswerVote(event) {
-    console.log(event.target);
     fetch("/api/v1/votes", {
       method: 'PUT',
       headers: {
@@ -499,14 +498,14 @@ class ProblemView extends React.Component {
           <h5>총 {this.state.answer_count}개의 풀이</h5>
         </Col>
         <Col>
-          <div class="text-right">
+          {/*<div class="text-right">
             <Button size="sm" disabled={false}>
               추천순
             </Button>
             <Button size="sm" disabled={false}>
               최신순
             </Button>
-          </div>
+          </div>*/}
         </Col>
       </Row>
     );

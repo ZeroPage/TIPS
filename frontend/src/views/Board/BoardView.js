@@ -19,230 +19,535 @@ import React from "react";
 
 // reactstrap components
 import {
-  Button, Card, CardImg, CardText, CardBody,
-  CardTitle,  ButtonGroup,  Container, Form, Input, Modal, PopoverBody, UncontrolledPopover, Row, Col, ListGroup, ListGroupItem
+  Badge, Button, Card, Container, Form, Progress, PopoverBody, UncontrolledPopover, Row, Col
 } from "reactstrap";
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 // core components
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
+import Template from "views/Template.js";
 
 class BoardView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: "",
-      memberId: "",
-      categoryId: "",
-      timeLimit: "",
-      reference: "",
-      content: "",
-      difficulty: "",
-      vote: "",
-      problemId: this.props.match.params.id,
-      isShare: false,
-      time: ""
+      board_id: 0,
+      document_id: this.props.match.params.id,
+      document: [],
+      categories: [],
+      comments: [],
+      member_id: 0,
+      is_admin: false
     };
-  }
 
-  toggleModal = () => {
-    this.setState({
-      isShare: !this.state.isShare
-    });
-  };
-
-  tick = () => {
-    if (this.state.time > 0) {
-      this.setState({
-        time: this.state.time - 1
-      });
-    }
+    this.getLogin();
+    this.getDocument();
+    this.getCategory();
+    this.getComment();
+    
+    this.hanbleShare = this.handleShare.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleDocumentVote = this.handleDocumentVote.bind(this);
+    this.handleCommentVote = this.handleCommentVote.bind(this);
+    this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
+    this.handleCommentDelete = this.handleCommentDelete.bind(this);
   }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+  }
 
-    fetch("/api/v1/problem/" + this.state.problemId, {
+  handleShare() {
+    prompt("현재 문제 링크를 공유하세요.", window.location.href);
+  }
+
+  handleDelete() {
+    var result = window.confirm(this.state.document_id + "번 게시물을 삭제하시겠습니까?");  
+    if(result)
+    {
+      fetch("/api/v1/documents/" + this.state.document_id, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json"
+        },
+      })
+      .then(
+        (result) => {
+          if(result.ok) {
+            alert("삭제가 완료되었습니다.");
+            this.props.history.push('/board-list-page/' + this.state.document.board_id);
+            return;
+          }
+          else {
+            alert("삭제를 실패하였습니다.");
+            return;
+          }
+        },
+        (error) => {
+          alert("삭제를 실패하였습니다.");
+          console.log(error);
+          return;
+        }
+      )
+    }
+    return;
+  }
+
+  handleDocumentVote() {
+    fetch("/api/v1/votes", {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "document_id": this.state.document_id,
+        "type": "u"
+      })
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          alert("추천이 완료되었습니다.");
+          window.location.reload();
+          return;
+        }
+        else {
+          alert("추천에 실패하였습니다.");
+          return;
+        }
+      },
+      (error) => {
+        alert("추천에 실패하였습니다.");
+        console.log(error);
+        return;
+      }
+    )
+  }
+
+  handleCommentVote(event) {
+    fetch("/api/v1/votes", {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "comment_id": event.target.id,
+        "type": "u"
+      })
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          alert("추천이 완료되었습니다.");
+          window.location.reload();
+          return;
+        }
+        else {
+          alert("추천에 실패하였습니다.");
+          return;
+        }
+      },
+      (error) => {
+        alert("추천에 실패하였습니다.");
+        console.log(error);
+        return;
+      }
+    )
+  }
+
+  handleCommentSubmit() {
+    fetch("/api/v1/comments", {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "document_id": this.state.document_id,
+        "content": this.state.content
+      })
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          alert("댓글 등록이 완료되었습니다.");
+          window.location.reload();
+          return;
+        }
+        else {
+          alert("댓글 등록에 실패하였습니다.");
+          return;
+        }
+      },
+      (error) => {
+        alert("댓글 등록에 실패하였습니다.");
+        console.log(error);
+        return;
+      }
+    )
+  }
+
+  handleCommentDelete(event) {
+    var result = window.confirm("댓글을 삭제하시겠습니까?");  
+    if(result)
+    {
+      fetch("/api/v1/comments/" + event.target.id, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(
+        (result) => {
+          if(result.ok) {
+            alert("댓글 삭제가 완료되었습니다.");
+            window.location.reload();
+            return;
+          }
+          else {
+            alert("댓글 삭제에 실패하였습니다.");
+            return;
+          }
+        },
+        (error) => {
+          alert("댓글 삭제에 실패하였습니다.");
+          console.log(error);
+          return;
+        }
+      );
+    }
+  }
+
+  getLogin() {
+    fetch("/api/v1/members", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
       }
     })
-      .then(res => res.json())
-      .then(
-        (result) => {
-          if (result.success === "ok") {
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
             this.setState({
-              title: result.title,
-              memberId: result.member_id,
-              categoryId: result.category_id,
-              timeLimit: result.time_limit,
-              reference: result.reference,
-              content: result.content,
-              difficulty: result.difficulty,
-              vote: result.vote,
-              time: 0 //result.time_limit
+              member_id: data.member_id,
+              is_admin: data.is_admin
             });
-          }
-        },
-        (error) => console.log(error)
-      )
-
-    setInterval(() => this.tick(), 1000);
+          });
+        }
+      }
+    );
   }
 
-  render() {
-    let answerPanel = <br />;
-    if (this.state.time === 0) {
-      let answer = "";
-      console.log(this.state.problemId);
-      if (this.state.problemId == 1) {
-        answer = "<p>Hello World!</p>";
+  getCategory() {
+    fetch("/api/v1/boards/" + this.state.document.board_id + "/categories", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
       }
-      else if (this.state.problemId == 2) {
-        answer = "<p>1. 표준 프로토콜을 사용"
-          + "<br>2. 작은 소리를 크게 변환 -  리피터 설치 증폭 / 작은 소리도 이해 가능 - 복조기 성능 향상"
-          + "<br>3. 빠른 속도의 조절 필요 - 반송파 신호 조정 / 빠른 속도도 이해 가능 - 반송파 신호 중첩"
-          + "<br>4. 한사람만 발언 허용 - 반이중 기술 적용/ 동시에 발언 가능 - 전이중 기술 적용"
-          + "<br>5.물이 아닌 전송매체 변화 - 무선통신 매체사용 / 물속 에서도 대화 가능 - 음파통신 매체사용<\p>";
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            this.setState({categories: data.results});
+          });
+        }
       }
-      else {
-        answer = "답변이 등록 되어있지 않습니다.";
-      }
+    );
+  }
 
-      answerPanel = (
+  getDocument() {
+    fetch("/api/v1/documents/" + this.state.document_id, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data_document => {
+            fetch("/api/v1/members/" + data_document.member_id, {
+              method: 'GET',
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+            .then(result => {
+              if(result.ok) {
+                result.json().then(data_member => {
+                  fetch("/api/v1/votes?document_id=" + this.state.document_id, {
+                    method: 'GET',
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  })
+                  .then(
+                    (result) => {
+                      if(result.ok) {
+                        result.json().then(data_vote => {
+                          data_document.vote = data_vote.u;
+                          data_document.member_nickname = data_member.nickname;
+                          this.setState({document: data_document});
+                        });
+                      }
+                    }
+                  );
+                });
+              }
+            });
+          });
+        };
+      }
+    );
+  }
+
+  getComment() {
+    var comment_info = [];
+
+    fetch(`/api/v1/comments?document_id=${this.state.document_id}`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
+            data.results.forEach(data_comment => {
+              fetch("/api/v1/members/" + data_comment.member_id, {
+                method: 'GET',
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              })
+              .then(
+                (result) => {
+                  if(result.ok) {
+                    result.json().then(data_member => {
+                      fetch("/api/v1/votes?comment_id=" + data_comment.comment_id, {
+                        method: 'GET',
+                        headers: {
+                          "Content-Type": "application/json"
+                        }
+                      })
+                      .then(
+                        (result) => {
+                          if(result.ok) {
+                            result.json().then(data_vote => {
+                              data_comment.vote = data_vote.u;
+                              data_comment.member_nickname = data_member.nickname;
+                              comment_info.push(data_comment);
+                              this.setState({comments: comment_info});
+                            });
+                          }
+                        }
+                      );
+                    });
+                  }
+                }
+              );
+            });
+          });
+        }
+        else {
+          console.log(result.status);
+        }
+      }
+    );
+  }
+
+  getCategoryName(find_id) {
+    console.log(find_id);
+    for(var i=0;i<this.state.categories.length;i++) {
+      if(this.state.categories[i].category_id === find_id) {
+        return this.state.categories[i].name;
+      }
+    }
+  }
+
+  getProblemInfo() {
+    var ret = [];
+
+    //Header
+    ret.push(<br />);
+    ret.push(<h1 className="display-3 text-center">{this.state.document.title}</h1>);
+    ret.push(
+      <Row>
+        <Col xs="4">
+          <h5 className="text-left">
+            No. {this.state.document_id}
+          </h5>
+          출처 : {this.state.document.reference}
+          <Badge className="text-uppercase" color="primary" pill>
+            {this.getCategoryName(this.state.document.category_id)}
+          </Badge>
+        </Col>
+        <Col xs="4" />
+        <Col xs="4">
+          <div className="text-right">
+            게시일 : {('' + this.state.document.created).substring(0, 10)}
+            <br />
+            작성자 : {this.state.document.member_nickname}
+          </div>
+          {
+            (this.state.member_id === this.state.document.member_id || this.state.is_admin) &&
+            <div className="text-right">
+              <br />
+              <Button color="primary" size="sm" type="button"
+                href={"/board-edit-page/" + this.state.document_id + "?board_id=" + this.state.document.board_id}>
+                게시물 수정
+              </Button>
+              <Button color="primary" size="sm" type="button" onClick={this.handleDelete}>
+                게시물 삭제
+              </Button>
+            </div>
+          }
+        </Col>
+      </Row>
+    );
+
+    ret.push(<hr />);
+
+    //Body
+    ret.push(
+      <p className="lead">
+        <div dangerouslySetInnerHTML={{ __html: this.state.document.content }} />
+      </p>
+    );
+
+    ret.push(<br />);
+    ret.push(<br />);
+    ret.push(<br />);
+
+    ret.push(
+        <div className="text-center">
+            <Button color="primary" size="sm" type="button" onClick={this.handleShare} >
+              게시글 공유
+            </Button>
+            {
+              parseInt(this.state.member_id) !== 0 &&
+              <Button id={this.state.document_id} color='none' onClick={this.handleDocumentVote}>
+                <Row>
+                  <Col>
+                    <div>
+                      <i class="fa fa-thumbs-o-up" aria-hidden="true" />
+                      {" " + this.state.document.vote}
+                    </div>
+                  </Col>
+                </Row>
+              </Button>
+            }
+        </div>
+    )
+
+    return ret;
+  }
+  
+  getAnswerInfo() {
+    var ret = [];
+
+    ret.push(
+      <Row xs='2'>
+        <Col>
+          <h5>총 {this.state.comments.length}개의 답변</h5>
+        </Col>
+        <Col>
+          {/*<div class="text-right">
+            <Button size="sm" disabled={false}>
+              추천순
+            </Button>
+            <Button size="sm" disabled={false}>
+              최신순
+            </Button>
+          </div>*/}
+        </Col>
+      </Row>
+    );
+    ret.push(<br />);
+
+    this.state.comments.forEach(comment => {
+      ret.push(
         <div>
-          <h2 className="display-5">답변</h2>
-          <div dangerouslySetInnerHTML={{ __html: answer }}></div>
+          <Row>
+            <Col xs="2">
+              <div className="text-center">
+                {comment.member_nickname}
+                <br />
+                {('' + comment.created).substring(0, 10)}
+                <Button id={comment.comment_id} color='none' onClick={this.handleCommentVote}>
+                  <Row>
+                    {
+                      parseInt(this.state.member_id) !== 0 &&
+                      <Col id={comment.comment_id}>
+                        <i id={comment.comment_id} class="fa fa-thumbs-o-up" aria-hidden="true" />
+                        {" " + comment.vote}
+                      </Col>
+                    }
+                  </Row>
+                </Button>
+              </div>
+            </Col>
+            <Col xs="9">
+              <div dangerouslySetInnerHTML={{ __html: comment.content }} />
+            </Col>
+            <Col xs="1">
+              {
+                this.state.member_id === comment.member_id &&
+                <Button id={comment.comment_id} color='none' onClick={this.handleCommentDelete}>
+                  ×
+                </Button>
+              }
+            </Col>
+          </Row>
+          <br />
+        </div>
+      );
+    });
+
+    ret.push(<hr />);
+
+    if(this.state.member_id !== 0) {
+      ret.push(
+        <div className="text-center">
+          <h2>답변 작성</h2>
+          <br />
+          <CKEditor
+            editor={ClassicEditor}
+            data={this.state.content}
+            onChange={(event, editor) => {
+              let data = editor.getData();
+              this.setState({ content: data });
+            }}
+          />
+          <br />
+          <Button color='primary' onClick={this.handleCommentSubmit}>
+            작성완료
+          </Button>
         </div>
       );
     }
+    return ret;
+  }
+
+  render() {
     return (
       <>
         <SimpleNavbar />
         <main ref="main">
-          <section className="section section-lg section-shaped pb-250">
-            {/* Circles background */}
-            <div className="shape shape-style-1 shape-default alpha-4">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-            <Container className="py-lg-md d-flex">
-              <div className="col px-0">
-                <Row>
-                  <Col className="text-center" lg="6">
-                    <h1 className="display-3 text-white">&nbsp;</h1>
-                  </Col>
-                </Row>
-              </div>
-            </Container>
-
-            {/* SVG separator */}
-            <div className="separator separator-bottom separator-skew">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="fill-white"
-                  points="2560 0 2560 100 0 100"
-                />
-              </svg>
-            </div>
-          </section>
+          <Template />
           <Container>
             <Card className="card-profile shadow mt--300">
               <div className="px-6">
                 <Form>
+                  {this.getProblemInfo()}
+                  <hr />
+                  {this.getAnswerInfo()}
                   <br />
-                  <h1 className="display-3">게시판제목</h1>
-                  <Row>
-                    <Col xs='3'>
-                      게시일 : 2015.15.15
-                  </Col>
-                    <Col xs='3'>
-                      답글 수 : 12
-                  </Col>
-                    <Col xs='3'>
-                      조회수 : 1010
-                  </Col>
-                  <Col>
-                  <div>
-                    
-                    <a href='#'>자료구조</a>
-                    -
-                    <a href='#'>자료구조</a>
-                  </div>
-                  </Col>
-                  </Row>
-                  
-                  <hr></hr>
-
-                  <div>버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬버튼위아래가운데정렬</div>
-                  <br/>
-                  <br/>
-                  <div>
-                    <Row xs='3'>
-                      <Col><a href = "#">공유하기</a></Col>
-                      <Col></Col>
-                      <Col>
-                        <Card body>
-                          <CardTitle tag="h9">질문일 : 2015.12.21 22:34</CardTitle>
-                          <div><img src = 'https://www.gravatar.com/avatar/b67222dadd40ac3a45ce5048a1e3cdb8?s=328&d=identicon&r=PG&f=1' weight = '30px' height='30px'></img> 작성자 : twice</div>
-                        </Card>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div border='1px'>
-                    <Card>
-                      <CardBody>
-                        <Row xs='2'>
-                          <Col xs='4'></Col>
-                          <h1>0</h1>
-                          <Button href='#' width='60px' height='60px' color='none'><img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwt5NJwBuhBx3ky4esSe3itCDGvrx00B8qXQ&usqp=CAU' width='60px' height='60px'></img></Button>
-                          <Button href='#' width='60px' height='60px' color='none'><img src='data:image/png;base64,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' width='60px' height='60px'></img></Button>
-                          <h1>1</h1>
-                          <Col xs='4'></Col>
-                        </Row>
-                      </CardBody>
-                    </Card>
-                  </div>
-                  <br/>
-                    <Row xs = '5'>
-                      <Col><h5>4개의 답변</h5></Col>
-                      <Col></Col>
-                      <Col></Col>
-                      <Col></Col>
-                      <Col>
-                        <Col xs="auto">
-                          <ButtonGroup size="sm">
-                            <Button>인기순</Button>
-                            <Button>날짜순</Button>
-                          </ButtonGroup>
-                        </Col>
-                      </Col>
-                    </Row>
-
-                    <hr/>
-                    
-
-
-
-                  <div className="text-center">
-                    
-
-                  </div>
-                  {answerPanel}
                   <br />
                 </Form>
               </div>

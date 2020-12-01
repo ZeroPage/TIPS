@@ -51,7 +51,7 @@ class BoardEdit extends React.Component {
       category_id: 1,
       categories: [],
       title: "",
-      contnet: "",
+      content: "",
       reference: ""
     };
 
@@ -116,11 +116,9 @@ class BoardEdit extends React.Component {
       .then(
         (result) => {
           if(result.ok) {
-            result.json().then(data => {
-              alert("게시글 수정이 완료되었습니다.");
-              this.redirect();
-              return;
-            });
+            alert("게시글 수정이 완료되었습니다.");
+            this.redirect();
+            return;
           }
           else {
             alert("게시글 수정에 실패하였습니다.");
@@ -151,11 +149,9 @@ class BoardEdit extends React.Component {
       .then(
         (result) => {
           if(result.ok) {
-            result.json().then(data => {
-              alert("게시글 추가가 완료되었습니다.");
-              this.redirect();
-              return;
-            });
+            alert("게시글 추가가 완료되었습니다.");
+            this.redirect();
+            return;
           }
           else {
             alert("게시글 추가에 실패하였습니다.");
@@ -190,6 +186,7 @@ class BoardEdit extends React.Component {
       (result) => {
         if(result.ok) {
           result.json().then(data => {
+            console.log(data);
             this.setState({categories: data.results});
             return;
           });
@@ -214,7 +211,7 @@ class BoardEdit extends React.Component {
               document_id: data.document_id,
               category_id: data.category_id,
               title: data.title,
-              contnet: data.content,
+              content: data.content,
               reference: data.reference
             });
             return;

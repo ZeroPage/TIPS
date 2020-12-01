@@ -190,6 +190,23 @@ class DemoNavbar extends React.Component {
                       }
                     </DropdownMenu>
                   </UncontrolledDropdown>
+                  <UncontrolledDropdown nav>
+                    <DropdownToggle nav>
+                      <i className="ni ni-collection d-lg-none mr-1" />
+                      <span className="nav-link-inner--text">게시판</span>
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      <DropdownItem href="/board-list-page/1" onClick="window.location.href='/board-list-page/1';">
+                        공지사항
+                      </DropdownItem>
+                      <DropdownItem href="/board-list-page/2" onClick="window.location.href='/board-list-page/2';">
+                        자유게시판
+                      </DropdownItem>
+                      <DropdownItem href="/board-list-page/3" onClick="window.location.href='/board-list-page/3';">
+                        질의응답
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
                   {
                     this.state.isLogin &&
                     <UncontrolledDropdown nav>
@@ -200,26 +217,6 @@ class DemoNavbar extends React.Component {
                       <DropdownMenu>
                         <DropdownItem href="/group-list-page" onClick="window.location.href='/group-list-page';">
                           전체
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
-                  }
-                  {
-                    this.state.isLogin &&
-                    <UncontrolledDropdown nav>
-                      <DropdownToggle nav>
-                        <i className="ni ni-collection d-lg-none mr-1" />
-                        <span className="nav-link-inner--text">게시판</span>
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem href="/board-list-page/1" onClick="window.location.href='/board-list-page/1';">
-                          공지사항
-                        </DropdownItem>
-                        <DropdownItem href="/board-list-page/2" onClick="window.location.href='/board-list-page/2';">
-                          자유게시판
-                        </DropdownItem>
-                        <DropdownItem href="/board-list-page/3" onClick="window.location.href='/board-list-page/3';">
-                          질의응답
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>

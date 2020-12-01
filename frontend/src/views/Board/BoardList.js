@@ -49,7 +49,6 @@ class BoardList extends React.Component {
       is_prime: false
     };
 
-    this.getLogin();
     this.getCategory();
     this.getDocument();
 
@@ -84,31 +83,6 @@ class BoardList extends React.Component {
   redirect(category_id, page, order, search) {
     this.props.history.push(this.redirectUrl(category_id, page, order, search));
     window.location.reload();
-  }
-
-  getLogin() {
-    fetch("/api/v1/members", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            this.setState({
-              is_admin: data.is_admin,
-              is_prime: data.is_prime
-            });
-          });
-        }
-        else {
-          alert("로그인 후 이용해주세요.");
-          this.props.history.push('/');
-        }
-      }
-    );
   }
 
   getCategory() {
@@ -312,14 +286,14 @@ class BoardList extends React.Component {
                       </Input>
                       </Col>
                       <Col>
-                        <div className="text-right">
+                        {/*<div className="text-right">
                           <Button disabled={false}>
                             추천순
                           </Button>
                           <Button disabled={false}>
                             최신순
                           </Button>
-                        </div>
+                        </div>*/}
                       </Col>
                     </Row>
                     <br />
