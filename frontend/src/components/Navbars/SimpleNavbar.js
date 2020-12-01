@@ -201,7 +201,7 @@ class DemoNavbar extends React.Component {
                         <span className="nav-link-inner--text">그룹</span>
                       </DropdownToggle>
                       <DropdownMenu>
-                        <DropdownItem href="/problem-list-page?category_id=0" onClick="window.location.href='/problem-list-page?category_id=0';">
+                        <DropdownItem href="/group-list-page" onClick="window.location.href='/group-list-page';">
                           전체
                         </DropdownItem>
                       </DropdownMenu>

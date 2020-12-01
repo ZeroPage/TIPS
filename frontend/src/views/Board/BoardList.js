@@ -29,8 +29,7 @@ class BoardList extends React.Component {
     this.state = {
       items: [],
       category: [],
-      isConnect: false,
-      isLogin: true,
+      isLogin: true
     };
   }
 

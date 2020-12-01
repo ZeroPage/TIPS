@@ -26,11 +26,14 @@ import {
 import SimpleNavbar from "components/Navbars/SimpleNavbar.js";
 import Template from "views/Template.js";
 
-class GroupList extends React.Component {
+class GroupView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      group_id: parseInt(this.props.match.params.id),
+      member_id: 0,
       items: [],
+      members: [],
       group_name: "",
       group_desc: "",
       is_login: false,
@@ -40,7 +43,6 @@ class GroupList extends React.Component {
     this.getLogin();
     this.getGroup();
 
-    this.changeAdd = this.changeAdd.bind(this);
     this.handleGroupName = this.handleGroupName.bind(this);
     this.handleGroupDesc = this.handleGroupDesc.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -60,15 +62,11 @@ class GroupList extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch("/api/v1/classes", {
+    fetch("/api/v1/classes/" + this.state.group_id + "/members", {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "name": this.state.group_name,
-        "description": this.state.group_desc
-      })
+      }
     })
     .then(
       (result) => {
@@ -96,6 +94,7 @@ class GroupList extends React.Component {
         if(result.ok) {
           result.json().then(data => {
             this.setState({
+              member_id: data.member_id,
               is_login: true
             });
           });
@@ -119,6 +118,33 @@ class GroupList extends React.Component {
       (result) => {
         if(result.ok) {
           result.json().then(data => {
+            for(var i=0;i<data.results.length;i++)
+            {
+              
+              if(this.state.group_id === data.results[i].class_id) {
+                this.setState({
+                  group_name: data.results[i].name,
+                  group_desc: data.results[i].description
+                });
+
+                break;
+              }
+            }
+          });
+        }
+      }
+    );
+
+    fetch("/api/v1/classes/" + this.state.group_id + "/members", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(
+      (result) => {
+        if(result.ok) {
+          result.json().then(data => {
             this.setState({
               items: data.results
             });
@@ -129,31 +155,70 @@ class GroupList extends React.Component {
   }
 
   getList() {
-    var ret = [];
-    this.state.items.forEach(item => {
-      ret.push(
-        <ListGroupItem>
-          <Row>
-            <Col xs="3">No. {item.class_id}</Col>
-            <Col xs="9">
-              <a href={"/group-view-page/" + item.class_id}>
-                {item.name}
-              </a>
-              <Row>
-                <Col xs="8">{item.description}</Col>
-                <Col xs="4">게시일 : {item.created.substring(0, 10)}</Col>
-              </Row>
-            </Col>
-          </Row>
-          
-        </ListGroupItem>
-      );
-    });
-    return ret;
-  }
+    var list = [];
+    var is_join = false;
 
-  changeAdd() {
-    this.setState({is_edit: true});
+    this.state.items.forEach(item => {
+      if(this.state.member_id === item.member_id) {
+        is_join = true;
+      }
+
+      list.push(
+      <ListGroupItem>
+        <Row>
+          <Col xs="8">{item.member_id}</Col>
+          <Col xs="4">가입일 : {item.created.substring(0, 10)}</Col>
+        </Row>
+      </ListGroupItem>
+      );
+      /*fetch("/api/v1/members/" + item.member_id, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(
+        (result) => {
+          if(result.ok) {
+            result.json().then(data => {
+              ret.push(
+              <ListGroupItem>
+                <Row>
+                  <Col xs="8">{data.nickname}</Col>
+                  <Col xs="4">가입일 : {item.created.substring(0, 10)}</Col>
+                </Row>
+              </ListGroupItem>
+              );
+            });
+          }
+        }
+      );*/
+    });
+
+    var ret = [];
+    if(!is_join) {
+      ret.push(
+        <div className="text-right">
+          <Button
+            className="mt-4"
+            color="primary"
+            type="button"
+            onClick={this.handleSubmit}
+          >
+            그룹 가입
+          </Button>
+        </div>
+      );
+    }
+
+    ret.push(<br />);
+    ret.push(
+      <ListGroup>
+       {list}
+      </ListGroup>
+    );
+    
+    return ret;
   }
 
   render() {
@@ -167,39 +232,12 @@ class GroupList extends React.Component {
               <div className="px-4">
                 <Form>
                   <br />
-                  <h1 className="display-3 text-center">그룹 목록</h1>
+                  <h1 className="display-3 text-center">{this.state.group_name}</h1>
+                  <h5 className="text-center">{this.state.group_desc}</h5>
                   <Container>
                     <br />
-                    <ListGroup>
-                      {this.getList()}
-                    </ListGroup>
-                    <hr />
-                    <Button color="primary" size="lg" onClick={this.changeAdd} block>
-                      그룹 추가하기
-                    </Button>
-                    {
-                      this.state.is_edit &&
-                      <Row>
-                        <Col xs="10">
-                          <br />
-                          <Input placeholder="그룹명" type="text" value={this.state.group_name} onChange={this.handleGroupName} />
-                          <br />
-                          <Input placeholder="그룹 설명" type="text" value={this.state.group_desc} onChange={this.handleGroupDesc} />
-                        </Col>
-                        <Col xs="2">
-                          <div className="text-right">
-                            <Button
-                              className="mt-4"
-                              color="default"
-                              type="button"
-                              onClick={this.handleSubmit}
-                            >
-                              그룹 추가
-                            </Button>
-                          </div>
-                        </Col>
-                      </Row>
-                    }
+                    {this.getList()}
+                    <br />
                     <br />
                   </Container>
                 </Form>
@@ -214,4 +252,4 @@ class GroupList extends React.Component {
   }
 }
 
-export default GroupList;
+export default GroupView;

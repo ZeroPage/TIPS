@@ -35,6 +35,8 @@ import ProblemView from "views/Problem/ProblemView.js";
 import ProblemEdit from "views/Problem/ProblemEdit.js";
 
 import GroupList from "views/Group/GroupList.js";
+import GroupView from "views/Group/GroupView.js";
+import UserGroup from "views/Group/UserGroup.js";
 
 import BoardList from "views/Board/BoardList.js";
 import BoardView from "views/Board/BoardView.js";
@@ -56,6 +58,8 @@ ReactDOM.render(
       <Route path="/problem-edit-page/:id" exact render={props => <ProblemEdit {...props} />} />
 
       <Route path="/group-list-page" exact render={props => <GroupList {...props} />} />
+      <Route path="/group-view-page/:id" exact render={props => <GroupView {...props} />} />
+      <Route path="/group-user-page" exact render={props => <UserGroup {...props} />} />
 
       <Route path="/board-list-page/:id" exact render={props => <BoardList {...props} />} />
       <Route path="/board-view-page/:id/:id2" exact render={props => <BoardView {...props} />} />
