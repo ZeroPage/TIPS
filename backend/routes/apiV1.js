@@ -541,7 +541,7 @@ router.get('/solve/members/:member_id', function(req, res, next) {
 router.post('/difficulty', function(req, res, next) {
   if (req.isAuthenticated()) {
     models.difficulty.create(req.body, {
-      fields: ['problem_id', 'score', 'description'],
+      fields: ['member_id', 'problem_id', 'score', 'description'],
     })
     .then(() => res.status(201).end())
     .catch(() => res.status(400).end());
@@ -551,9 +551,16 @@ router.post('/difficulty', function(req, res, next) {
 });
 
 router.get('/difficulty', function(req, res, next) {
+  const page = Number(req.query.page) - 1 || 0;
+  const per_page = Number(req.query.per_page) || 5;
+  const order = req.query.order || 'created';
+  const direction = req.query.direction || 'DESC';
+
   models.difficulty.findAndCountAll({
-    order: [['created', 'DESC']],
+    order: [[order, direction]],
     where: { problem_id: req.query.problem_id },
+    offset: page * per_page,
+    limit: per_page,
   })
   .then(difficulty => {
     if (difficulty) {
