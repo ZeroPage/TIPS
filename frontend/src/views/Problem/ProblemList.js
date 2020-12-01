@@ -132,6 +132,7 @@ class ProblemList extends React.Component {
     if(this.state.order) fetch_url = fetch_url + `order=${this.state.order}&`;
     if(this.state.search) fetch_url = fetch_url + `title=${this.state.search}&`;
 
+    var problem_list = [];
     fetch(fetch_url, {
       method: 'GET',
       headers: {
@@ -163,37 +164,13 @@ class ProblemList extends React.Component {
     return "";
   }
 
-  getDifficulty(problem_id) {
-    var ret = 0;
-    /*fetch("/api/v1/difficulty", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        'problem_id': problem_id
-      })
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            ret = data.average;
-          });
-        }
-      }
-    );*/
-    return ret;
-  }
-
   getList() {
     var ret = [];
     this.state.items.forEach(item => {
-      var difficulty = this.getDifficulty(item.problem_id);
       ret.push(
         <ListGroupItem>
           <Row>
-            <Col xs="10">
+            <Col xs="12">
               <Row>
                 <Col xs="3">No. {item.problem_id}</Col>
                 <Col xs="9">
@@ -208,15 +185,12 @@ class ProblemList extends React.Component {
                     {this.getCategoryName(parseInt(item.category_id))}
                   </Badge>
                 </Col>
-                <Col xs="4">게시일 : {item.created.substring(0, 10)}</Col>
+                <Col xs="4">
+                  <div className="text-right">
+                    게시일 : {item.created.substring(0, 10)}
+                  </div>
+                </Col>
               </Row>
-            </Col>
-            <Col xs="0">
-              {/* 성공/실패 여부 넣기 */}
-            </Col>
-            <Col xs="2">
-              난이도 : {difficulty}단계
-              <Progress max="5" value={difficulty} color="default" />
             </Col>
           </Row>
         </ListGroupItem>
@@ -258,7 +232,7 @@ class ProblemList extends React.Component {
       else {
         ret.push(
           <PaginationItem>
-            <PaginationLink href={this.redirectUrl(this.state.category_id, 1, this.state.order, this.state.search)}>
+            <PaginationLink href={this.redirectUrl(this.state.category_id, id, this.state.order, this.state.search)}>
               {id}
             </PaginationLink>
           </PaginationItem>
