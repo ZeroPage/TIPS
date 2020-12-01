@@ -776,9 +776,9 @@ router.get('/comments', function(req, res, next) {
 
   models.comment.findAndCountAll({
     order: [[order, direction]],
-    where: req.query,
     attributes: ['comment_id', 'parent_id', 'member_id',
       'problem_id', 'answer_id', 'document_id', 'content', 'created'],
+    where: req.query,
     offset: page * per_page,
     limit: per_page,
   })
