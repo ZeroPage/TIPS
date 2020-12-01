@@ -283,7 +283,7 @@ router.get('/problems', function(req, res, next) {
     attributes: ['problem_id', 'category_id', 'member_id',
       'title', 'time_limit', 'created'],
     where: where,
-    offset: page,
+    offset: page * per_page,
     limit: per_page,
   })
   .then(problems => {
@@ -429,7 +429,7 @@ router.get('/answers', function(req, res, next) {
         attributes: ['answer_id', 'problem_id', 'member_id',
           'content', 'reference', 'created'],
         where: { problem_id: req.query.problem_id },
-        offset: page,
+        offset: page * per_page,
         limit: per_page,
       })
       .then(answers => {
@@ -682,7 +682,7 @@ router.get('/documents', function(req, res, next) {
     order: [[order, direction]],
     attributes: ['document_id', 'board_id', 'category_id', 'member_id',
       'title', 'created'],
-    offset: page,
+    offset: page * per_page,
     limit: per_page,
   })
   .then(documents => {
@@ -764,7 +764,7 @@ router.get('/comments', function(req, res, next) {
     where: req.body,
     attributes: ['comment_id', 'parent_id', 'member_id',
       'problem_id', 'answer_id', 'document_id', 'content', 'created'],
-    offset: page,
+    offset: page* per_page,
     limit: per_page,
   })
   .then(comments => {
