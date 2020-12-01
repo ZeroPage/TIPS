@@ -415,7 +415,6 @@ router.get('/answers', function(req, res, next) {
   const per_page = Number(req.query.per_page) || 5;
   const order = req.query.order || 'created';
   const direction = req.query.direction || 'DESC';
-  let where = {};
 
   models.problem.count({
     where: {
