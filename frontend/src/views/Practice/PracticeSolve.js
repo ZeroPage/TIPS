@@ -14,7 +14,7 @@ import 'views/Practice/PracticeSolve.css';
 
 // reactstrap components
 import {
-  Badge, Button, Card, Container, Form, ListGroup, ListGroupItem, Row, Col, PopoverBody, Progress, Table, UncontrolledPopover
+  Badge, Button, Card, Container, Form, ListGroup, ListGroupItem, Row, Col, PopoverBody, Progress, UncontrolledPopover
 } from "reactstrap";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -28,34 +28,69 @@ class PracticeSolve extends React.Component {
     super(props);
     this.state = {
       member_id: 0,
-      problem_id: 3,
+      current_problem: 0,
+      problem_id: [1, 2, 3],
       problems: [],
-      categories: [],
-      answer_count: 0,
       answers: [],
       content: "",
       member_nickname:[],
-      remain_time: ""
+      remain_time: -1
     };
 
     this.getLogin();
     this.getProblem();
+
+    this.handleNext = this.handleNext.bind(this);
+    this.handleEnd = this.handleEnd.bind(this);
   }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-
+    
     setInterval(this.tick, 1000);
   }
 
   tick = () => {
-    if (this.state.remain_time > 0) {
+    if (this.state.current_problem === 0 && this.state.remain_time === -1) {
+      this.setState({
+        remain_time: this.state.problems[this.state.current_problem].time_limit + 1
+      });
+    }
+    if (this.state.remain_time > 0) {  
       this.setState({
         remain_time: this.state.remain_time - 1
       });
     }
+    else {
+      if(this.state.current_problem + 1 === this.state.problem_id.length) this.endProblem();
+      this.nextProblem();
+    }
+  }
+
+  nextProblem() {
+    if(this.state.current_problem + 1 >= this.state.problems.length) {
+      alert("다음 문제가 없습니다.");
+      return null;
+    }
+    this.setState({
+      remain_time: this.state.problems[this.state.current_problem + 1].time_limit,
+      current_problem: this.state.current_problem + 1
+    });
+  }
+
+  endProblem() {
+    this.props.history.push('/practice-end-page?problem_id=' + this.state.problem_id.join(','));
+    window.location.reload();
+  }
+
+  handleNext(event) {
+    this.nextProblem();
+  }
+
+  handleEnd(event) {
+    this.endProblem();
   }
 
   getLogin() {
@@ -106,24 +141,46 @@ class PracticeSolve extends React.Component {
   }
 
   getProblem() {
-    fetch("/api/v1/problems/" + this.state.problem_id, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(
-      (result) => {
-        if(result.ok) {
-          result.json().then(data => {
-            this.setState({
-              problems: data,
-              remain_time: data.time_limit
-            });
-          });
+    var problem_list = [];
+    this.state.problem_id.forEach(id => {
+      fetch("/api/v1/problems/" + id, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json"
         }
-      }
-    );
+      })
+      .then(
+        (result) => {
+          if(result.ok) {
+            result.json().then(data_problem => {
+              fetch("/api/v1/members/" + data_problem.member_id, {
+                method: 'GET',
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              })
+              .then(
+                (result) => {
+                  if(result.ok) {
+                    result.json().then(data_member => {
+                      data_problem.member_nickname = data_member.nickname;
+                      problem_list.push(data_problem);
+                      this.setState({problems: problem_list});
+                    });
+                  }
+                  else {
+                    console.log(result.status);
+                  }
+                }
+              );
+            });
+          }
+          else {
+            console.log(result.status);
+          }
+        }
+      );
+    });
   }
 
   getProblemList() {
@@ -135,36 +192,33 @@ class PracticeSolve extends React.Component {
     </ListGroupItem>
     );
 
-    for(var i=1;i<=5;i++)
-    {
-      ret.push(
-        <ListGroupItem>
-          <Row>
-            <Col xs="6">
-              <input type="checkbox" checked="true" className='check-box' />
-            </Col>
-            <Col xs="6">{i}</Col>
-          </Row>
-        </ListGroupItem>
-      );
-    }
+    ret.push(
+      <ListGroupItem>
+        <h5 className="text-center">{this.state.current_problem + 1} / {this.state.problems.length}</h5>
+      </ListGroupItem>
+    );
 
     return ret;
   }
 
   getProblemInfo() {
     var ret = [];
+    if(this.state.current_problem >= this.state.problems.length) {
+      return <h1 className="display-3 text-center">로딩 중입니다.</h1>;
+    }
 
+    var problem = this.state.problems[this.state.current_problem];
     //Header
     ret.push(<br />);
-    ret.push(<h1 className="display-3 text-center">{this.state.problems.title}</h1>);
+    //ret.push(<h1 className="display-3 text-center">{this.state.problems.title}</h1>);
+    
     ret.push(
       <Row>
         <Col xs="4">
           <h5 className="text-left">
-            No. {this.state.problem_id}
+            No. {problem.problem_id}
           </h5>
-          출처 : {this.state.problems.reference}
+          출처 : {problem.reference}
           {/*<Badge className="text-uppercase" color="primary" pill>
             {this.getCategoryName(this.state.problems.category_id)}
           </Badge>*/}
@@ -172,16 +226,12 @@ class PracticeSolve extends React.Component {
         <Col xs="4" />
         <Col xs="4">
           <div className="text-right">
-            제한 시간 : {this.state.problems.time_limit}초
+            제한 시간 : {problem.time_limit}초
+            <br />
+            작성자 : {problem.member_id}
             <br />
             난이도 : {this.getDifficulty()}단계
             <Progress max="5" value={this.getDifficulty()} color="default" />
-            {/*
-            <br />
-            게시일 : {('' + this.state.problems.created).substring(0, 10)}
-            <br />
-            작성자 : {this.getMemberNickname(this.state.problems.member_id)}
-            */}
           </div>
         </Col>
       </Row>
@@ -192,7 +242,7 @@ class PracticeSolve extends React.Component {
     //Body
     ret.push(
       <p className="lead">
-        <div dangerouslySetInnerHTML={{ __html: this.state.problems.content }} />
+        <div dangerouslySetInnerHTML={{ __html: problem.content }} />
       </p>
     );
 
@@ -211,7 +261,7 @@ class PracticeSolve extends React.Component {
               className="popover-primary"
             >
               <PopoverBody>
-                {this.state.problems.hint}
+                {problem.hint}
               </PopoverBody>
             </UncontrolledPopover>
         </div>
@@ -222,7 +272,7 @@ class PracticeSolve extends React.Component {
       <h3>
         남은 시간 : {this.state.remain_time}초
         <br />
-        <Progress max={this.state.problems.time_limit} value={this.state.remain_time} color="danger" />
+        <Progress max={problem.time_limit} value={this.state.remain_time} color="danger" />
       </h3>
     );
 
@@ -247,9 +297,6 @@ class PracticeSolve extends React.Component {
                       <CKEditor
                         editor={ClassicEditor}
                         data={this.state.content}
-                        onInit={(event, editor) => {
-                          editor.resize_minHeight = 500;
-                        }}
                         onChange={(event, editor) => {
                           let data = editor.getData();
                           this.setState({ content: data });
@@ -257,7 +304,7 @@ class PracticeSolve extends React.Component {
                       />
                       <br />
                       <div className='right-button'>
-                        <Button color='primary' href="/user-group-page">다음 문제</Button>
+                        <Button color='primary' onClick={this.handleNext}>다음 문제</Button>
                       </div>
                       <br />
                     </Form>
@@ -275,7 +322,7 @@ class PracticeSolve extends React.Component {
                   </ListGroup>
                   <br />
                   <div className='text-center'>
-                    <Button color='primary' href="prac-end-page">풀이종료</Button>
+                    <Button color='primary' onClick={this.handleEnd}>풀이종료</Button>
                   </div>
                   <br />
                 </Form>

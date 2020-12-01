@@ -36,6 +36,7 @@ import ProblemEdit from "views/Problem/ProblemEdit.js";
 
 import PracticeMain from "views/Practice/PracticeMain.js";
 import PracticeSolve from "views/Practice/PracticeSolve.js";
+import PracticeEnd from "views/Practice/PracticeEnd.js";
 
 import GroupList from "views/Group/GroupList.js";
 import GroupView from "views/Group/GroupView.js";
@@ -61,6 +62,7 @@ ReactDOM.render(
 
       <Route path="/practice-main-page" exact render={props => <PracticeMain {...props} />} />
       <Route path="/practice-solve-page" exact render={props => <PracticeSolve {...props} />} />
+      <Route path="/practice-end-page" exact render={props => <PracticeEnd {...props} />} />
 
       <Route path="/group-list-page" exact render={props => <GroupList {...props} />} />
       <Route path="/group-view-page/:id" exact render={props => <GroupView {...props} />} />
