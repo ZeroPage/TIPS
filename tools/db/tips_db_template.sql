@@ -30,9 +30,9 @@ CREATE TABLE `answer` (
   `reference` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`answer_id`),
+  KEY `created` (`created`),
   KEY `problem_id` (`problem_id`),
   KEY `member_id` (`member_id`),
-  KEY `created` (`created`),
   CONSTRAINT `answer_ibfk_1` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
   CONSTRAINT `answer_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -84,9 +84,9 @@ CREATE TABLE `class` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
-  `is_default` tinyint(1) NOT NULL DEFAULT 0,
-  `is_admin` tinyint(1) NOT NULL DEFAULT 0,
-  `is_prime` tinyint(1) NOT NULL DEFAULT 0,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0 CHECK (`is_default` in (0,1)),
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0 CHECK (`is_admin` in (0,1)),
+  `is_prime` tinyint(1) NOT NULL DEFAULT 0 CHECK (`is_prime` in (0,1)),
   PRIMARY KEY (`class_id`),
   UNIQUE KEY `name` (`name`),
   KEY `created` (`created`),
@@ -152,12 +152,12 @@ CREATE TABLE `comment` (
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`comment_id`),
+  KEY `created` (`created`),
   KEY `parent_id` (`parent_id`),
   KEY `member_id` (`member_id`),
   KEY `problem_id` (`problem_id`),
   KEY `answer_id` (`answer_id`),
   KEY `document_id` (`document_id`),
-  KEY `created` (`created`),
   CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `comment` (`comment_id`),
   CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
   CONSTRAINT `comment_ibfk_3` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
@@ -191,10 +191,9 @@ CREATE TABLE `difficulty` (
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`difficulty_id`),
   UNIQUE KEY `member_id` (`member_id`,`problem_id`),
-  KEY `member_id_2` (`member_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `score` (`score`),
   KEY `created` (`created`),
+  KEY `problem_id` (`problem_id`),
   CONSTRAINT `difficulty_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
   CONSTRAINT `difficulty_ibfk_2` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -226,11 +225,11 @@ CREATE TABLE `document` (
   `reference` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`document_id`),
+  KEY `title` (`title`),
+  KEY `created` (`created`),
   KEY `board_id` (`board_id`),
   KEY `category_id` (`category_id`),
   KEY `member_id` (`member_id`),
-  KEY `title` (`title`),
-  KEY `created` (`created`),
   CONSTRAINT `document_ibfk_1` FOREIGN KEY (`board_id`) REFERENCES `board` (`board_id`),
   CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `document_category` (`category_id`),
   CONSTRAINT `document_ibfk_3` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
@@ -260,9 +259,9 @@ CREATE TABLE `document_category` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`category_id`),
+  KEY `name` (`name`),
   KEY `parent_id` (`parent_id`),
   KEY `board_id` (`board_id`),
-  KEY `name` (`name`),
   CONSTRAINT `document_category_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `document_category` (`category_id`),
   CONSTRAINT `document_category_ibfk_2` FOREIGN KEY (`board_id`) REFERENCES `board` (`board_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -291,8 +290,8 @@ CREATE TABLE `member` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
-  `is_admin` tinyint(1) NOT NULL DEFAULT 0,
-  `is_prime` tinyint(1) NOT NULL DEFAULT 0,
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0 CHECK (`is_admin` in (0,1)),
+  `is_prime` tinyint(1) NOT NULL DEFAULT 0 CHECK (`is_prime` in (0,1)),
   PRIMARY KEY (`member_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `nickname` (`nickname`),
@@ -330,11 +329,11 @@ CREATE TABLE `problem` (
   `hint` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`problem_id`),
-  KEY `category_id` (`category_id`),
-  KEY `member_id` (`member_id`),
   KEY `title` (`title`),
   KEY `time_limit` (`time_limit`),
   KEY `created` (`created`),
+  KEY `category_id` (`category_id`),
+  KEY `member_id` (`member_id`),
   CONSTRAINT `problem_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `problem_category` (`category_id`),
   CONSTRAINT `problem_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -362,8 +361,8 @@ CREATE TABLE `problem_category` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`category_id`),
-  KEY `parent_id` (`parent_id`),
   KEY `name` (`name`),
+  KEY `parent_id` (`parent_id`),
   CONSTRAINT `problem_category_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `problem_category` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -389,13 +388,13 @@ CREATE TABLE `solve` (
   `problem_id` bigint(20) NOT NULL,
   `member_id` bigint(20) NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `duration` time NOT NULL,
+  `duration` smallint(6) NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`solve_id`),
-  KEY `problem_id` (`problem_id`),
-  KEY `member_id` (`member_id`),
   KEY `duration` (`duration`),
   KEY `created` (`created`),
+  KEY `problem_id` (`problem_id`),
+  KEY `member_id` (`member_id`),
   CONSTRAINT `solve_ibfk_1` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
   CONSTRAINT `solve_ibfk_2` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -431,13 +430,12 @@ CREATE TABLE `vote` (
   UNIQUE KEY `member_id_2` (`member_id`,`answer_id`),
   UNIQUE KEY `member_id_3` (`member_id`,`document_id`),
   UNIQUE KEY `member_id_4` (`member_id`,`comment_id`),
-  KEY `member_id_5` (`member_id`),
+  KEY `type` (`type`),
+  KEY `created` (`created`),
   KEY `problem_id` (`problem_id`),
   KEY `answer_id` (`answer_id`),
   KEY `document_id` (`document_id`),
   KEY `comment_id` (`comment_id`),
-  KEY `type` (`type`),
-  KEY `created` (`created`),
   CONSTRAINT `vote_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
   CONSTRAINT `vote_ibfk_2` FOREIGN KEY (`problem_id`) REFERENCES `problem` (`problem_id`),
   CONSTRAINT `vote_ibfk_3` FOREIGN KEY (`answer_id`) REFERENCES `answer` (`answer_id`),
@@ -464,4 +462,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-11-06 23:30:22
+-- Dump completed on 2020-12-09  5:15:16
