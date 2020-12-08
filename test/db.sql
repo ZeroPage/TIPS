@@ -1,6 +1,3 @@
--- Foreign keys will be removed soon. They are provided just for easy understanding of relations.
--- Triggers will be added soon.
-
 DROP DATABASE IF EXISTS tips;
 CREATE DATABASE tips;
 USE tips;
